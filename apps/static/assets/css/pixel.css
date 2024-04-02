@@ -15967,18 +15967,19 @@ textarea.form-control-lg {
 .section {
   position: relative;
   padding-top: 3rem;
-  padding-bottom: 3rem; }
+  padding-bottom: 14rem; }
 
 .section-header {
   position: relative;
   padding-top: 7rem;
-  padding-bottom: 3rem; }
+  padding-bottom: 14rem; }
 
 @media (min-width: 576px) {
   .section {
     position: relative;
     padding-top: 6rem;
-    padding-bottom: 6rem; }
+    padding-bottom: 14rem; }
+    
   .section-header {
     position: relative;
     padding-top: 10rem;

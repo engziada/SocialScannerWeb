@@ -1,6 +1,6 @@
 {% extends "layouts/base-fullscreen.html" %}
 
-{% block title %} Sign UP {% endblock %} 
+{% block title %} إضافة مستخدم {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,14 +19,14 @@
                         <div class="signin-inner my-4 my-lg-0 bg-white shadow-soft border rounded border-gray-300 p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">
-                                    <a href="https://appseed.us/product/pixel-bootstrap/flask/" target="_blank">Flask Pixel UI</a> - Register
+                                    إنشاء حساب جديد
                                 </h1>
                                 <br />
                                 <span class="font-weight-normal">
                                     {% if msg %}
                                         {{ msg | safe }}
                                     {% else %}
-                                        Add your credentials
+                                        مراقب حسابات الشبكات الإجتماعية
                                     {% endif %}                                  
                                 </span>
                             </div>
@@ -38,7 +38,7 @@
                                     {{ form.hidden_tag() }}
 
                                     <div class="form-group mb-4">
-                                        <label for="email">Username</label>
+                                        <label for="email">إسم المستخدم</label>
                                         <div class="input-group">
                                             <span class="input-group-text" id="basic-addon1"><span class="fas fa-user"></span></span>
                                             {{ form.username(class="form-control") }}
@@ -46,7 +46,7 @@
                                     </div>
                                     <!-- Form -->
                                     <div class="form-group mb-4">
-                                        <label for="email">Email</label>
+                                        <label for="email">البريد الالكتروني</label>
                                         <div class="input-group">
                                             <span class="input-group-text" id="basic-addon3"><span class="fas fa-envelope"></span></span>
                                             {{ form.email(class="form-control", type="email") }}
@@ -56,7 +56,7 @@
                                     <div class="form-group">
                                         <!-- Form -->
                                         <div class="form-group mb-4">
-                                            <label for="password">Password</label>
+                                            <label for="password">كلمة المرور</label>
                                             <div class="input-group">
                                                 <span class="input-group-text" id="basic-addon4"><span class="fas fa-unlock-alt"></span></span>
                                                 {{ form.password(class="form-control", type="password") }}
@@ -67,21 +67,21 @@
                                             <div class="form-check mb-0">
                                                 <input class="form-check-input" type="checkbox" value="" id="remember">
                                                 <label class="form-check-label mb-0" for="remember">
-                                                Agree <a class="fw-bold text-underline" href="#">Terms</a>
+                                                موافق على <a class="fw-bold text-underline" href="#">الشروط و الأحكام</a>
                                                 </label>
                                             </div>
-                                            <div><a href="{{ url_for('authentication_blueprint.login') }}" class="text-right">Login</a></div>
+                                            <div><a href="{{ url_for('authentication_blueprint.login') }}" class="text-right">تسجيل الدخول</a></div>
                                         </div>
                                     </div>
                                     <div class="d-grid">
-                                        <button type="submit" name="register" class="btn btn-primary">Sign UP</button>
+                                        <button type="submit" name="register" class="btn btn-primary">إضافة</button>
                                     </div>
                                 </form>
                             
                             {% else %} 
 
                                 <p class="mt-4 text-sm text-center">
-                                    <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-primary">Sign IN</a>
+                                    <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-primary">تسجيل الدخول</a>
                                 </p>
                             
                             {% endif %}
@@ -90,9 +90,9 @@
 
                             <div class="d-flex justify-content-center align-items-center mt-4">
                                 <span class="fw-normal">
-                                    &copy; Themesberg - coded by 
-                                    <a href="https://appseed.us" target="_blank"
-                                       class="fw-bold text-underline">AppSeed</a>
+                                    &copy; جميع الحقوق محفوظة
+                                    <!-- <a href="https://appseed.us" target="_blank"
+                                       class="fw-bold text-underline">AppSeed</a> -->
                                 </span>
                             </div>
 

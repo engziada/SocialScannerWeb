@@ -32,3 +32,17 @@ def verify_pass(provided_password, stored_password):
                                   100000)
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_password
+
+
+# Create the default admin user (you can modify this data as needed)
+def create_default_admin(Users,db):
+    username = "admin"
+    password = "admin"
+    email = "admin@email.com"
+    admin_user = Users.query.filter_by(username=username).first()
+    if admin_user is None:
+        # If the admin user doesn't exist, create it
+        admin_user = Users(username=username, password_hash=password, email=email)
+
+        db.session.add(admin_user)
+        db.session.commit()
