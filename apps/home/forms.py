@@ -8,28 +8,29 @@ class InfluencerForm(FlaskForm):
     full_name = StringField("الإسم بالكامل", validators=[DataRequired()])
     gender = SelectField(
         "الجنس",
-        choices=[("M", "ذكر"), ("F", "أنثى"), ("O", "أخرى")],
+        choices=[("ذكر", "ذكر"), ("أنثى", "أنثى"), ("أخرى", "أخرى")],
     )
     country = StringField("البلد")
     city = StringField("المدينة")
     phone = StringField("رقم الهاتف")
     email = StringField("البريد الإلكتروني", validators=[Email()])
-    profile_picture = FileField(
-        "صورة الملف الرئيسية", validators=[FileAllowed(["jpg", "png"], "Images only!")]
-    )
+    profile_picture = FileField("صورة الملف الرئيسية", validators=[FileAllowed(["jpg", "png"], "Images only!")])
     
     
-class SubProfileForm(FlaskForm):
+class SocialAccountForm(FlaskForm):
     platform = SelectField(
         "المنصة",
         choices=[
-            ("snapchat", "سناب شات"),
-            ("tiktok", "تيك توك"),
-            ("instagram", "إنستاغرام"),
-            ("others", "أخرى"),
+            ("سناب شات", "سناب شات"),
+            ("تيك توك", "تيك توك"),
+            ("إنستاغرام", "إنستاغرام"),
+            ("أخرى", "أخرى"),
         ],
         validators=[DataRequired()],
     )
     username = StringField("إسم المستخدم", validators=[DataRequired()])
     content_type = StringField("نوع المحتوى")
     description = StringField("الوصف")
+    profile_picture = StringField("صورة الحساب",render_kw={"readonly": True})
+
+
