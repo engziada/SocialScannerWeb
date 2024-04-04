@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} إضافة حساب {% endblock %}
+{% block title %} إضافة ملف {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -16,7 +16,7 @@
         <div class="container">
             <div class="row justify-content-between align-items-center">
                 <div class="col-12 col-md-7 col-lg-6 text-center text-md-left">
-                    <h1 class="display-2 mb-4">{{ influencer.full_name }} <br class="d-none d-md-inline"> إضافة حساب</h1>
+                    <h1 class="display-2 mb-4">نظام <br class="d-none d-md-inline"> إضافة ملف</h1>
                     <!-- <p class="lead mb-4 text-muted">Themesberg can help you build a modern website, a creative logo or PWA, that will bring you customers and and stay on top of your competition.</p>
                     <a href="./services.html" class="btn btn-tertiary me-3 animate-up-2">What we do <span class="ms-2"><span class="fas fa-arrow-right"></span></span></a> -->
                 </div>
@@ -34,33 +34,47 @@
     <!-- Section -->
     <section class="section section-md">
         <div class="container">
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('home_blueprint.socialaccount_add', influencer_id=influencer.id) }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('profiles_blueprint.influencer_add') }}">
                 {{ form.hidden_tag() }}
-                {{ form.platform.label }}
+                {{ form.full_name.label }}
                 <div class="form-group">
-                    {{ form.platform(class_='form-control',size=1) }}
-                    {% for error in form.platform.errors %}
+                    {{ form.full_name(class_='form-control', size=30) }}
+                    {% for error in form.full_name.errors %}
                     <span class="error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {{ form.username.label }}
+                {{ form.gender.label }}
                 <div class="form-group">
-                    {{ form.username(class_='form-control',size=30) }}
-                    {% for error in form.username.errors %}
+                    {{ form.gender(class_='form-control',size=1) }}
+                    {% for error in form.gender.errors %}
                     <span class="error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {{ form.content_type.label }}
+                {{ form.country.label }}
                 <div class="form-group">
-                    {{ form.content_type(class_='form-control',size=30) }}
-                    {% for error in form.content_type.errors %}
+                    {{ form.country(class_='form-control',size=30) }}
+                    {% for error in form.country.errors %}
                     <span class="error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {{ form.description.label }}
+                {{ form.city.label }}
                 <div class="form-group">
-                    {{ form.description(class_='form-control',size=30) }}
-                    {% for error in form.description.errors %}
+                    {{ form.city(class_='form-control',size=30) }}
+                    {% for error in form.city.errors %}
+                    <span class="error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {{ form.phone.label }}
+                <div class="form-group">
+                    {{ form.phone(class_='form-control',size=30) }}
+                    {% for error in form.phone.errors %}
+                    <span class="error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {{ form.email.label }}
+                <div class="form-group">
+                    {{ form.email(class_='form-control',size=30) }}
+                    {% for error in form.email.errors %}
                     <span class="error">{{ error }}</span>
                     {% endfor %}
                 </div>
