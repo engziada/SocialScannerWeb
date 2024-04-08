@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "flask-pixel"
+name = "SocialScannerWeb"
 version = "0.1.0"
 description = ""
 authors = ["muhammad ziada <engziada@gmail.com>"]
-readme = "README.md"
+readme = ""
 
 [tool.poetry.dependencies]
 python = "^3.11"
