@@ -1,0 +1,71 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} تفاصيل محتوى {% endblock %} 
+{% block header_title %} تفاصيل المحتوى {% endblock %}
+{% block header_profile_image %}/static/assets/img/illustrations/reading-side.svg{% endblock %}
+
+<!--  -->
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+
+        <section class="section section-md">
+            <div class="container">
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('content_blueprint.content_edit',content_id=content.id) }}">
+                    {{ form.hidden_tag() }}
+                    {{ form.name.label }}
+                    <div class="form-group">
+                        {{ form.name(class_='form-control', size=30) }}
+                        {% for error in form.name.errors %}
+                        <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {{ form.description.label }}
+                    <div class="form-group">
+                        {{ form.description(class_='form-control',size=1) }}
+                        {% for error in form.description.errors %}
+                        <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <button type="submit" class="btn btn-primary" id="submitButton" disabled>حفظ</button>
+
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                        <li class="flash {{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endwith %}
+                </form>
+                <hr>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        // Get the form element
+        const form = document.querySelector('form');
+
+        // Add event listener to form inputs
+        form.addEventListener('input', function () {
+            // Enable the submit button when the form has changes
+            document.getElementById('submitButton').disabled = false;
+        });
+    </script>
+{% endblock javascripts %}

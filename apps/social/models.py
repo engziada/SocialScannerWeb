@@ -6,14 +6,27 @@ from icecream import ic
 import datetime
 
 
+class Platform(db.Model):
+    __tablename__ = "platforms"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
+    # social_accounts = db.relationship("SocialAccount", backref="platform", lazy=True)
+
+    def __repr__(self):
+        return f"Platform(id={self.id}, name='{self.name}')"
+    
+
 # Define Subprofiles Model
 class SocialAccount(db.Model):
     __tablename__ = "socialaccounts"
     id = db.Column(db.Integer, primary_key=True)
     influencer_id = db.Column(db.Integer, db.ForeignKey("influencers.id"), nullable=False)
-    platform = db.Column(db.String, nullable=False)
+    # platform = db.Column(db.String, nullable=False)
+    platform_id = db.Column(db.Integer, db.ForeignKey("platforms.id"), nullable=False)
+    platform = db.relationship("Platform", backref="socialaccounts", lazy=True)
     username = db.Column(db.String, nullable=False, unique=True)
-    content_type = db.Column(db.String)
+    content_id = db.Column(db.Integer, db.ForeignKey("contents.id"), nullable=False)
+    content = db.relationship("Content", backref="socialaccount", lazy=True)
     description = db.Column(db.Text)
     profile_picture = db.Column(db.String)
     scan_logs = db.relationship("ScanLog", backref="socialaccount", lazy=True)

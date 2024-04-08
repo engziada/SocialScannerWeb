@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} سجل الأحداث {% endblock %} 
+{% block header_title %} إستعراض السجل {% endblock %}
+{% block header_profile_image %}/static/assets/img/illustrations/reading-side.svg{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+        <!-- Hero -->
+        <section class="section-header">
+            <div class="container">
+                <table class="table table-hover">
+                    <tr>
+                        <th scope="col">إسم المستخدم</th>
+                        <th scope="col">البريد الإلكتروني</th>
+                        <th scope="col">التاريخ</th>
+                        <th scope="col">الوقت</th>
+                        <th scope="col">الحدث</th>
+                    </tr>
+                    
+                    {% for log in logs %}
+                        <tr>
+                            <td scope="row">{{ log.user.username }}</td>
+                            <td scope="row">{{ log.user.email }}</td>
+                            <td scope="row">{{ log.log_date }}</td>
+                            <td scope="row">{{ log.log_time.strftime('%H:%M')}}</td>
+                            <td scope="row">{{ log.log_text }}</td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

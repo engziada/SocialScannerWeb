@@ -68,6 +68,15 @@
                                 <div class="d-grid">
                                     <button type="submit" name="login" class="btn btn-primary">دخول</button>
                                 </div>
+                                {% with messages = get_flashed_messages(with_categories=True) %}
+                                {% if messages %}
+                                <ul class="flashes">
+                                    {% for category, message in messages %}
+                                    <li class="flash {{ category }}">{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                                {% endwith %}
                             </form>
 
                             <br />
@@ -75,8 +84,6 @@
                             <div class="d-flex justify-content-center align-items-center mt-4">
                                 <span class="fw-normal">
                                     &copy; جميع الحقوق محفوظة 
-                                    <!-- <a href="https://appseed.us" target="_blank"
-                                       class="fw-bold text-underline">AppSeed</a> -->
                                 </span>
                             </div>
                         </div>

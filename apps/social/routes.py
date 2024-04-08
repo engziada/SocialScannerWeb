@@ -6,10 +6,10 @@ from apps.social import blueprint
 from apps import db
 
 from apps.social.forms import  SocialAccountForm
-from apps.social.models import  SocialAccount
-# from apps.home.util import verify_pass, create_default_admin
+from apps.social.models import  SocialAccount, Platform
 
 from apps.profiles.models import Influencer
+from apps.content_types.models import Content
 
 from icecream import ic
 from sqlalchemy.exc import IntegrityError
@@ -40,13 +40,16 @@ def socialaccount_add(influencer_id):
         return redirect(url_for("social_blueprint.influencers"))
     
     form = SocialAccountForm()  # Create an instance of the form
+    form.content_type.choices = [(content.id, content.name) for content in Content.query.all()]
+    form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
+
     if form.validate_on_submit():
         try:
             new_socialaccount = SocialAccount(
                 influencer_id=influencer_id,
-                platform=form.platform.data,
+                platform_id=form.platform.data,
                 username=form.username.data,
-                content_type=form.content_type.data,
+                content_id=form.content_type.data,
                 description=form.description.data,
                 profile_picture=None,  # Set a default value initially
             )
@@ -63,44 +66,36 @@ def socialaccount_add(influencer_id):
         except IntegrityError:
             db.session.rollback()
             flash("Username already exists!", "danger")
-    return render_template(
-        "social/socialaccount_add.html", form=form, influencer=influencer
-    )
+    return render_template("social/socialaccount_add.html", form=form, influencer=influencer)
 
 
-@blueprint.route("/socialaccount/<int:socialaccount_id>")
+@blueprint.route("/socialaccount_delete/<int:influencer_id>/<int:socialaccount_id>", methods=["POST"])
 # @login_required
-def socialaccount_details(socialaccount_id):
+def socialaccount_delete(influencer_id, socialaccount_id):
     socialaccount = SocialAccount.query.get(socialaccount_id)
     if not socialaccount:
         flash("Social Account not found!", "danger")
-        return redirect(url_for("social_blueprint.socialaccounts"))
-    return render_template(
-        "social/socialaccount_details.html", socialaccount=socialaccount
-    )
-
-
-@blueprint.route("/socialaccount_delete/<int:socialaccount_id>")
-# @login_required
-def socialaccount_delete(socialaccount_id):
-    socialaccount = SocialAccount.query.get(socialaccount_id)
-    if not socialaccount:
-        flash("Social Account not found!", "danger")
-        return redirect(url_for("social_blueprint.socialaccounts"))
+        return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
     db.session.delete(socialaccount)
     db.session.commit()
     flash("Social Account deleted successfully!", "success")
+    return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
 
 
-@blueprint.route("/socialaccount_edit/<int:socialaccount_id>", methods=["GET", "POST"])
+@blueprint.route(
+    "/socialaccount_edit/<int:influencer_id>/<int:socialaccount_id>",methods=["GET", "POST"],
+)
 # @login_required
-def socialaccount_edit(socialaccount_id):
+def socialaccount_edit(influencer_id, socialaccount_id):
     socialaccount = SocialAccount.query.get(socialaccount_id)
     if not socialaccount:
         flash("Social Account not found!", "danger")
-        return redirect(url_for("social_blueprint.socialaccounts"))
+        return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
 
     form = SocialAccountForm(obj=socialaccount)  # Create an instance of the form and populate it with existing data
+    form.content_type.choices = [(content.id, content.name) for content in Content.query.all()]
+    form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
+
     if form.validate_on_submit():
         socialaccount.platform = form.platform.data
         socialaccount.username = form.username.data
@@ -120,7 +115,7 @@ def socialaccount_edit(socialaccount_id):
         )
 
     return render_template(
-        "social/socialaccount_edit.html", form=form, socialaccount=socialaccount
+        "social/socialaccount_edit.html", form=form, socialaccount=socialaccount, influencer=socialaccount.influencer
     )
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -7,10 +7,13 @@ from flask_login import (
 
 from apps import db, login_manager
 from apps.authentication import blueprint
+
 from apps.authentication.forms import LoginForm, CreateAccountForm
 from apps.authentication.models import Users
 
 from apps.authentication.util import verify_pass,create_default_admin
+
+from apps.home.models import Log
 
 
 @blueprint.route('/')
@@ -39,6 +42,7 @@ def login():
         if user and verify_pass(password, user.password):
 
             login_user(user)
+            Log.add_log(Log, user.id, f'{user.username} logged in')
             return redirect(url_for('authentication_blueprint.route_default'))
 
         # Something (user or pass) is not ok
@@ -81,6 +85,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        Log.add_log(Log, user.id, f'{user.username} registered')
         return render_template('accounts/register.html',
                                msg='User created please <a href="/login">login</a>',
                                success=True,
@@ -92,7 +97,9 @@ def register():
 
 @blueprint.route('/logout')
 def logout():
+    user = current_user
     logout_user()
+    Log.add_log(Log, user.id, f'{user.username} logged in')
     return redirect(url_for('authentication_blueprint.login'))
 
 

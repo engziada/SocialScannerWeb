@@ -1,75 +1,184 @@
-<!--
-
-=========================================================
-* Pixel Free Bootstrap 5 UI Kit
-=========================================================
-
-* Product Page: https://themesberg.com/product/ui-kit/pixel-free-bootstrap-5-ui-kit
-* Copyright 2021 Themesberg (https://www.themesberg.com)
-
-* Coded by https://themesberg.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Contact us if you want to remove it.
-
--->
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
-<head>
+    <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<!-- Primary Meta Tags -->
-<title>
-    امواج المشاهير - {% block title %}{% endblock %}
-</title>
+        <!-- Primary Meta Tags -->
+        <title>
+            امواج المشاهير - {% block title %}{% endblock %}
+        </title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="title" content="Pixel Bootstrap 5 - About company">
-<meta name="author" content="Themesberg">
-<meta name="description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
-<link rel="canonical" href="https://appseed.us/apps/flask-apps/flask-pixel-bootstrap-uikit">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="title" content="أمواج المشاهير">
+        <meta name="author" content="M.Ziada">
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://demo.themesberg.com/pixel-bootstrap-5-ui-kit">
-<meta property="og:title" content="Pixel Bootstrap 5 - About company">
-<meta property="og:description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
-<meta property="og:image" content="https://themesberg.s3.us-east-2.amazonaws.com/public/products/pixel-lite/pixel-lite-preview.jpg">
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="أمواج المشاهير">
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://demo.themesberg.com/pixel-bootstrap-5-ui-kit">
-<meta property="twitter:title" content="Pixel Bootstrap 5 - About company">
-<meta property="twitter:description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
-<meta property="twitter:image" content="https://themesberg.s3.us-east-2.amazonaws.com/public/products/pixel-lite/pixel-lite-preview.jpg">
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:title" content="أمواج المشاهير">
 
-<!-- Favicon -->
-<link rel="apple-touch-icon" sizes="120x120" href="/static/assets/img/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
-<link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">
-<link rel="mask-icon" href="/static/assets/img/favicon/safari-pinned-tab.svg" color="#ffffff">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="theme-color" content="#ffffff">
+        <!-- Favicon -->
+        <link rel="apple-touch-icon" sizes="120x120" href="/static/assets/img/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">
+        <link rel="mask-icon" href="/static/assets/img/favicon/safari-pinned-tab.svg" color="#ffffff">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="theme-color" content="#ffffff">
 
-<!-- Fontawesome -->
-<link type="text/css" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+        <!-- Fontawesome -->
+        <link type="text/css" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 
-<!-- Pixel CSS -->
-<link type="text/css" href="/static/assets/css/pixel.css" rel="stylesheet">
-<link type="text/css" href="/static/assets/css/custom-style.css" rel="stylesheet">
+        <!-- Pixel CSS -->
+        <link type="text/css" href="/static/assets/css/pixel.css" rel="stylesheet">
 
-<!-- Specific Page JS goes HERE  -->    
-{% block stylesheets %}{% endblock stylesheets %}
+        <!-- Custom CSS -->
+        <link type="text/css" href="/static/assets/css/custom-style.css" rel="stylesheet">
 
-</head>
+        <!-- Specific Page JS goes HERE  -->    
+        {% block stylesheets %}{% endblock stylesheets %}
+
+    </head>
+
     <body>
 
-        {% include 'includes/navigation.html' %}
+        <header class="header-global">
+            <section class="section-header bg-secondary text-white header-image">
+                <div class="header-title">
+                    <h1> {% block header_title %}{% endblock %} </h1>
+                    <h5> {% block header_sub_title %}{% endblock %}</h5>
+                </div>
+                <div class="header-profile-picture" style="background-image: url({% block header_profile_image %}https://via.placeholder.com/200{% endblock %});"></div>
+                <figure class="position-absolute bottom-0 left-0 w-100 d-none d-md-block mb-n2 header-figure">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                        <path fill="#ffffff" d="M0,100 Q125,50 250,100 Q375,150 500,100 Q625,50 750,100 Q875,150 1000,100 L1000,200 L0,200 Z"></path>
+                    </svg>
+                </figure>
+            </section>
+        
+            <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary headroom navbar-dark">
+                <div class="container position-relative">
+                    <a class="navbar-brand me-lg-5" href="{{ url_for('home_blueprint.index') }}">
+                        <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Logo light">
+                        <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Logo dark">
+                    </a>
+                    <div class="navbar-collapse collapse me-auto" id="navbar_global">
+                        <div class="navbar-collapse-header">
+                            <div class="row">
+                                <div class="col-6 collapse-brand">
+                                    <a href="{{ url_for('home_blueprint.index') }}">
+                                        <img src="/static/assets/img/brand/dark.svg" alt="Themesberg logo">
+                                    </a>
+                                </div>
+                                <div class="col-6 collapse-close">
+                                    <a href="#navbar_global" class="fas fa-times" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" title="close" aria-label="Toggle navigation"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="frontPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    إدارة البيانات
+                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="frontPagesDropdown">
+                                    <div class="row" style="text-align: right;">
+                                        <div class="col-6 col-lg-4">
+                                            <h6 class="d-block mb-3 text-primary">إدارة الملفات</h6>
+                                            <ul class="list-style-none mb-4">
+                                                <li class="mb-2 megamenu-item">
+                                                    <a class="megamenu-link" href="{{ url_for('profiles_blueprint.influencer_add') }}">إضافة ملف</a>
+                                                </li>
+                                                <li class="mb-2 megamenu-item">
+                                                    <a class="megamenu-link" href="{{ url_for('profiles_blueprint.influencers') }}">عرض الملفات</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-6 col-lg-4">
+                                            <h6 class="d-block mb-3 text-primary">إدراة المحتوى</h6>
+                                            <ul class="list-style-none mb-4">
+                                                <li class="mb-2 megamenu-item">
+                                                    <a class="megamenu-link" href="{{ url_for('content_blueprint.content_add') }}">إضافة محتوى</a>
+                                                </li>
+                                                <li class="mb-2 megamenu-item">
+                                                    <a class="megamenu-link" href="{{ url_for('content_blueprint.contents') }}">عرض المحتوى</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="reportsPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    التقارير
+                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="reportsPagesDropdown">
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item">
+                                            <a class="megamenu-link" href="{{ url_for('authentication_blueprint.login') }}">تسجيل دخول</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item">
+                                            <a class="megamenu-link" href="{{ url_for('authentication_blueprint.register') }}">مستخدم جديد</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+        
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="userPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    المستخدم
+                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="userPagesDropdown">
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item">
+                                            <a class="megamenu-link" href="/log">سجل الأحداث</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item">
+                                            <a class="megamenu-link" href="/sign-in.html">تسجيل دخول</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item">
+                                            <a class="megamenu-link" href="/sign-up.html">مستخدم جديد</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <a href="{{ url_for('authentication_blueprint.logout') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-out-alt me-2"></span> خروج</a>
+                        <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+                        <!-- Modal Content -->
+                        <div class="modal fade " id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2 class="h6 modal-title">تأكيد</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="modal-message"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="hidden" id="callback-url" value="">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirm-delete-btn">موافق</button>
+                                        <button type="button" class="btn btn-link ms-auto" data-bs-dismiss="modal">إلغاء</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
         {% block content %}{% endblock content %}
 
@@ -78,5 +187,36 @@
         <!-- Specific Page JS goes HERE  -->
         {% block javascripts %}{% endblock javascripts %}
 
+        <script>
+            function openConfirmationModal(message, url) {
+                document.getElementById('modal-message').innerHTML = message;
+                document.getElementById('callback-url').value = url;
+                //document.getElementById('modal-default').classList.add('show');
+            }
+
+            document.getElementById('confirm-delete-btn').addEventListener('click', function () {
+                var callbackUrl = document.getElementById('callback-url').value;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', callbackUrl);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        window.location.reload();
+                    } else {
+                        alert('Error occurred during deletion. Please try again.');
+                    }
+                };
+                xhr.send();
+            });
+        </script>
+
     </body>
 </html>
+
+<!-- <script>
+    document.getElementById('delete-form').addEventListener('submit', function (e) {
+        var confirmed = confirm('Are you sure you want to delete this data?');
+        if (!confirmed) {
+            e.preventDefault(); // Prevent form submission if not confirmed
+        }
+    });
+</script> -->

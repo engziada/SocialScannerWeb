@@ -10,14 +10,14 @@ import datetime
 class Influencer(db.Model):
     __tablename__ = "influencers"
     id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String, nullable=False)
+    full_name = db.Column(db.String, nullable=False, unique=True)
     gender = db.Column(db.String)
     country = db.Column(db.String)
     city = db.Column(db.String)
     phone = db.Column(db.String)
-    email = db.Column(db.String)
+    email = db.Column(db.String,)
     profile_picture = db.Column(db.String)
-    socialaccounts = db.relationship("SocialAccount", backref="influencer", lazy=True)
+    socialaccounts = db.relationship("SocialAccount", backref="influencer", lazy=True, cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"Influencer(id={self.id}, full_name='{self.full_name}'), email='{self.email}', phone='{self.phone}', country='{self.country}', city='{self.city}', profile_picture='{self.profile_picture}', socialaccounts='{self.socialaccounts}'"

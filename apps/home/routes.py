@@ -5,11 +5,14 @@ from jinja2 import TemplateNotFound
 
 from apps import db
 
-from apps.home.models import ScanLog
+from apps.home.models import Log
+from apps.home.forms import SearchForm
+
+from apps.home.util import search_user_profile
+from apps.social.models import Platform
 # from apps.home.util import verify_pass, create_default_admin
 
 from icecream import ic
-from sqlalchemy.exc import IntegrityError
 
 
 @blueprint.route('/index')
@@ -51,3 +54,39 @@ def get_segment(request):
     except:
         return None
 
+
+#////////////////////////////////////////////////////////////////////////////////////////
+
+
+@blueprint.route("/log")
+# @login_required
+def log():
+    logs = Log.query.all()  # Fetch all influencers
+    return render_template("home/log.html", logs=logs)
+
+#////////////////////////////////////////////////////////////////////////////////////////
+
+
+@blueprint.route("/search", methods=["GET", "POST"])
+# @login_required
+def search():
+    form = SearchForm()
+    form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
+
+    profile_data = None
+
+    if form.validate_on_submit():
+        platform = form.platform.data
+        username = form.username.data
+
+        try:
+            profile_data = search_user_profile(username, platform)
+            if not profile_data:
+                flash("User not found on that platform.")
+        except Exception as e:
+            flash(f"Error: {str(e)}")  # Handle backend errors gracefully
+
+    return render_template("home/search.html", form=form, profile_data=profile_data)
+
+
+# ////////////////////////////////////////////////////////////////////////////////////////

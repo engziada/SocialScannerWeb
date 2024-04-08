@@ -604,7 +604,7 @@ $table-bg-level: -9 !default;
 //
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
-$input-btn-padding-y  : .55rem !default;
+$input-btn-padding-y  : .55rem !default; //.55
 $input-btn-padding-x  : .75rem !default;
 $input-btn-font-family: null !default;
 $input-btn-font-size  : $font-size-base !default;

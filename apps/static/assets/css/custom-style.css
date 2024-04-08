@@ -1,14 +1,111 @@
-.profile-picture {
-    width: 150px;
-    height: 150px;
+body {
+    min-width: 290px;
+}
+
+.header-profile-picture {
+    width: 190px;
+    height: 220px;
     border-radius: 50%;
-    margin: 0 auto;
-    display: block;
-    margin-bottom: 20px;
-    background-size: cover; 
+    background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    border-color: white;
+    border-style: solid;
+    border-width: medium;
+    z-index: 3;
+    box-shadow: 0px 8px 5px 0px rgba(0, 0, 0, 0.2);
 }
 
 .col-center {
     text-align: center;
+}
+
+
+.header-image {
+    background-image: url(/static/assets/img/illustrations/social.svg);
+    background-size: cover;
+    background-position: center;
+    height: 380px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: flex-end;
+    justify-content: space-evenly;
+    padding-inline: 25px;
+}
+
+.header-image::before {
+    content: "";
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #242e4ce6; /* Adjust color and opacity as needed */
+    z-index: 1;
+}
+
+.header-row{
+    z-index: 1; 
+    position: relative;
+    bottom: 100%;
+}
+
+.header-figure{
+    z-index: 2;
+}
+
+.header-title {
+    /* color: white;
+    font-size: 6rem;
+    font-weight: 900; */
+    mix-blend-mode: difference;
+    z-index: 3;
+    text-align: center;
+}
+
+@media screen and (max-width: 588px) {
+    .header-title {
+        font-size: 4rem;
+    }
+
+    .profile-picture {
+        width: 150px;
+        height: 174px;
+    }
+}
+
+.btn-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 30px;
+    /* margin-top: 20px; */
+    justify-items: flex-start;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+
+.form-select{
+    padding-inline: 2rem;
+}
+
+.search-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    direction: ltr;
+}
+
+.search-bar input{
+    direction: rtl;
+}
+
+.search-bar span{
+    cursor: pointer;
 }

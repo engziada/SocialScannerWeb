@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, request, url_for, flash
 from flask_wtf.file import FileField
 
 from apps.profiles import blueprint
@@ -9,13 +9,22 @@ from apps.profiles.forms import InfluencerForm
 from apps.profiles.models import Influencer
 
 from icecream import ic
-from werkzeug.datastructures import FileStorage
 
 
 @blueprint.route("/influencers")
 # @login_required
 def influencers():
-    influencers = Influencer.query.all()  # Fetch all influencers
+    # Get search term from query string (optional)
+    search_term = request.args.get('q', '')  
+    # Fetch all influencers
+    influencers = Influencer.query.all()  
+    if search_term:
+        # Filter based on search term (name)
+        influencers = [
+            influencer
+            for influencer in influencers
+            if search_term.lower() in influencer.full_name.lower()
+        ]
     return render_template("profiles/influencers.html", influencers=influencers)
 
 
@@ -40,21 +49,11 @@ def influencer_add():
         db.session.add(new_influencer)
         db.session.commit()
         flash("Influencer created successfully!", "success")
-        return redirect(url_for("profiles_blueprint.socialaccount_add", influencer_id=new_influencer.id))
+        return redirect(url_for("social_blueprint.socialaccount_add", influencer_id=new_influencer.id))
     return render_template("profiles/influencer_add.html", form=form)
 
 
-@blueprint.route("/influencer/<int:influencer_id>")
-# @login_required
-def influencer_details(influencer_id):
-    influencer = Influencer.query.get(influencer_id)
-    if not influencer:
-        flash("Influencer not found!", "danger")
-        return redirect(url_for("profiles_blueprint.influencers"))
-    return render_template("profiles/influencer_details.html", influencer=influencer)
-
-
-@blueprint.route("/influencer_delete/<int:influencer_id>")
+@blueprint.route("/influencer_delete/<int:influencer_id>", methods=["POST"])
 # @login_required
 def influencer_delete(influencer_id):
     influencer = Influencer.query.get(influencer_id)
