@@ -6,8 +6,15 @@ from   sys import exit
 from apps.config import config_dict
 from apps import create_app, db
 
+from icecream import ic
+from dotenv import load_dotenv
+
+
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path)
+
 # WARNING: Don't run with debug turned on in production!
-DEBUG = (os.getenv('DEBUG', 'False') == 'True')
+DEBUG = os.getenv("DEBUG_MODE", "False") == "True"
 
 # The configuration
 get_config_mode = 'Debug' if DEBUG else 'Production'

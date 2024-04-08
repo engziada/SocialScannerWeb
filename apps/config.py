@@ -3,11 +3,19 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import os, random, string
+import os
+import random
+import string
+from icecream import ic
+from dotenv import load_dotenv
+
+# load_dotenv()
 
 class Config(object):
 
     basedir = os.path.abspath(os.path.dirname(__file__))
+    dotenv_path = os.path.join(str.join(os.sep,basedir.split(os.sep)[:-1]) , ".env")
+    load_dotenv(dotenv_path)
 
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')  
@@ -27,7 +35,7 @@ class Config(object):
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
     USE_SQLITE  = True 
-
+    
     # try to set up a Relational DBMS
     if DB_ENGINE and DB_NAME and DB_USERNAME:
 
@@ -53,10 +61,13 @@ class Config(object):
     if USE_SQLITE:
 
         # This will create a file in <app> FOLDER
-        # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-        SQLALCHEMY_DATABASE_URI ='postgresql://postgres:mazisvip@localhost/SocialScanner'
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
+        # SQLALCHEMY_DATABASE_URI ='postgresql://postgres:mazisvip@localhost/SocialScanner'
 
     
+    ic(DB_ENGINE, DB_USERNAME, DB_PASS, DB_HOST, DB_PORT, DB_NAME, USE_SQLITE)
+
+
 class ProductionConfig(Config):
     DEBUG = False
 
