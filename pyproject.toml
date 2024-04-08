@@ -2,8 +2,7 @@
 name = "SocialScannerWeb"
 version = "0.1.0"
 description = ""
-authors = ["muhammad ziada <engziada@gmail.com>"]
-readme = ""
+authors = ["Muhammad Ziada <engziada@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
