@@ -30,7 +30,3 @@ instaloader = "^4.11"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.env]
-HTTPX_MAX_CONCURRENCY = "8"  # Adjust the number as needed
-
