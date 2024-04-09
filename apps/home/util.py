@@ -1,36 +1,26 @@
 
 import datetime
-from select import select
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+import html
 from bs4 import BeautifulSoup
 from icecream import ic
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-
 import instaloader
+import json
+import requests
 
-from icecream import ic
 
-
-# Set Firefox options to run in headless mode
-firefox_options = FirefoxOptions()
-# firefox_options.headless = True
-# firefox_options.add_argument("-headless")
-# Initialize WebDriver with Firefox and set options
-
-# # Set Chrome options to run in headless mode
-# chrome_options = ChromeOptions()
-# chrome_options.add_argument("--headless")  # Enable headless mode
-# chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (necessary in headless mode)
-# chrome_options.add_argument("--window-size=1920x1080")  # Set window size
-# # Initialize WebDriver with Chrome and set options
-# driver = webdriver.Chrome(options=chrome_options)
-
+profile_data: dict = {
+    "username": '',
+    "platform": '',
+    "public_profile_name": '',
+    "followers": 0,
+    "likes": 0,
+    "posts": 0,
+    "profile_picture": '',
+    "bio_text": '',
+    "external_url": '',
+    "time_taken": 0,
+    "Error": ''
+}
 
 def search_user_profile(username:str, platform:str) -> dict:
     """
@@ -39,8 +29,8 @@ def search_user_profile(username:str, platform:str) -> dict:
     :param platform: The platform to search on
     :return: A dictionary containing the user's profile data
     """
+    t1 = datetime.datetime.now()
 
-    ic(username, platform)
     if platform == '1':
         profile_data = snapchat(username)
     elif platform == '2':
@@ -48,116 +38,111 @@ def search_user_profile(username:str, platform:str) -> dict:
     elif platform == '3':
         profile_data = tiktok(username)
     else:
-        ic("Invalid platform value")
         raise ValueError("Invalid platform value")
-
+    
+    duration = datetime.datetime.now() - t1
+    profile_data["time_taken"] = duration.total_seconds()
+    ic(profile_data)
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def tiktok(username:str)->dict:
     
-    profile_data: dict = None
     url = f"https://www.tiktok.com/@{username}"
-    t1 = datetime.datetime.now()
-    # Open the TikTok website
-    driver = webdriver.Firefox(options=firefox_options)
-    driver.get(url)
-    # Dismiss the popup modal if present# Dismiss the login modal if present
-    try:
-        login_modal = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "loginContainer")))
-        # Press ESC key
-        ActionChains(driver).send_keys(Keys.ESCAPE).perform()
-    except:
-        ic("Login modal not found")
 
-    # Dismiss the captcha dialog if present
-    try:
-        captcha_dialog = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, "captcha_verify_bar")))
-        # Locate the close icon and click it
-        close_icon = captcha_dialog.find_element(By.CLASS_NAME, "verify-bar-close")
-        close_icon.click()
-    except:
-        ic("Captcha dialog not found")
+    payload = {
+        "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
+        "url": url,
+        "country_code": "eu",
+        "device_type": "desktop",
+        "session_number": 123,
+    }
+    r = requests.get("https://api.scraperapi.com/", params=payload)
 
-    # Parse HTML content
-    soup = BeautifulSoup(driver.page_source, "html.parser")
+    # Print the status code
+    ic(r.status_code)
 
-    profile_section = soup.find("div", class_=lambda x: x and "DivShareLayoutHeader" in x)
-
-    if profile_section is None:
-        ic("Profile section not found.")
+    if r.status_code != 200:
+        profile_data["Error"] = f"Failed to fetch the URL, HTTP status code: {r.status_code}"
         return profile_data
-    else:
-        ic("profile section found")
-
-        # Extract profile details
-        profile_name = profile_section.find("h2", attrs={"data-e2e": "user-subtitle"}).text.strip()
-        follower_count = profile_section.find("strong", attrs={"data-e2e": "followers-count"}).text.strip()
-        likes_count = profile_section.find("strong", attrs={"data-e2e": "likes-count"}).text.strip()
-        user_bio = profile_section.find("h2", attrs={"data-e2e": "user-bio"}).text.strip()
-        profile_image = profile_section.find("div", attrs={"data-e2e": "user-avatar"}).find("img")["src"]
-
-    # Close the browser when done
-    driver.quit()
-    duration = datetime.datetime.now() - t1
     
+    # Parse the HTML content
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    # Find the script element by ID
+    script_element = soup.find("script", id="__UNIVERSAL_DATA_FOR_REHYDRATION__")
+
+    # Check if the script element exists
+    if script_element is None:
+        profile_data["Error"] = "Script element with ID '__UNIVERSAL_DATA_FOR_REHYDRATION__' not found."
+        return profile_data
+
+    # Extract the text content of the script element
+    json_text = script_element.text.strip()
+    # Parse the JSON data
+    json_data = json.loads(json_text)
+    try:
+        user_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["user"]
+        stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
+    except KeyError:
+        profile_data["Error"] = "Could not find the required data in the JSON structure."
+        return profile_data
+
     profile_data: dict = {
         "username": username,
         "platform": "TikTok",
-        "public_profile_name": profile_name,
-        "followers": follower_count,
-        "likes": likes_count,
+        "public_profile_name": user_data["nickname"],
+        "followers": stats_data['followerCount'],
+        "likes": stats_data['heartCount'],
         "posts": 0,
-        "profile_picture": profile_image,
-        "bio_text": user_bio,
+        "profile_picture": user_data['avatarLarger'],
+        "bio_text": user_data['signature'],
         "external_url": url,
-        "time_taken": duration.total_seconds(),
-    }
-    
+        # "time_taken": duration.total_seconds(),
+    }  
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def snapchat(username:str)->dict:
-    profile_data: dict = None
-    url = f"https://www.snapchat.com/add/{username}"
-    t1 = datetime.datetime.now()
-    # Open the Snapchat website
-    driver = webdriver.Firefox(options=firefox_options)
-    driver.get(url)
 
-    try:
-        # Wait for the toast to appear
-        toast = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, "ToastBodyExpanded_toastBodyExpanded")))
-        # Dismiss the toast by pressing the ESC key
-        ActionChains(driver).send_keys(Keys.ESCAPE).perform()
-        print("Toast dismissed successfully.")
-    except:
-        ic("Login modal not found")
+    url = f"https://www.snapchat.com/add/{username}"
+
+    # Fetch the URL using Scraper API
+    payload = {
+        "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
+        "url": url,
+        "country_code": "eu",
+        "device_type": "desktop",
+        "session_number": 345,
+    }
+    r = requests.get("https://api.scraperapi.com/", params=payload)
+
+    # Print the status code
+    ic(r.status_code)
+
+    if r.status_code != 200:
+        profile_data["Error"] = (f"Failed to fetch the URL, HTTP status code: {r.status_code}")
+        return profile_data
 
     # Parse HTML content
-    soup = BeautifulSoup(driver.page_source, "html.parser")
+    soup = BeautifulSoup(r.text, "html.parser")
 
-    profile_section = soup.find("div", class_=lambda x: x and "DesktopPublicProfile_profileCardWrapper" in x)
+    profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
+
     if profile_section is None:
-        ic("Profile section not found.")
+        profile_data["Error"] = "Profile section not found."
         return profile_data
-    else:
-        ic("profile section found")
-        # Extract profile details
-        profile_name = profile_section.find("span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x).text.strip()
-        follower_count = profile_section.find("div",class_=lambda x: x and "PublicProfileDetailsCard_desktopSubscriberText" in x,).text.strip()
-        subtitle = profile_section.find("div", class_=lambda x: x and "PublicProfileCard_desktopTitle" in x).text.strip()
-        profile_image = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x).find("img")["srcset"]
-        # address = profile_section.find("address").text.strip()
 
-        # ic(address)
-
-    # Close the browser when done
-    driver.quit()
-
-    duration = datetime.datetime.now() - t1
+    # Extract profile details
+    profile_name = profile_section.find(
+        "span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x
+    ).text.strip()
+    follower_count = profile_section.find("div",class_=lambda x: x and "SubscriberText" in x).text.strip()
+    subtitle = soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x).text.strip()
+    profile_image = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x).find("img")["srcset"]
+    # address = profile_section.find("address").text.strip()
 
     profile_data: dict = {
         "username": username,
@@ -169,7 +154,7 @@ def snapchat(username:str)->dict:
         "profile_picture": profile_image,
         "bio_text": subtitle,
         "external_url": url,
-        "time_taken": duration.total_seconds(),
+        # "time_taken": duration.total_seconds(),
     }
     return profile_data
 
