@@ -1222,6 +1222,21 @@ markupsafe = "*"
 email = ["email-validator"]
 
 [[package]]
+name = "wtforms-sqlalchemy"
+version = "0.4.1"
+description = "SQLAlchemy tools for WTForms"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "WTForms-SQLAlchemy-0.4.1.tar.gz", hash = "sha256:370f52b738527cf6d8ab78d3488afb9342666144da2637e0cf8b5ae522e8a4db"},
+    {file = "WTForms_SQLAlchemy-0.4.1-py3-none-any.whl", hash = "sha256:df3965015b60de172f4b35e691a47d9913d56bb0abb62c620edd04c1376979e3"},
+]
+
+[package.dependencies]
+SQLAlchemy = ">=1.4"
+WTForms = ">=3.1"
+
+[[package]]
 name = "xxhash"
 version = "3.4.1"
 description = "Python binding for xxHash"
@@ -1341,4 +1356,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e3299b57c08ec6d07874251c789c0fe28f9ce56245c1adeba532e506c342bfda"
+content-hash = "0d3afa4cfb5c4d335fe69e6549eca98ee537011d6f072af17047ccdf739d2451"

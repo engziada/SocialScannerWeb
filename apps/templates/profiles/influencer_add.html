@@ -17,87 +17,127 @@
 
     <section class="section section-md">
         <div class="container">
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('profiles_blueprint.influencer_add') }}">
-                {{ form.hidden_tag() }}
-                {{ form.full_name.label }}
-                <div class="form-group">
-                    {{ form.full_name(class_='form-control', size=30) }}
-                    {% for error in form.full_name.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.gender.label }}
-                <div class="form-group">
-                    {{ form.gender(class_='form-select',size=1) }}
-                    {% for error in form.gender.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.country.label }}
-                <div class="form-group">
-                    {{ form.country(class_='form-control',size=30) }}
-                    {% for error in form.country.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.city.label }}
-                <div class="form-group">
-                    {{ form.city(class_='form-control',size=30) }}
-                    {% for error in form.city.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.phone.label }}
-                <div class="form-group">
-                    {{ form.phone(class_='form-control',size=30) }}
-                    {% for error in form.phone.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.email.label }}
-                <div class="form-group">
-                    {{ form.email(class_='form-control',size=30) }}
-                    {% for error in form.email.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.profile_picture.label }}
-                <div class="form-group">
-                    {{ form.profile_picture(class_='form-control') }}
-                    {% for error in form.profile_picture.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <hr>
-                <button type="submit" class="btn btn-primary">إضافة</button>
+            <div class="row">
+                <div class="col">
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('profiles_blueprint.influencer_add') }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.full_name.label }}
+                        <div class="form-group">
+                            {{ form.full_name(class_='form-control', size=30, value=profile_data.get('public_profile_name')) }}
+                            {% for error in form.full_name.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.gender.label }}
+                        <div class="form-group">
+                            {{ form.gender(class_='form-select',size=1) }}
+                            {% for error in form.gender.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.country.label }}
+                        <div class="form-group">
+                            {{ form.country(class_='form-control',size=30) }}
+                            {% for error in form.country.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.city.label }}
+                        <div class="form-group">
+                            {{ form.city(class_='form-control',size=30) }}
+                            {% for error in form.city.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.phone.label }}
+                        <div class="form-group">
+                            {{ form.phone(class_='form-control',size=30) }}
+                            {% for error in form.phone.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.email.label }}
+                        <div class="form-group">
+                            {{ form.email(class_='form-control',size=30) }}
+                            {% for error in form.email.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="form-check form-switch py-4">
+                            {% if profile_data and not profile_data.get('error') %}
+                            {{ form.set_as_default_profile_picture.label(class_='form-check-label') }}
+                                {{ form.set_as_default_profile_picture(class_='form-check-input', id='id_set_as_default_profile_picture') }}
+                                {% for error in form.set_as_default_profile_picture.errors %}
+                                <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div id="id_profile_picture">
+                            {{ form.profile_picture.label }}
+                            <div class="form-group">
+                                {{ form.profile_picture(class_='form-control') }}
+                                {% for error in form.profile_picture.errors %}
+                                <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <hr>
+                        <button type="submit" class="btn btn-primary">إضافة</button>
+                    </form>
+                
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                    <hr>
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                        <li class="flash text-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endwith %}
 
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                <ul class="flashes">
-                    {% for category, message in messages %}
-                    <li class="flash {{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
+                </div>
+                {%if profile_data and not profile_data.get('error')%}
+                <div class="col-md-4">
+                    <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
+                        <div class="card-body"><span class="h6 icon-tertiary small" style="display: flex; flex-direction: row-reverse;"><span class="fas fa-medal me-2"></span>{{ profile_data.get('username') }}</span>
+                            <h3 class="h5 card-title mt-3">{{ profile_data.get('public_profile_name') }}</h3>
+                            <p class="card-text">المنصة: {{ profile_data.get('platform') }}</p>
+                            <p class="card-text">عدد المتابعين: {{ profile_data.get('followers') }}</p>
+                            <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
+                            <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
+                            <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
+                            <!-- <p class="card-text">العنوان: {{ profile_data.get('address') }}</p> -->
+                            <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
-                {% endwith %}
-            </form>
+            </div>
         </div>
     </section>
 
 
 </main>
 
-<section class="section py-0">
-    <div class="container z-2">
-    </div>
-</section>
 
 {% include 'includes/footer.html' %}
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                var profilePictureField = document.getElementById('id_profile_picture');
+                                var setAsDefaultCheckbox = document.getElementById('id_set_as_default_profile_picture');
+                                profilePictureField.style.display = setAsDefaultCheckbox.checked ? 'none' : 'block';
+                                setAsDefaultCheckbox.addEventListener('change', function () {
+                                    profilePictureField.style.display = this.checked ? 'none' : 'block';
+                                });
+                            });
+                        </script>
+{% endblock javascripts %}
 
 
 

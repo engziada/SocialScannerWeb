@@ -74,17 +74,20 @@
                         <button type="button" class="btn btn-primary" id="addButton" onclick="location.href='{{ url_for('social_blueprint.socialaccount_add', influencer_id=influencer.id) }}';">إضافة حساب جديد</button>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('profiles_blueprint.influencer_delete', influencer_id=influencer.id) }}');">حذف</button>
                     </div>
-
-                    {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                    <ul class="flashes">
-                        {% for category, message in messages %}
-                        <li class="flash {{ category }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                    {% endwith %}
                 </form>
+                
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <hr>
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                <hr>
+                {% endif %}
+                {% endwith %}
+
                 <hr>
                 <h3>الحسابات</h3>
                 <table class="table table-hover">
@@ -100,18 +103,17 @@
                     {% for socialaccount in influencer.socialaccounts %}
                     <tr>
                         <td scope="row">{{ influencer.full_name }}</td>
-                        <td scope="row">{{ socialaccount.platform }}</td>
+                        <td scope="row">{{ socialaccount.platform.name }}</td>
                         <td scope="row">
                             <a href="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
                                 {{ socialaccount.username }}
                             </a>
                         </td>
-                        <td scope="row">{{ socialaccount.content.name }}</td>
+                        <td scope="row">{{ socialaccount.content }}</td>
                         <td scope="row">{{ socialaccount.description }}</td>
                         <td scope="row">{{ socialaccount.profile_picture }}</td>
                     </tr>
                     {% endfor %}
-                
                 </table>
             </div>
         </section>

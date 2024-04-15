@@ -82,71 +82,52 @@
                         </div>
                         <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
                             <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="frontPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
-                                    إدارة البيانات
+                                <a href="#" class="nav-link dropdown-toggle" id="xPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    <i class="fas fa-portrait"></i>
+                                    المشاهير
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
-                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="frontPagesDropdown">
-                                    <div class="row" style="text-align: right;">
-                                        <div class="col-6 col-lg-4">
-                                            <h6 class="d-block mb-3 text-primary">إدارة الملفات</h6>
-                                            <ul class="list-style-none mb-4">
-                                                <li class="mb-2 megamenu-item">
-                                                    <a class="megamenu-link" href="{{ url_for('profiles_blueprint.influencer_add') }}">إضافة ملف</a>
-                                                </li>
-                                                <li class="mb-2 megamenu-item">
-                                                    <a class="megamenu-link" href="{{ url_for('profiles_blueprint.influencers') }}">عرض الملفات</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-6 col-lg-4">
-                                            <h6 class="d-block mb-3 text-primary">إدراة المحتوى</h6>
-                                            <ul class="list-style-none mb-4">
-                                                <li class="mb-2 megamenu-item">
-                                                    <a class="megamenu-link" href="{{ url_for('content_blueprint.content_add') }}">إضافة محتوى</a>
-                                                </li>
-                                                <li class="mb-2 megamenu-item">
-                                                    <a class="megamenu-link" href="{{ url_for('content_blueprint.contents') }}">عرض المحتوى</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                <div class="dropdown-menu py-0" aria-labelledby="xPagesDropdown">
+                                    <a class="dropdown-item rounded-top" href="{{ url_for('home_blueprint.search') }}">بحث<i class="fas fa-search"></i></a>
+                                    <a class="dropdown-item " href="{{ url_for('profiles_blueprint.influencer_add') }}">إضافة<i class="fas fa-plus"></i></a>
+                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('profiles_blueprint.influencers') }}">عرض<i class="fas fa-list"></i></a>
                                 </div>
                             </li>
+
                             <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="reportsPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="yPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    <i class="fas fa-microphone-alt"></i>
+                                    المحتوى
+                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
+                                </a>
+                                <div class="dropdown-menu py-0" aria-labelledby="yPagesDropdown">
+                                    <a class="dropdown-item rounded-top" href="{{ url_for('content_blueprint.content_add') }}">إضافة<i class="fas fa-plus"></i></a>
+                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('content_blueprint.contents') }}">عرض<i class="fas fa-list"></i></a>
+                                </div>
+                            </li>
+                            
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="zPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    <i class="far fa-newspaper"></i>
                                     التقارير
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
-                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="reportsPagesDropdown">
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item">
-                                            <a class="megamenu-link" href="{{ url_for('authentication_blueprint.login') }}">تسجيل دخول</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item">
-                                            <a class="megamenu-link" href="{{ url_for('authentication_blueprint.register') }}">مستخدم جديد</a>
-                                        </li>
-                                    </ul>
+                                <div class="dropdown-menu py-0" aria-labelledby="zPagesDropdown">
+                                    <a class="dropdown-item rounded-top" href="{{ url_for('authentication_blueprint.login') }}">تسجيل دخول</a>
+                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('authentication_blueprint.register') }}">مستخدم جديد</a>
                                 </div>
                             </li>
         
                             <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="userPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="wPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user"></i>
                                     المستخدم
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
-                                <div class="dropdown-menu dropdown-megamenu px-0 py-2 p-lg-4" aria-labelledby="userPagesDropdown">
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item">
-                                            <a class="megamenu-link" href="/log">سجل الأحداث</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item">
-                                            <a class="megamenu-link" href="/sign-in.html">تسجيل دخول</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item">
-                                            <a class="megamenu-link" href="/sign-up.html">مستخدم جديد</a>
-                                        </li>
-                                    </ul>
+                                <div class="dropdown-menu py-0" aria-labelledby="wPagesDropdown">
+                                    <a class="dropdown-item rounded-top" href="/log">سجل الأحداث<i class="fas fa-clipboard-list"></i></a>
+                                    <a class="dropdown-item" href="/sign-in.html">تسجيل دخول<i class="fas fa-sign-in-alt"></i></a>
+                                    <a class="dropdown-item rounded-bottom" href="/sign-up.html">مستخدم جديد<i class="fas fa-user-plus"></i></a>
                                 </div>
                             </li>
                         </ul>

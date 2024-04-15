@@ -35,33 +35,44 @@
                 <hr>
                 <div class="btn-bar">
                     <button type="submit" class="btn btn-primary">بحث</button>
+                    {% if profile_data and not profile_data.get('error')%}
+                        {%if profile_data.get('existing_record') %}
+                            <p class="text-danger">إسم المستخدم موجود بقاعدة البيانات على هذه المنصة</p>
+                        {%else%}
+                            <p class="text-success">إسم المستخدم غير موجود بقاعدة البيانات على هذه المنصة</p>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <hr>
-
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                <ul class="flashes">
-                    {% for category, message in messages %}
-                    <li class="flash {{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
-
             </form>
 
-            {% if profile_data %}
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <hr>
+            <ul class="flashes">
+                {% for category, message in messages %}
+                <li class="flash text-{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            <hr>
+            {% endif %}
+            {% endwith %}
+
+            {% if profile_data and not profile_data.get('error') %}
                 <div class="search-result">
                     <h2>بيانات الملف الشخصي</h2>
                     <div class="row">
                         <div class="col-md-6">
                             <ul>
-                                <li><div class="label">رابط الملف الشخصي</div> <div class="form-control">{{ profile_data.external_url }}</div></li>
-                                <li><div class="label">الإسم بالكامل</div> <div class="form-control">{{ profile_data.public_profile_name }}</div></li>
-                                <li><div class="label">التعريف</div> <div class="form-control">{{ profile_data.bio_text }}</div></li>
-                                <li><div class="label">عدد المتابعين</div> <div class="form-control">{{ profile_data.followers }}</div></li>
-                                <li><div class="label">عدد الإعجابات</div> <div class="form-control">{{ profile_data.likes }}</div></li>
-                                <li><div class="label">عدد المنشورات</div> <div class="form-control">{{ profile_data.posts }}</div></li>
+                                <!-- <li><div class="label">رابط الملف الشخصي</div> <div class="form-control">{{ profile_data.external_url }}</div></li> -->
+                                <li><div class="label">المنصة</div><div class="form-control">{{ profile_data.get('platform') }}</div></li>
+                                <li><div class="label">الإسم بالكامل</div> <div class="form-control">{{ profile_data.get('public_profile_name') }}</div></li>
+                                <li><div class="label">عدد المتابعين</div> <div class="form-control">{{ profile_data.get('followers') }}</div></li>
+                                <li><div class="label">عدد الإعجابات</div> <div class="form-control">{{ profile_data.get('likes') }}</div></li>
+                                <li><div class="label">عدد المقاطع المنشورة</div> <div class="form-control">{{ profile_data.get('posts') }}</div></li>
+                                <li><div class="label">نص البايو</div> <div class="form-control">{{ profile_data.get('bio_text') }}</div></li>
+                                <!-- <li><div class="label">العنوان</div><div class="form-control">{{ profile_data.get('address') }}</div></li> -->
+                                <li><div class="label">الوقت المستغرق</div> <div class="form-control">{{ profile_data.get('time_taken') }}</div></li>
                             </ul>
                         </div>
                         <div class="col-md-6">
@@ -70,6 +81,12 @@
                             </div>
                         </div>
                     </div>
+                    {% if not profile_data.existingRecord %}
+                        <div class="btn-bar">
+                            <a href="{{ url_for('profiles_blueprint.influencer_add') }}" class="btn btn-primary">إضافة ملف شخصي</a>
+                            <!-- <a href="{{ url_for('profiles_blueprint.influencer_add', profile_data=profile_data) }}" class="btn btn-primary">إضافة ملف شخصي</a> -->
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

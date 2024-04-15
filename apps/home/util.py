@@ -1,26 +1,28 @@
 
 import datetime
-import html
+from os import makedirs, path
 from bs4 import BeautifulSoup
+from flask import current_app, url_for
 from icecream import ic
 import instaloader
 import json
 import requests
+from werkzeug.utils import secure_filename
 
 
-profile_data: dict = {
-    "username": '',
-    "platform": '',
-    "public_profile_name": '',
-    "followers": 0,
-    "likes": 0,
-    "posts": 0,
-    "profile_picture": '',
-    "bio_text": '',
-    "external_url": '',
-    "time_taken": 0,
-    "Error": ''
-}
+# profile_data: dict = {
+#     "username": '',
+#     "platform": '',
+#     "public_profile_name": '',
+#     "followers": 0,
+#     "likes": 0,
+#     "posts": 0,
+#     "profile_picture": '',
+#     "bio_text": '',
+#     "external_url": '',
+#     "time_taken": 0,
+#     "Error": ''
+# }
 
 def search_user_profile(username:str, platform:str) -> dict:
     """
@@ -41,14 +43,14 @@ def search_user_profile(username:str, platform:str) -> dict:
         raise ValueError("Invalid platform value")
     
     duration = datetime.datetime.now() - t1
-    profile_data["time_taken"] = duration.total_seconds()
+    profile_data["time_taken"] = f"{duration.total_seconds():.1f} ثانية"
     ic(profile_data)
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def tiktok(username:str)->dict:
-    
+    profile_data = {}
     url = f"https://www.tiktok.com/@{username}"
 
     payload = {
@@ -64,7 +66,7 @@ def tiktok(username:str)->dict:
     ic(r.status_code)
 
     if r.status_code != 200:
-        profile_data["Error"] = f"Failed to fetch the URL, HTTP status code: {r.status_code}"
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
     
     # Parse the HTML content
@@ -75,7 +77,7 @@ def tiktok(username:str)->dict:
 
     # Check if the script element exists
     if script_element is None:
-        profile_data["Error"] = "Script element with ID '__UNIVERSAL_DATA_FOR_REHYDRATION__' not found."
+        profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
         return profile_data
 
     # Extract the text content of the script element
@@ -106,7 +108,7 @@ def tiktok(username:str)->dict:
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def snapchat(username:str)->dict:
-
+    profile_data = {}
     url = f"https://www.snapchat.com/add/{username}"
 
     # Fetch the URL using Scraper API
@@ -123,7 +125,7 @@ def snapchat(username:str)->dict:
     ic(r.status_code)
 
     if r.status_code != 200:
-        profile_data["Error"] = (f"Failed to fetch the URL, HTTP status code: {r.status_code}")
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
     # Parse HTML content
@@ -132,7 +134,7 @@ def snapchat(username:str)->dict:
     profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
 
     if profile_section is None:
-        profile_data["Error"] = "Profile section not found."
+        profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
         return profile_data
 
     # Extract profile details
@@ -148,11 +150,12 @@ def snapchat(username:str)->dict:
         "username": username,
         "platform": "SnapChat",
         "public_profile_name": profile_name,
-        "followers": follower_count,
+        "followers": format_numbers_snapchat(follower_count),
         "likes": 0,
         "posts": 0,
         "profile_picture": profile_image,
         "bio_text": subtitle,
+        # "address": address,
         "external_url": url,
         # "time_taken": duration.total_seconds(),
     }
@@ -161,25 +164,24 @@ def snapchat(username:str)->dict:
 #////////////////////////////////////////////////////////////////////////////////////////
 
 def instagram(username:str)-> dict:
-    profile_data: dict = None
+    profile_data = {}
     L = instaloader.Instaloader()
 
     # Login (if required)
     # L.load_session_from_file('username')
 
-    t1 = datetime.datetime.now()
-
     # Retrieve profile details
-    profile = instaloader.Profile.from_username(L.context, "_eyad_")
+    profile = instaloader.Profile.from_username(L.context, username)
+    if not profile:
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
+        return profile_data
 
-    # Get profile details
+    # # Get profile details
     # ic(profile.followees)
     # ic(profile.external_url)
     # ic(profile.is_private)
     # ic(profile.is_verified)
-    # ic(profile.posts)
     # ic(profile.igtvcount)
-    # ic(profile.saved_media)
     # ic(profile.mediacount)
     # ic(profile.total_igtv_count)
     # ic(profile.total_saved_media_count)
@@ -190,8 +192,15 @@ def instagram(username:str)-> dict:
     # ic(profile.timeline_comments)
     # ic(profile.timeline_caption)
     # ic(profile.timeline)
+    # ic(profile.biography)
+    # ic(profile.profile_pic_url)
+    # ic(profile.profile_pic_url_hd)
+    # ic(profile.full_name)
+    # ic(profile.username)
+    # ic(profile.userid)
+    # ic(profile.followers)
     
-    duration = datetime.datetime.now() - t1
+    
 
     profile_data: dict = {
         "username": profile.username,
@@ -200,9 +209,35 @@ def instagram(username:str)-> dict:
         "followers": profile.followers,
         "likes": 0,
         "posts": 0,
-        "profile_picture": profile.biography,
-        "bio_text": "",
-        "external_url": profile.profile_pic_url,
-        "time_taken": duration.total_seconds(),
+        "profile_picture": download_profile_image_instagram(profile.profile_pic_url),
+        "bio_text": profile.biography,
+        "external_url": profile.external_url,
+        # "time_taken": duration.total_seconds(),
     }
     return profile_data
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
+def format_numbers_snapchat(follower_count_str):
+    # Remove ' Subscribers' from the string
+    follower_count_str = follower_count_str.split(' ')[0]
+    # Remove commas from the string    
+    if follower_count_str.endswith('m'):
+        return int(float(follower_count_str[:-1]) * 1_000_000)
+    elif follower_count_str.endswith('k'):
+        return int(float(follower_count_str[:-1]) * 1_000)
+    else:
+        return int(follower_count_str)
+
+
+def download_profile_image_instagram(image_url):
+    response = requests.get(image_url)
+    upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    if not path.exists(upload_folder):
+        makedirs(upload_folder)
+    new_filename = secure_filename(f"temp_insta_profile_image.jpg")
+    filepath = path.join(upload_folder, new_filename)
+    with open(filepath, "wb") as f:
+        f.write(response.content)    
+    profile_picture_url=url_for("static", filename="profile_pictures/" + new_filename) 
+    return profile_picture_url  # Return the path to the downloaded image

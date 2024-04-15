@@ -17,59 +17,86 @@
     <!-- Section -->
     <section class="section section-md">
         <div class="container">
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_add', influencer_id=influencer.id) }}">
-                {{ form.hidden_tag() }}
-                {{ form.platform.label }}
-                <div class="form-group">
-                    {{ form.platform(class_='form-select',size=1) }}
-                    {% for error in form.platform.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.username.label }}
-                <div class="form-group">
-                    {{ form.username(class_='form-control',size=30) }}
-                    {% for error in form.username.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.content_type.label }}
-                <div class="form-group">
-                    {{ form.content_type(class_='form-select',size=1) }}
-                    {% for error in form.content_type.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.description.label }}
-                <div class="form-group">
-                    {{ form.description(class_='form-control',size=30) }}
-                    {% for error in form.description.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.profile_picture.label }}
-                <div class="form-group">
-                    {{ form.profile_picture(class_='form-control') }}
-                    {% for error in form.profile_picture.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <hr>
-                <div class="btn-bar">
-                    <button type="submit" class="btn btn-primary">إضافة</button>
-                    <a href="{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}" class="btn btn-secondary">إلغاء</a>
-                </div>
-
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        <ul class="flashes">
-                            {% for category, message in messages %}
-                                <li class="flash {{ category }}">{{ message }}</li>
+            <div class="row">
+                <div class="col">
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_add', influencer_id=influencer.id) }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.platform.label }}
+                        <div class="form-group">
+                            {{ form.platform(class_='form-select',size=1) }}
+                            {% for error in form.platform.errors %}
+                            <span class="error">{{ error }}</span>
                             {% endfor %}
-                        </ul>
+                        </div>
+                        {{ form.username.label }}
+                        <div class="form-group">
+                            {{ form.username(class_='form-control',size=30) }}
+                            {% for error in form.username.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.contents.label }}
+                        <div class="checkbox-list">
+                            {% for choice in form.contents %}
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="contents" value="{{ choice.id }}" {% if choice.data|int in form.contents.data|map(attribute='id')|list %}checked{% endif %} >
+                                    {{ choice.label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {{ form.description.label }}
+                        <div class="form-group">
+                            {{ form.description(class_='form-control',size=30) }}
+                            {% for error in form.description.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.profile_picture.label }}
+                        <div class="form-group">
+                            {{ form.profile_picture(class_='form-control') }}
+                            {% for error in form.profile_picture.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="btn-bar">
+                            <button type="submit" class="btn btn-primary">إضافة</button>
+                            <a href="{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                    <hr>
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                        <li class="flash text-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
                     {% endif %}
-                {% endwith %}
-            </form>
+                    {% endwith %}
+
+                </div>
+                {%if profile_data and not profile_data.get('error')%}
+                <div class="col-md-4">
+                    <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
+                        <div class="card-body"><span class="h6 icon-tertiary small" style="display: flex; flex-direction: row-reverse;"><span class="fas fa-medal me-2"></span>{{ profile_data.get('username') }}</span>
+                            <h3 class="h5 card-title mt-3">{{ profile_data.get('public_profile_name') }}</h3>
+                            <p class="card-text">المنصة: {{ profile_data.get('platform') }}</p>
+                            <p class="card-text">عدد المتابعين: {{ profile_data.get('followers') }}</p>
+                            <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
+                            <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
+                            <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
+                            <!-- <p class="card-text">العنوان: {{ profile_data.get('address') }}</p> -->
+                            <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </section>
 </main>

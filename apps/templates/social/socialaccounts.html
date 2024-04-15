@@ -42,7 +42,7 @@
                                     {{ socialaccount.username }}
                                 </a>
                             </td>
-                            <td scope="row">{{ socialaccount.content.name }}</td>
+                            <td scope="row">{{ socialaccount.contents|map(attribute='name')|join(', ') }}</td>
                             <td scope="row">{{ socialaccount.description }}</td>
                             <td scope="row">{{ socialaccount.profile_picture }}</td>
                             <td scope="row">

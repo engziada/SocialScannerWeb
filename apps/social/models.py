@@ -1,3 +1,4 @@
+import requests
 from apps import db
 from werkzeug.utils import secure_filename
 from os import path, makedirs
@@ -25,8 +26,7 @@ class SocialAccount(db.Model):
     platform_id = db.Column(db.Integer, db.ForeignKey("platforms.id"), nullable=False)
     platform = db.relationship("Platform", backref="socialaccounts", lazy=True)
     username = db.Column(db.String, nullable=False, unique=True)
-    content_id = db.Column(db.Integer, db.ForeignKey("contents.id"), nullable=False)
-    content = db.relationship("Content", backref="socialaccount", lazy=True)
+    contents = db.relationship("Content", secondary="socialaccount_content", backref="socialaccounts", lazy=True)
     description = db.Column(db.Text)
     profile_picture = db.Column(db.String)
     scan_logs = db.relationship("ScanLog", backref="socialaccount", lazy=True)
@@ -36,9 +36,7 @@ class SocialAccount(db.Model):
 
     def save_profile_picture(self, picture_file):
         if picture_file:
-            upload_folder = path.join(
-                current_app.root_path, "static", "profile_pictures"
-            )
+            upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
             if not path.exists(upload_folder):
                 makedirs(upload_folder)
             filename = secure_filename(picture_file.filename)
@@ -48,3 +46,26 @@ class SocialAccount(db.Model):
             picture_file.save(filepath)
             self.profile_picture = new_filename
             db.session.commit()
+
+    def download_image(self, image_url):
+        response = requests.get(image_url)
+        upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+        if not path.exists(upload_folder):
+            makedirs(upload_folder)
+        current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+        new_filename = secure_filename(f"{current_time}.jpg")
+        filepath = path.join(upload_folder, new_filename)
+        with open(filepath, "wb") as f:
+            f.write(response.content)
+        self.profile_picture = new_filename
+        db.session.commit()
+
+
+class SocialAccount_Content(db.Model):
+    __tablename__ = "socialaccount_content"
+    socialaccount_id = db.Column(db.Integer, db.ForeignKey("socialaccounts.id"), primary_key=True)
+    content_id = db.Column(db.Integer, db.ForeignKey("contents.id"), primary_key=True)
+    
+    def __repr__(self):
+        return f"SocialAccount_Content(socialaccount_id={self.socialaccount_id}, content_id={self.content_id})"
+    

@@ -1,3 +1,4 @@
+import requests
 from apps import db
 # from apps.home.util import *
 from werkzeug.utils import secure_filename
@@ -34,3 +35,17 @@ class Influencer(db.Model):
             picture_file.save(filepath)
             self.profile_picture = new_filename
             db.session.commit()
+
+
+    def download_image(self, image_url):
+        response = requests.get(image_url)
+        upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+        if not path.exists(upload_folder):
+            makedirs(upload_folder)
+        current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+        new_filename = secure_filename(f"{current_time}.jpg")
+        filepath = path.join(upload_folder, new_filename)
+        with open(filepath, "wb") as f:
+            f.write(response.content)
+        self.profile_picture = new_filename
+        db.session.commit()

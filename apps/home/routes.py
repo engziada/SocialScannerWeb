@@ -1,15 +1,13 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, request, flash, session
 from apps.home import blueprint
 from flask_login import login_required
 from jinja2 import TemplateNotFound
-
-from apps import db
 
 from apps.home.models import Log
 from apps.home.forms import SearchForm
 
 from apps.home.util import search_user_profile
-from apps.social.models import Platform
+from apps.social.models import Platform, SocialAccount
 # from apps.home.util import verify_pass, create_default_admin
 
 from icecream import ic
@@ -81,8 +79,12 @@ def search():
 
         try:
             profile_data = search_user_profile(username, platform)
-            if not profile_data:
-                flash("User not found on that platform.")
+            if profile_data.get("error") is not None:
+                flash(profile_data["error"], "danger")
+            existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first() is not None
+            profile_data["existing_record"] = existingRecord
+            if profile_data and not existingRecord:
+                session["profile_data"] = profile_data
         except Exception as e:
             flash(f"Error: {str(e)}")  # Handle backend errors gracefully
 
