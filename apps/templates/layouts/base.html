@@ -72,7 +72,7 @@
                             <div class="row">
                                 <div class="col-6 collapse-brand">
                                     <a href="{{ url_for('home_blueprint.index') }}">
-                                        <img src="/static/assets/img/brand/dark.svg" alt="Themesberg logo">
+                                        <img src="/static/assets/img/brand/dark.svg" alt="logo">
                                     </a>
                                 </div>
                                 <div class="col-6 collapse-close">
@@ -125,15 +125,25 @@
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
                                 <div class="dropdown-menu py-0" aria-labelledby="wPagesDropdown">
-                                    <a class="dropdown-item rounded-top" href="/log">سجل الأحداث<i class="fas fa-clipboard-list"></i></a>
-                                    <a class="dropdown-item" href="/sign-in.html">تسجيل دخول<i class="fas fa-sign-in-alt"></i></a>
-                                    <a class="dropdown-item rounded-bottom" href="/sign-up.html">مستخدم جديد<i class="fas fa-user-plus"></i></a>
+                                    <a class="dropdown-item rounded-top" href="{{ url_for('home_blueprint.log') }}">سجل الأحداث<i class="fas fa-clipboard-list"></i></a>
+                                    <a class="dropdown-item rounded" href="{{ url_for('authentication_blueprint.register') }}">مستخدم جديد<i class="fas fa-user-plus"></i></a>
+                                    <div class="dropdown-divider"></div>
+                                    {% if current_user.is_authenticated %}
+                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('authentication_blueprint.logout') }}">خروج<i class="fas fa-sign-out-alt"></i></a>
+                                    {% else %}
+                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('authentication_blueprint.login') }}">دخول<i class="fas fa-sign-in-alt"></i></a>
+                                    {% endif %}
+
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <div class="d-flex align-items-center">
+                        {% if current_user.is_authenticated %}
                         <a href="{{ url_for('authentication_blueprint.logout') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-out-alt me-2"></span> خروج</a>
+                        {% else %}
+                        <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-in-alt me-2"></span> دخول</a>
+                        {% endif %}
                         <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
@@ -167,28 +177,6 @@
 
         <!-- Specific Page JS goes HERE  -->
         {% block javascripts %}{% endblock javascripts %}
-
-        <script>
-            function openConfirmationModal(message, url) {
-                document.getElementById('modal-message').innerHTML = message;
-                document.getElementById('callback-url').value = url;
-                //document.getElementById('modal-default').classList.add('show');
-            }
-
-            document.getElementById('confirm-delete-btn').addEventListener('click', function () {
-                var callbackUrl = document.getElementById('callback-url').value;
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', callbackUrl);
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        window.location.reload();
-                    } else {
-                        alert('Error occurred during deletion. Please try again.');
-                    }
-                };
-                xhr.send();
-            });
-        </script>
 
     </body>
 </html>

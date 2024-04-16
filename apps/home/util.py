@@ -168,7 +168,9 @@ def instagram(username:str)-> dict:
     L = instaloader.Instaloader()
 
     # Login (if required)
-    # L.load_session_from_file('username')
+    L.login("engziada", "mazisvip")
+    # L.two_factor_login(two_factor_code)
+    # L.load_session_from_file('engziada')
 
     # Retrieve profile details
     profile = instaloader.Profile.from_username(L.context, username)

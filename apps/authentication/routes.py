@@ -98,8 +98,8 @@ def register():
 @blueprint.route('/logout')
 def logout():
     user = current_user
+    Log.add_log(Log, user.id, f'{user.username} logged out')
     logout_user()
-    Log.add_log(Log, user.id, f'{user.username} logged in')
     return redirect(url_for('authentication_blueprint.login'))
 
 

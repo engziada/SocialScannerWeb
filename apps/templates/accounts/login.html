@@ -22,13 +22,13 @@
                                     تسجيل الدخول
                                 </h1>
                                 <br />
+                                <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Logo dark" style="width: 50px; height:50px;">
+                                <br />
                                 <span class="font-weight-normal">
                                     {% if msg %}
                                         <span class="text-danger">
                                             {{ msg | safe }}
                                         </span>                                        
-                                    {% else %}
-                                        امواج المشاهير
                                     {% endif %}                                  
                                 </span>
                             </div>
@@ -38,7 +38,7 @@
 
                                 <!-- Form -->
                                 <div class="form-group mb-4">
-                                    <label for="email">إسم المستخدم</label>
+                                    <label for="username">إسم المستخدم</label>
                                     <div class="input-group">
                                         <span class="input-group-text" id="basic-addon1"><span class="fas fa-user"></span></span>
                                         {{ form.username(class="form-control") }}
