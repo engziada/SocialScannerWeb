@@ -59,7 +59,11 @@ def get_segment(request):
 @blueprint.route("/log")
 # @login_required
 def log():
-    logs = Log.query.all()  # Fetch all influencers
+    logs = (
+        Log.query.order_by(Log.creation_time.desc())
+        .order_by(Log.creation_date.desc())
+        .all()
+    )  # Fetch all influencers ordered by creation_time descending
     return render_template("home/log.html", logs=logs)
 
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +71,7 @@ def log():
 
 @blueprint.route("/search", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early("عملية بحث")
 def search():
     form = SearchForm()
     form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]

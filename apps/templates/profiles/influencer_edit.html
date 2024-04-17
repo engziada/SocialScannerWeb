@@ -74,20 +74,22 @@
                         <button type="button" class="btn btn-primary" id="addButton" onclick="location.href='{{ url_for('social_blueprint.socialaccount_add', influencer_id=influencer.id) }}';">إضافة حساب جديد</button>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('profiles_blueprint.influencer_delete', influencer_id=influencer.id) }}');">حذف</button>
                     </div>
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                    <hr>
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                        <li class="flash text-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endwith %}
                 </form>
-                
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                <hr>
-                <ul class="flashes">
-                    {% for category, message in messages %}
-                    <li class="flash {{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                <hr>
-                {% endif %}
-                {% endwith %}
+            </div>
+            </section>
 
+        <section class="section section-md">
+                {% if influencer.socialaccounts %}
                 <hr>
                 <h3>الحسابات</h3>
                 <table class="table table-hover">
@@ -115,7 +117,7 @@
                     </tr>
                     {% endfor %}
                 </table>
-            </div>
+                {% endif %}
         </section>
 
     </main>

@@ -1,6 +1,7 @@
 from flask import render_template, redirect, request, session, url_for, flash
 from flask_wtf.file import FileField
 
+from apps.home.models import Log
 from apps.social import blueprint
 
 from apps import db
@@ -20,7 +21,7 @@ from sqlalchemy.exc import IntegrityError
 def socialaccounts(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
-        flash("Influencer not found!", "danger")
+        flash("الملف غير موجود", "danger")
         return redirect(url_for("social_blueprint.influencers"))
 
     socialaccounts = SocialAccount.query.filter_by(influencer_id=influencer_id).all()  # Fetch social accounts for a specific influencer
@@ -33,10 +34,11 @@ def socialaccounts(influencer_id):
 
 @blueprint.route("/socialaccount_add/<int:influencer_id>", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early("إضافة حساب")
 def socialaccount_add(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
-        flash("Influencer not found!", "danger")
+        flash("الملف غير موجود", "danger")
         return redirect(url_for("social_blueprint.influencers"))
 
     profile_data = {}
@@ -69,27 +71,28 @@ def socialaccount_add(influencer_id):
 
             db.session.add(new_socialaccount)
             db.session.commit()
-            flash("Social Account created successfully!", "success")
+            flash("تم إضافة الحساب", "success")
             return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
         except IntegrityError:
             db.session.rollback()
-            flash("Username already exists!", "danger")
+            flash("إسم الحساب موجود بالفعل", "danger")
         except Exception as e:
             db.session.rollback()
-            flash(f"An error occurred while creating the Social Account!\n{e}", "danger")
+            flash(f"حدث خطأ أثناء تسجيل البيانات\n{e}", "danger")
     return render_template("social/socialaccount_add.html", form=form, influencer=influencer, profile_data=profile_data)
 
 
 @blueprint.route("/socialaccount_delete/<int:influencer_id>/<int:socialaccount_id>", methods=["POST"])
 # @login_required
+@Log.add_log_early("حذف حساب")
 def socialaccount_delete(influencer_id, socialaccount_id):
     socialaccount = SocialAccount.query.get(socialaccount_id)
     if not socialaccount:
-        flash("Social Account not found!", "danger")
+        flash("الحساب غير موجود", "danger")
         return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
     db.session.delete(socialaccount)
     db.session.commit()
-    flash("Social Account deleted successfully!", "success")
+    flash("تم حذف الحساب", "success")
     return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
 
 
@@ -97,10 +100,11 @@ def socialaccount_delete(influencer_id, socialaccount_id):
     "/socialaccount_edit/<int:influencer_id>/<int:socialaccount_id>",methods=["GET", "POST"],
 )
 # @login_required
+@Log.add_log_early("تعديل حساب")
 def socialaccount_edit(influencer_id, socialaccount_id):
     socialaccount = SocialAccount.query.get(socialaccount_id)
     if not socialaccount:
-        flash("Social Account not found!", "danger")
+        flash("الحساب غير موجود", "danger")
         return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
 
     form = SocialAccountForm(obj=socialaccount)  # Create an instance of the form and populate it with existing data
@@ -118,7 +122,7 @@ def socialaccount_edit(influencer_id, socialaccount_id):
             socialaccount.save_profile_picture(form.profile_picture.data)
 
         db.session.commit()
-        flash("Social Account updated successfully!", "success")
+        flash("تم تعديل الحساب", "success")
         return redirect(
             url_for(
                 "social_blueprint.socialaccounts",

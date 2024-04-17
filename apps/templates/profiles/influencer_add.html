@@ -83,20 +83,21 @@
                         </div>
                         <hr>
                         <button type="submit" class="btn btn-primary">إضافة</button>
-                    </form>
-                
-                    {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                    <hr>
-                    <ul class="flashes">
-                        {% for category, message in messages %}
-                        <li class="flash text-{{ category }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                    {% endwith %}
 
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                        <hr>
+                        <ul class="flashes">
+                            {% for category, message in messages %}
+                            <li class="flash text-{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% endwith %}
+
+                    </form>
                 </div>
+
                 {%if profile_data and not profile_data.get('error')%}
                 <div class="col-md-4">
                     <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">

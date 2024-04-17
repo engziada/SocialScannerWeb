@@ -64,20 +64,19 @@
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}'">الغاء</button>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}');">حذف</button>
                 </div>
-            </form>
-            
-            {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-            <hr>
-            <ul class="flashes">
-                {% for category, message in messages %}
-                <li class="flash {{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-            <hr>
-            {% endif %}
-            {% endwith %}
 
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <hr>
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                    <li class="flash text-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+                
+            </form>
         </div>
     </section>
 </main>

@@ -8,6 +8,7 @@ from flask import (
 )
 from flask_wtf.file import FileField
 
+from apps.home.models import Log
 from apps.profiles import blueprint
 
 from apps import db
@@ -38,6 +39,7 @@ def influencers():
 
 @blueprint.route("/influencer_add", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early("إضافة ملف")
 def influencer_add():
     profile_data = {}
     if session.get("profile_data"):
@@ -62,40 +64,42 @@ def influencer_add():
             if profile_data and profile_data["profile_picture"] and set_as_default_profile_picture:
                 new_influencer.download_image(profile_data["profile_picture"])
             elif form.profile_picture.data:
-                new_influencer.upload_profile_picture(form.profile_picture.data)
+                new_influencer.save_profile_picture(form.profile_picture.data)
 
             db.session.add(new_influencer)
             db.session.commit()
-            flash("Influencer created successfully!", "success")
+            flash("تم إضافة الملف", "success")
             return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=new_influencer.id,profile_data=profile_data,))
         except IntegrityError:
             db.session.rollback()
-            flash("Username already exists!", "danger")
+            flash("إسم الملف موجود بالفعل", "danger")
         except Exception as e:
             db.session.rollback()
-            flash(f"An error occurred while creating the Profile!\n{e}", "danger")
+            flash(f"حدث خطأ أثناء إضافة الملف\n{e}", "danger")
     return render_template("profiles/influencer_add.html", form=form, profile_data=profile_data)
 
 
 @blueprint.route("/influencer_delete/<int:influencer_id>", methods=["POST"])
 # @login_required
+@Log.add_log_early("حذف ملف")
 def influencer_delete(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
-        flash("Influencer not found!", "danger")
+        flash("الملف غير موجود", "danger")
         return redirect(url_for("profiles_blueprint.influencers"))
     db.session.delete(influencer)
     db.session.commit()
-    flash("Influencer deleted successfully!", "success")
+    flash("تم حذف الملف", "success")
     return redirect(url_for("profiles_blueprint.influencers"))
 
 
 @blueprint.route("/influencer_edit/<int:influencer_id>", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early("تعديل ملف")
 def influencer_edit(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
-        flash("Influencer not found!", "danger")
+        flash("الملف غير موجود", "danger")
         return redirect(url_for("profiles_blueprint.influencers"))
 
     form = InfluencerForm(obj=influencer)  # Create an instance of the form
@@ -112,64 +116,9 @@ def influencer_edit(influencer_id):
             influencer.save_profile_picture(form.profile_picture.data)
 
         db.session.commit()
-        flash("Influencer updated successfully!", "success")
+        flash("تم تعديل الملف", "success")
         return redirect(url_for("profiles_blueprint.influencers"))
 
     return render_template(
         "profiles/influencer_edit.html", form=form, influencer=influencer
     )
-
-
-# @blueprint.route("/download_image", methods=["POST"])
-# def download_image():
-#     image_url = request.form.get("profile_picture")  # Check for hidden field
-
-#     response = requests.get(image_url)
-
-#     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
-#     if not path.exists(upload_folder):
-#         makedirs(upload_folder)
-
-#     # filename = secure_filename(picture_file.filename)
-#     current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-#     new_filename = secure_filename(f"{current_time}.jpg")
-#     filepath = path.join(upload_folder, new_filename)
-
-#     with open(filepath, "wb") as f:
-#         f.write(response.content)
-
-#     # Here you would update your form or database with the new local path
-#     # This depends on how your application is structured
-
-#     return redirect(request.referrer + "?filepath=" + filepath)
-
-
-# def save_profile_picture(self, picture_file):
-#     if picture_file:
-#         if picture_file.startswith("http"):
-#             response = requests.get(picture_file)
-#             if response.status_code == 200:
-#                 picture_data = response.content
-#                 picture_stream = BytesIO(picture_data)
-#                 filename = picture_file.split("/")[-1]
-#             else:
-#                 raise ValueError("Failed to download image from URL")
-#         else:
-#             filename = secure_filename(picture_file.filename)
-#             picture_stream = picture_file.stream
-
-#         upload_folder = path.join(
-#             current_app.root_path, "static", "profile_pictures"
-#         )
-#         if not path.exists(upload_folder):
-#             makedirs(upload_folder)
-
-#         current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-#         new_filename = f'{current_time}.{filename.split(".")[-1]}'
-#         filepath = path.join(upload_folder, new_filename)
-
-#         with open(filepath, "wb") as f:
-#             f.write(picture_stream.read())
-
-#         self.profile_picture = new_filename
-#         db.session.commit()

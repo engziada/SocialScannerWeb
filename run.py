@@ -41,5 +41,5 @@ if DEBUG:
 
 if __name__ == "__main__":
     # app.run()
-    app.run(host="0.0.0.0", debug=DEBUG)
+    app.run(host="0.0.0.0", debug=DEBUG, port=4000)
 

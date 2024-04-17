@@ -65,21 +65,21 @@
                             <button type="submit" class="btn btn-primary">إضافة</button>
                             <a href="{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}" class="btn btn-secondary">إلغاء</a>
                         </div>
+
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                        <hr>
+                        <ul class="flashes">
+                            {% for category, message in messages %}
+                            <li class="flash text-{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% endwith %}
+
                     </form>
-
-                    {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                    <hr>
-                    <ul class="flashes">
-                        {% for category, message in messages %}
-                        <li class="flash text-{{ category }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                    <hr>
-                    {% endif %}
-                    {% endwith %}
-
                 </div>
+                
                 {%if profile_data and not profile_data.get('error')%}
                 <div class="col-md-4">
                     <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
@@ -90,7 +90,6 @@
                             <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
                             <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
                             <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
-                            <!-- <p class="card-text">العنوان: {{ profile_data.get('address') }}</p> -->
                             <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
                         </div>
                     </div>

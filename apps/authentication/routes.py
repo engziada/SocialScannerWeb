@@ -24,6 +24,7 @@ def route_default():
 # Login & Registration
 
 @blueprint.route('/login', methods=['GET', 'POST'])
+@Log.add_log("تسجيل دخول")  # Pass the message as an argument
 def login():
     login_form = LoginForm(request.form)
     if 'login' in request.form:
@@ -42,12 +43,11 @@ def login():
         if user and verify_pass(password, user.password):
 
             login_user(user)
-            Log.add_log(Log, user.id, f'{user.username} logged in')
             return redirect(url_for('authentication_blueprint.route_default'))
 
         # Something (user or pass) is not ok
         return render_template('accounts/login.html',
-                               msg='Wrong user or password',
+                               msg=' بيانات الحساب خطأ, من فضلك تأكد من إسم المستخدم و كلمة المرور',
                                form=login_form)
 
     if not current_user.is_authenticated:
@@ -57,6 +57,7 @@ def login():
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
+@Log.add_log("إضافة مستخدم")
 def register():
     create_account_form = CreateAccountForm(request.form)
     if 'register' in request.form:
@@ -68,7 +69,7 @@ def register():
         user = Users.query.filter_by(username=username).first()
         if user:
             return render_template('accounts/register.html',
-                                   msg='Username already registered',
+                                   msg='إسم المستخدم موجود بالفعل',
                                    success=False,
                                    form=create_account_form)
 
@@ -76,7 +77,7 @@ def register():
         user = Users.query.filter_by(email=email).first()
         if user:
             return render_template('accounts/register.html',
-                                   msg='Email already registered',
+                                   msg='البريد الإلكتروني موجود بالفعل',
                                    success=False,
                                    form=create_account_form)
 
@@ -85,9 +86,8 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        Log.add_log(Log, user.id, f'{user.username} registered')
         return render_template('accounts/register.html',
-                               msg='User created please <a href="/login">login</a>',
+                               msg='تم إضافة الحساب,  <a href="/login">تسجيل دخول</a>',
                                success=True,
                                form=create_account_form)
 
@@ -96,9 +96,8 @@ def register():
 
 
 @blueprint.route('/logout')
+@Log.add_log_early("تسجيل خروج")
 def logout():
-    user = current_user
-    Log.add_log(Log, user.id, f'{user.username} logged out')
     logout_user()
     return redirect(url_for('authentication_blueprint.login'))
 

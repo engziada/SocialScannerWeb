@@ -1,41 +1,67 @@
+from functools import wraps
+from flask import flash, request
+from flask_login import current_user
 from apps import db
-# from apps.home.util import *
+
 from icecream import ic
-import datetime
 
 
-# The `Log` class represents a database table for storing logs with attributes such as user ID, log
-# date, log time, and log text, and provides a method `add_log` to add new log entries to the
-# database.
 class Log(db.Model):
     __tablename__ = "log"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("Users.id"), nullable=False)
-    user = db.relationship("Users", backref="log", lazy=True)
-    log_date = db.Column(db.Date)
-    log_time = db.Column(db.Time)
     log_text = db.Column(db.String(255))
-    
+    creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
+    creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
+    created_by = db.Column(
+        db.Integer,
+        db.ForeignKey("Users.id"),
+        nullable=True
+    )
+    user = db.relationship("Users", backref="log", lazy=True)
+    user_ip = db.Column(db.String(255), nullable=True)
 
-    """
-    Add a log for the given user_id and log_text to the database.
+    def add_log(log_text:str):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                result = func(*args, **kwargs)
+                if request.method == 'POST':
+                    try:
+                        user_ip = request.remote_addr
+                        if log_text:
+                            new_log = Log(log_text=log_text, user_ip=user_ip)
+                            db.session.add(new_log)
+                            db.session.commit()
+                    except Exception as e:
+                        flash("فشل في تسجيل الحدث", "danger")
+                    finally:
+                        return result
+                else:
+                    return result
+            return wrapper
+        return decorator
     
-    Args:
-        self: the object itself
-        user_id (int): the ID of the user
-        log_text (str): the text of the log
-        
-    Returns:
-        None
-    """
-    def add_log(self, user_id: int, log_text: str) -> None:
-        if log_text:
-            new_log = Log(
-                user_id=user_id,
-                log_date=datetime.datetime.now().date(),
-                log_time=datetime.datetime.now().time(),
-                log_text=log_text,
-            )
-            db.session.add(new_log)
-            db.session.commit()
+    def add_log_early(log_text: str):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                try:
+                    user_ip = request.remote_addr
+                    if log_text:
+                        new_log = Log(log_text=log_text)
+                        db.session.add(new_log, user_ip=user_ip)
+                        db.session.commit()
+                except Exception as e:
+                    flash("فشل في تسجيل الحدث", "danger")
+                finally:
+                    return func(*args, **kwargs)
+            return wrapper
+        return decorator
 
+
+from sqlalchemy import event
+
+@event.listens_for(Log, "before_insert")
+def before_insert_listener(mapper, connection, target):
+    if current_user.is_authenticated:
+        target.created_by = current_user.id

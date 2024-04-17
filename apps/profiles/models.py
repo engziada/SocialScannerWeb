@@ -1,3 +1,4 @@
+from flask_login import current_user
 import requests
 from apps import db
 # from apps.home.util import *
@@ -6,6 +7,7 @@ from os import path, makedirs
 from flask import current_app
 from icecream import ic
 import datetime
+
 
 # Define Influencers Model
 class Influencer(db.Model):
@@ -19,7 +21,14 @@ class Influencer(db.Model):
     email = db.Column(db.String,)
     profile_picture = db.Column(db.String)
     socialaccounts = db.relationship("SocialAccount", backref="influencer", lazy=True, cascade="all, delete-orphan")
-    
+    creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
+    creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
+    created_by = db.Column(
+        db.Integer,
+        db.ForeignKey("Users.id"),
+        nullable=True,
+    )
+
     def __repr__(self):
         return f"Influencer(id={self.id}, full_name='{self.full_name}'), email='{self.email}', phone='{self.phone}', country='{self.country}', city='{self.city}', profile_picture='{self.profile_picture}', socialaccounts='{self.socialaccounts}'"
 
@@ -49,3 +58,11 @@ class Influencer(db.Model):
             f.write(response.content)
         self.profile_picture = new_filename
         db.session.commit()
+
+
+from sqlalchemy import event
+
+@event.listens_for(Influencer, "before_insert")
+def before_insert_listener(mapper, connection, target):
+    if current_user.is_authenticated:
+        target.created_by = current_user.id

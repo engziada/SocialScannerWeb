@@ -1,3 +1,4 @@
+from flask_login import current_user
 import requests
 from apps import db
 from werkzeug.utils import secure_filename
@@ -12,10 +13,17 @@ class Platform(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     # social_accounts = db.relationship("SocialAccount", backref="platform", lazy=True)
+    creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
+    creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
+    created_by = db.Column(
+        db.Integer,
+        db.ForeignKey("Users.id"),
+        nullable=True,
+    )
 
     def __repr__(self):
         return f"Platform(id={self.id}, name='{self.name}')"
-    
+
 
 # Define Subprofiles Model
 class SocialAccount(db.Model):
@@ -30,7 +38,18 @@ class SocialAccount(db.Model):
     description = db.Column(db.Text)
     profile_picture = db.Column(db.String)
     scan_logs = db.relationship("ScanLog", backref="socialaccount", lazy=True)
-    
+    creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
+    creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
+    created_by = db.Column(
+        db.Integer,
+        db.ForeignKey("Users.id"),
+        nullable=True,
+    )
+
+    def __init__(self):
+        if g and hasattr(g, "user_id") and g.user_id:
+            self.created_by = g.user_id
+
     def __repr__(self):
         return f"SocialAccount(id={self.id}, platform='{self.platform}', username='{self.username}')"
 
@@ -69,3 +88,14 @@ class SocialAccount_Content(db.Model):
     def __repr__(self):
         return f"SocialAccount_Content(socialaccount_id={self.socialaccount_id}, content_id={self.content_id})"
     
+
+
+from sqlalchemy import event
+
+
+@event.listens_for(SocialAccount, "before_insert")
+@event.listens_for(Platform, "before_insert")
+def before_insert_listener(mapper, connection, target):
+    if current_user.is_authenticated:
+        target.created_by = current_user.id
+        

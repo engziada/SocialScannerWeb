@@ -9,6 +9,8 @@ from apps.content_types.models import Content
 
 from icecream import ic
 
+from apps.home.models import Log
+
 
 @blueprint.route("/contents")
 # @login_required
@@ -19,6 +21,7 @@ def contents():
 
 @blueprint.route("/content_add", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early('إضافة محتوى')
 def content_add():
     form = ContentForm()  # Create an instance of the form
     if form.validate_on_submit():
@@ -29,30 +32,33 @@ def content_add():
 
         db.session.add(new_content)
         db.session.commit()
-        flash("Content created successfully!", "success")
+        flash("تم إضافة المحتوى", "success")
+
         return redirect(url_for("content_blueprint.content_add"))
     return render_template("content/content_add.html", form=form)
 
 
 @blueprint.route("/content_delete/<int:content_id>", methods=["POST"])
 # @login_required
+@Log.add_log_early("حذف محتوى")
 def content_delete(content_id):
     content = Content.query.get(content_id)
     if not content:
-        flash("Content not found!", "danger")
+        flash("المحتوى غير موجود", "danger")
         return redirect(url_for("content_blueprint.contents"))
     db.session.delete(content)
     db.session.commit()
-    flash("Content deleted successfully!", "success")
+    flash("تم حذف المحتوى", "success")
     return redirect(url_for("content_blueprint.contents"))
 
 
 @blueprint.route("/content_edit/<int:content_id>", methods=["GET", "POST"])
 # @login_required
+@Log.add_log_early("تعديل محتوى")
 def content_edit(content_id):
     content = Content.query.get(content_id)
     if not content:
-        flash("Content not found!", "danger")
+        flash("المحتوى غير موجود", "danger")
         return redirect(url_for("content_blueprint.contents"))
 
     form = ContentForm(obj=content)  # Create an instance of the form
@@ -61,7 +67,7 @@ def content_edit(content_id):
                 content.description = form.description.data
 
                 db.session.commit()
-                flash("Content updated successfully!", "success")
+                flash("تم تعديل المحتوى", "success")
                 return redirect(url_for("content_blueprint.contents"))
     
     return render_template(
