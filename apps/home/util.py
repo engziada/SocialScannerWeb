@@ -44,7 +44,7 @@ def search_user_profile(username:str, platform:str) -> dict:
     
     duration = datetime.datetime.now() - t1
     profile_data["time_taken"] = f"{duration.total_seconds():.1f} ثانية"
-    ic(profile_data)
+    # ic(profile_data)
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ def tiktok(username:str)->dict:
     r = requests.get("https://api.scraperapi.com/", params=payload)
 
     # Print the status code
-    ic(r.status_code)
+    # ic(r.status_code)
 
     if r.status_code != 200:
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -122,7 +122,7 @@ def snapchat(username:str)->dict:
     r = requests.get("https://api.scraperapi.com/", params=payload)
 
     # Print the status code
-    ic(r.status_code)
+    # ic(r.status_code)
 
     if r.status_code != 200:
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -168,7 +168,7 @@ def instagram(username:str)-> dict:
     L = instaloader.Instaloader()
 
     # Login (if required)
-    L.login("engziada", "mazisvip")
+    # L.login("engziada", "mazisvip")
     # L.two_factor_login(two_factor_code)
     # L.load_session_from_file('engziada')
 
@@ -178,6 +178,7 @@ def instagram(username:str)-> dict:
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
+    ic(profile.external_url)
     # # Get profile details
     # ic(profile.followees)
     # ic(profile.external_url)

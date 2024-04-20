@@ -71,7 +71,7 @@ def log():
 
 @blueprint.route("/search", methods=["GET", "POST"])
 # @login_required
-@Log.add_log_early("عملية بحث")
+@Log.add_log("عملية بحث")
 def search():
     form = SearchForm()
     form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]

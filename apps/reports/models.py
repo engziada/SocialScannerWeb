@@ -1,4 +1,4 @@
-from apps import db
+from apps import db, social
 # from apps.home.util import *
 from werkzeug.utils import secure_filename
 from os import path, makedirs
@@ -12,16 +12,18 @@ class ScanLog(db.Model):
     __tablename__ = "scanlogs"
     id = db.Column(db.Integer, primary_key=True)
     socialaccount_id = db.Column(db.Integer, db.ForeignKey("socialaccounts.id"), nullable=False)
-    public_profile_name = db.Column(db.String)
+    # socialaccount = db.relationship("SocialAccount", back_populates="scanlogs")
+    public_profile_name = db.Column(db.String(100))
     bio_text = db.Column(db.Text)
-    profile_picture = db.Column(db.String)
+    profile_picture = db.Column(db.String(255))
     followers = db.Column(db.Integer)
     likes = db.Column(db.Integer)
     posts = db.Column(db.Integer)
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
+    external_url = db.Column(db.String(255))
+    time_taken = db.Column(db.String(20))
 
-  
     def __repr__(self):
         return f"ScanLog(id={self.id}, scan_date='{self.scan_date}', platform='{self.socialaccount.platform}')"
     

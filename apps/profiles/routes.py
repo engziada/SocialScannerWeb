@@ -19,27 +19,32 @@ from apps.profiles.models import Influencer
 from icecream import ic
 from sqlalchemy.exc import IntegrityError
 
+from apps.social.models import SocialAccount
+
 
 @blueprint.route("/influencers")
 # @login_required
 def influencers():
     # Get search term from query string (optional)
-    search_term = request.args.get("q", "")
-    # Fetch all influencers
-    influencers = Influencer.query.all()
-    if search_term:
-        # Filter based on search term (name)
-        influencers = [
-            influencer
-            for influencer in influencers
-            if search_term.lower() in influencer.full_name.lower()
-        ]
+    search_terms = request.args.get("q", "")
+
+    # filter influencers
+    influencers = Influencer.query.filter(
+        (Influencer.full_name.ilike(f"%{search_terms}%"))
+        | (
+            Influencer.socialaccounts.any(
+                SocialAccount.username.ilike(f"%{search_terms}%")
+            )
+        )
+    ).all()
+
+    
     return render_template("profiles/influencers.html", influencers=influencers)
 
 
 @blueprint.route("/influencer_add", methods=["GET", "POST"])
 # @login_required
-@Log.add_log_early("إضافة ملف")
+@Log.add_log("إضافة ملف")
 def influencer_add():
     profile_data = {}
     if session.get("profile_data"):
@@ -81,7 +86,7 @@ def influencer_add():
 
 @blueprint.route("/influencer_delete/<int:influencer_id>", methods=["POST"])
 # @login_required
-@Log.add_log_early("حذف ملف")
+@Log.add_log("حذف ملف")
 def influencer_delete(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
@@ -95,7 +100,7 @@ def influencer_delete(influencer_id):
 
 @blueprint.route("/influencer_edit/<int:influencer_id>", methods=["GET", "POST"])
 # @login_required
-@Log.add_log_early("تعديل ملف")
+@Log.add_log("تعديل ملف")
 def influencer_edit(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:

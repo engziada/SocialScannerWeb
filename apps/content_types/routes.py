@@ -21,7 +21,7 @@ def contents():
 
 @blueprint.route("/content_add", methods=["GET", "POST"])
 # @login_required
-@Log.add_log_early('إضافة محتوى')
+@Log.add_log("إضافة محتوى")
 def content_add():
     form = ContentForm()  # Create an instance of the form
     if form.validate_on_submit():
@@ -40,7 +40,7 @@ def content_add():
 
 @blueprint.route("/content_delete/<int:content_id>", methods=["POST"])
 # @login_required
-@Log.add_log_early("حذف محتوى")
+@Log.add_log("حذف محتوى")
 def content_delete(content_id):
     content = Content.query.get(content_id)
     if not content:
@@ -54,7 +54,7 @@ def content_delete(content_id):
 
 @blueprint.route("/content_edit/<int:content_id>", methods=["GET", "POST"])
 # @login_required
-@Log.add_log_early("تعديل محتوى")
+@Log.add_log("تعديل محتوى")
 def content_edit(content_id):
     content = Content.query.get(content_id)
     if not content:

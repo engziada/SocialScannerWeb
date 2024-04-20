@@ -13,8 +13,12 @@ from dotenv import load_dotenv
 
 class Config(object):
 
+    # Determine the environment and load the appropriate .env file
     basedir = os.path.abspath(os.path.dirname(__file__))
-    dotenv_path = os.path.join(str.join(os.sep,basedir.split(os.sep)[:-1]) , ".env")
+    if os.getenv("FLASK_ENV") == "development":
+        dotenv_path = os.path.join(str.join(os.sep,basedir.split(os.sep)[:-1]) , ".env.dev")
+    else:
+        dotenv_path = os.path.join(str.join(os.sep,basedir.split(os.sep)[:-1]) , ".env.prod")
     load_dotenv(dotenv_path)
 
     # Assets Management
@@ -65,16 +69,16 @@ class Config(object):
         # SQLALCHEMY_DATABASE_URI ='postgresql://postgres:mazisvip@localhost/SocialScanner'
 
     
-    ic(DB_ENGINE, DB_USERNAME, DB_PASS, DB_HOST, DB_PORT, DB_NAME, USE_SQLITE)
+    ic(os.getenv("FLASK_ENV"), DB_ENGINE, DB_USERNAME, DB_PASS, DB_HOST, DB_PORT, DB_NAME, USE_SQLITE)
 
 
 class ProductionConfig(Config):
     DEBUG = False
-
     # Security
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_DURATION = 3600
+
 
 class DebugConfig(Config):
     DEBUG = True

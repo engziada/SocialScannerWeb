@@ -45,10 +45,7 @@ class SocialAccount(db.Model):
         db.ForeignKey("Users.id"),
         nullable=True,
     )
-
-    def __init__(self):
-        if g and hasattr(g, "user_id") and g.user_id:
-            self.created_by = g.user_id
+    # scanlogs = db.relationship("ScanLog", back_populates="socialaccount")
 
     def __repr__(self):
         return f"SocialAccount(id={self.id}, platform='{self.platform}', username='{self.username}')"

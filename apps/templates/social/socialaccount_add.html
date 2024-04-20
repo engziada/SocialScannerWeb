@@ -40,7 +40,7 @@
                             {% for choice in form.contents %}
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="contents" value="{{ choice.id }}" {% if choice.data|int in form.contents.data|map(attribute='id')|list %}checked{% endif %} >
+                                    <input type="checkbox" name="contents" value="{{ choice.data }}" {% if choice.data|int in form.contents.data|map(attribute='id')|list %}checked{% endif %} >
                                     {{ choice.label }}
                                 </label>
                             </div>
