@@ -269,10 +269,10 @@ def get_summerized_report()->dict:
         .count(),
         "last_scan_date": ScanLog.query.order_by(ScanLog.creation_date.desc())
         .first()
-        .creation_date,
+        .creation_date if ScanLog.query.first() else None,
         "last_scan_time": ScanLog.query.order_by(ScanLog.creation_time.desc())
         .first()
-        .creation_time,
+        .creation_time if ScanLog.query.first() else None,
         "platforms": (
             db.session.query(Platform.name, func.count(ScanLog.id))
             .select_from(Platform)
