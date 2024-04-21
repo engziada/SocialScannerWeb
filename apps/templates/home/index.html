@@ -38,7 +38,7 @@
                         <p>عدد الملفات المفتوحة:{{stats.get('total_profiles')}}</p>
                         <p>عدد حسابات مواقع التواصل الإجتماعي:{{stats.get('total_accounts')}}</p>
                         <p>عدد مرات المسح حتى الآن:{{stats.get('total_scans')}}</p>
-                        <p>آخر تاريخ للمسح:{{stats.get('last_scan_date')}} @ {{stats.get('last_scan_time').strftime('%H:%M')}}</p>
+                        <p>آخر تاريخ للمسح:{{stats.get('last_scan_date')}} @ {% if stats.get('last_scan_time') %}{{stats.get('last_scan_time').strftime('%H:%M')}}{% endif %}</p>
                         <p class="h6">عدد مرات المسح لكل منصة:</p>
                         {% for platform in stats.get('platforms')%}
                             <p>{{platform[0]}}:{{platform[1]}}</p>
