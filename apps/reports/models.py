@@ -12,7 +12,7 @@ class ScanLog(db.Model):
     __tablename__ = "scanlogs"
     id = db.Column(db.Integer, primary_key=True)
     socialaccount_id = db.Column(db.Integer, db.ForeignKey("socialaccounts.id"), nullable=False)
-    # socialaccount = db.relationship("SocialAccount", back_populates="scanlogs")
+    socialaccount = db.relationship("SocialAccount", back_populates="scan_logs")
     public_profile_name = db.Column(db.String(100))
     bio_text = db.Column(db.Text)
     profile_picture = db.Column(db.String(255))

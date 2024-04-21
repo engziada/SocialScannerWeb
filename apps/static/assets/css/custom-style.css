@@ -165,3 +165,10 @@ body {
     font-weight: 400;
     font-style: normal;
 }
+
+.organic-radius {
+    border-radius: 63% 37% 30% 70% / 50% 45% 55% 50%;
+    border-color: white;
+    border-width: 10px;
+    border-style: solid;
+}

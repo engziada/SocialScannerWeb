@@ -5,8 +5,8 @@ from jinja2 import TemplateNotFound
 
 from apps.home.models import Log
 from apps.home.forms import SearchForm
+from apps.home.util import search_user_profile, get_summerized_report
 
-from apps.home.util import search_user_profile
 from apps.social.models import Platform, SocialAccount
 # from apps.home.util import verify_pass, create_default_admin
 
@@ -14,13 +14,15 @@ from icecream import ic
 
 
 @blueprint.route('/index')
-@login_required
+# @login_required
 def index():
-    return render_template('home/index.html', segment='index')
+    statistics = get_summerized_report()
+    ic(statistics)
+    return render_template('home/index.html', segment='index', stats=statistics)
 
 
 @blueprint.route('/<template>')
-@login_required
+# @login_required
 def route_template(template):
     try:
         if not template.endswith('.html'):

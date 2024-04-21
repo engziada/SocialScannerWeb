@@ -58,8 +58,7 @@ def scheduled_job():
     with app.app_context():  # noqa: F821
         scan_database(app, db.session)
 
-scheduled_job()
-# sched.add_job(id="scan", func=scheduled_job, trigger="interval", seconds=10)#trigger=CronTrigger(hour=1, minute=12))
+sched.add_job(id="scan", func=scheduled_job, trigger="interval", seconds=10)#trigger=CronTrigger(hour=1, minute=12))
 # sched.start()
 
 if __name__ == "__main__":

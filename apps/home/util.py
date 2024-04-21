@@ -1,13 +1,23 @@
 
 import datetime
-from os import makedirs, path
+from genericpath import isfile
+from os import listdir, makedirs, path
+import random
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
 from icecream import ic
 import instaloader
 import json
 import requests
+from sqlalchemy import func
 from werkzeug.utils import secure_filename
+
+from apps.profiles.models import Influencer
+from apps.reports.models import ScanLog
+from apps.social.models import Platform, SocialAccount
+from apps.authentication.models import Users
+
+from apps import db
 
 
 # profile_data: dict = {
@@ -244,3 +254,34 @@ def download_profile_image_instagram(image_url):
         f.write(response.content)    
     profile_picture_url=url_for("static", filename="profile_pictures/" + new_filename) 
     return profile_picture_url  # Return the path to the downloaded image
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
+def get_summerized_report()->dict:
+    pictures_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    pictures = [f for f in listdir(pictures_folder) if isfile(path.join(pictures_folder, f))]
+    report = {
+        "total_users": Users.query.count(),
+        "total_profiles": Influencer.query.count(),
+        "total_accounts": SocialAccount.query.count(),
+        "total_scans": ScanLog.query.with_entities(ScanLog.creation_date)
+        .distinct()
+        .count(),
+        "last_scan_date": ScanLog.query.order_by(ScanLog.creation_date.desc())
+        .first()
+        .creation_date,
+        "last_scan_time": ScanLog.query.order_by(ScanLog.creation_time.desc())
+        .first()
+        .creation_time,
+        "platforms": (
+            db.session.query(Platform.name, func.count(ScanLog.id))
+            .select_from(Platform)
+            .join(SocialAccount)
+            .join(ScanLog)
+            .group_by(Platform.name)
+            .all()
+        ),
+        "random_pictures": random.sample(pictures, 10),
+    }
+
+    return report

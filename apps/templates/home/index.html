@@ -20,54 +20,29 @@
         <section class="section section-lg pt-0">
             <div class="container">
                 <!-- <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modal-default">Default</button> -->
-
-                <div class="row justify-content-center">
-                    <div class="col-12 col-md-10 col-lg-8 text-center">
-                        <h2 class="fw-bold">
-                            أحدث الأخبار
-                        </h2>
-                        <p class="lead text-muted">
-                            تابع أحدث الأخبار والمقالات والتقارير الخاصة بالمشاهير
-                        </p>
-                    </div>
-                </div>
-                <div class="row mt-6">
-                    <div class="col-12 col-md-6 col-lg-4 mb-5">
-                        <div class="card card-overlay">
-                            <a class="card-img" href="/news/1">
-                                <img src="/static/assets/img/news/1.jpg" alt="Image" class="card-img-top">
-                            </a>
-                            <div class="card-body">
-                                <h3 class="h5">
-                                    <a href="/news/1" class="stretched-link text-reset">
-                                        ماذا قالت الفنانة نادية الجندي عن الفنانة نيللي كريم؟
-                                    </a>
-                                </h3>
-                                <p class="text-muted">
-                                    قالت الفنانة نادية الجندي أنها تحب الفنانة نيللي كريم وتعتبرها من أفضل الفنانات في مصر
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 mb-5">
-                        <div class="card card-overlay">
-                            <a class="card-img" href="/news/2">
-                                <img src="/static/assets/img/news/2.jpg" alt="Image" class="card-img-top">
-                            </a>
-                            <div class="card-body">
-                                <h3 class="h5">
-                                    <a href="/news/2" class="stretched-link text-reset">
-                                        ماذا قال الفنان محمد رمضان عن الفنانة ياسمين صبري؟
-                                    </a>
-                                </h3>
-                                <p class="text-muted">
-                                    قال الفنان محمد رمضان أنه يحب الفنانة ياسمين صبري ويتمنى التعاون معها في عمل فني
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="card border-0 overflow-hidden pt-6">
+                            <div class="position-relative">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[0]) if stats.get('random_pictures')[0] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="width: 20%;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[1]) if stats.get('random_pictures')[1] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 5%;left: 35%;z-index: 2;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[2]) if stats.get('random_pictures')[2] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -20%;left: 65%;z-index: 3;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[3]) if stats.get('random_pictures')[3] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -15%;left: 10%;z-index: 1;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[4]) if stats.get('random_pictures')[4] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -25%;left: 50%;z-index: 1;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[5]) if stats.get('random_pictures')[5] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 10%;left: 0%;z-index: 0;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[6]) if stats.get('random_pictures')[6] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 6%;left: 70%;z-index: 2;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[7]) if stats.get('random_pictures')[7] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 10%;left: 20%;z-index: 3;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[8]) if stats.get('random_pictures')[8] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 15%;left: 50%;z-index: 1;">
+<img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[9]) if stats.get('random_pictures')[9] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -25%;left: 30%;z-index: 1;">                            </div>
+                            <div class="card-body position-relative mt-n6 mx-2 bg-white border border-gray-300 text-center rounded py-8">
+                                <h3 class="h5 card-title">نظرة خاطفة</h3>
+                                <p>عدد المستخدمين الحاليين: {{stats.get('total_users')}}</p>
+                                <p>عدد الملفات المفتوحة:{{stats.get('total_profiles')}}</p>
+                                <p>عدد حسابات مواقع التواصل الإجتماعي:{{stats.get('total_accounts')}}</p>
+                                <p>عدد مرات المسح حتى الآن:{{stats.get('total_scans')}}</p>
+                                <p>آخر تاريخ للمسح:{{stats.get('last_scan_date')}} @ {{stats.get('last_scan_time').strftime('%H:%M')}}</p>
+                                <p class="h6">عدد مرات المسح لكل منصة:</p>
+                                {% for platform in stats.get('platforms')%}
+                                <p>{{platform[0]}}:{{platform[1]}}</p>
+                                {% endfor %}
         </section>
 
     </main>
