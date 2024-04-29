@@ -25,20 +25,25 @@ from apps.social.models import SocialAccount
 @blueprint.route("/influencers")
 # @login_required
 def influencers():
+    page = request.args.get("page", 1, type=int)
+    per_page = 50  # Number of logs per page
+
     # Get search term from query string (optional)
     search_terms = request.args.get("q", "")
 
     # filter influencers
-    influencers = Influencer.query.filter(
-        (Influencer.full_name.ilike(f"%{search_terms}%"))
-        | (
-            Influencer.socialaccounts.any(
-                SocialAccount.username.ilike(f"%{search_terms}%")
+    influencers = (
+        Influencer.query.filter(
+            (Influencer.full_name.ilike(f"%{search_terms}%"))
+            | (
+                Influencer.socialaccounts.any(
+                    SocialAccount.username.ilike(f"%{search_terms}%")
+                )
             )
         )
-    ).all()
-
-    
+        .paginate(page=page, per_page=per_page)
+        # .all()
+    )
     return render_template("profiles/influencers.html", influencers=influencers)
 
 
@@ -77,7 +82,22 @@ def influencer_add():
             return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=new_influencer.id,profile_data=profile_data,))
         except IntegrityError:
             db.session.rollback()
-            flash("إسم الملف موجود بالفعل", "danger")
+            flash(
+                "إسم الملف موجود بالفعل, تم تحويلك إلى صفحة تعديل الملف",
+                "danger",
+            )
+            influencer_id = (
+                Influencer.query.filter_by(full_name=form.full_name.data).first().id
+            )
+            # return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=influencer_id,profile_data=profile_data,))
+            return redirect(
+                url_for(
+                    "profiles_blueprint.influencer_edit",
+                    influencer_id=influencer_id,
+                    profile_data=profile_data,
+                )
+            )
+
         except Exception as e:
             db.session.rollback()
             flash(f"حدث خطأ أثناء إضافة الملف\n{e}", "danger")
@@ -102,6 +122,11 @@ def influencer_delete(influencer_id):
 # @login_required
 @Log.add_log("تعديل ملف")
 def influencer_edit(influencer_id):
+    profile_data = {}
+    if session.get("profile_data"):
+        profile_data = session["profile_data"]
+        # session.pop("profile_data")
+
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")

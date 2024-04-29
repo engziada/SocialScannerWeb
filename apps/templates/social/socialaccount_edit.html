@@ -3,7 +3,7 @@
 {% block title %} تعديل حساب {% endblock %}
 {% block header_title %} تعديل حساب{% endblock %}
 {% block header_sub_title %} {{influencer.full_name}}{% endblock %}
-{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
+{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -17,66 +17,96 @@
     <!-- Section -->
     <section class="section section-md">
         <div class="container">
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
-                {{ form.hidden_tag() }}
-                {{ form.platform.label }}
-                <div class="form-group">
-                    {{ form.platform(class_='form-select',size=1) }}
-                    {% for error in form.platform.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.username.label }}
-                <div class="form-group">
-                    {{ form.username(class_='form-control',size=30) }}
-                    {% for error in form.username.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.contents.label }}
-                <div class="checkbox-list">
-                    {% for choice in form.contents %}
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="contents" value="{{ choice.id }}" {% if choice.data|int in socialaccount.contents|map(attribute='id')|list %}checked{% endif %} >
-                            {{ choice.label }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-                {{ form.description.label }}
-                <div class="form-group">
-                    {{ form.description(class_='form-control',size=30) }}
-                    {% for error in form.description.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {{ form.profile_picture.label }}
-                <div class="form-group">
-                    {{ form.profile_picture(class_='form-control') }}
-                    {% for error in form.profile_picture.errors %}
-                    <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <hr>
-                <div class="btn-bar">
-                    <button type="submit" class="btn btn-primary" id="submitButton" disabled>حفظ</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}'">الغاء</button>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}');">حذف</button>
-                </div>
+            <div class="row">
+                <div class="col">
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.platform.label }}
+                        <div class="form-group">
+                            {{ form.platform(class_='form-select',size=1) }}
+                            {% for error in form.platform.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.username.label }}
+                        <div class="form-group">
+                            {{ form.username(class_='form-control',size=30) }}
+                            {% for error in form.username.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.contents.label }}
+                        <div class="checkbox-list">
+                            {% for choice in form.contents %}
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="contents" value="{{ choice.data }}" {% if choice.data|int in socialaccount.contents|map(attribute='id')|list %}checked{% endif %} >
+                                    {{ choice.label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {{ form.bio_text.label }}
+                        <div class="form-group">
+                            {{ form.bio_text(class_='form-control',size=30) }}
+                            {% for error in form.bio_text.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.external_url.label }}
+                        <div class="form-group">
+                            {{ form.external_url(class_='form-control',size=30)}}
+                            {% for error in form.external_url.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.public_profile_name.label }}
+                        <div class="form-group">
+                            {{ form.public_profile_name(class_='form-control',size=30) }}
+                            {% for error in form.public_profile_name.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                            {{ form.profile_picture(class_='form-control') }}
+                        <hr>
+                        <div class="btn-bar">
+                            <button type="submit" class="btn btn-primary" id="submitButton" disabled>حفظ</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}'">الغاء</button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}');">حذف</button>
+                        </div>
 
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                <hr>
-                <ul class="flashes">
-                    {% for category, message in messages %}
-                    <li class="flash text-{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                        <hr>
+                        <ul class="flashes">
+                            {% for category, message in messages %}
+                            <li class="flash text-{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% endwith %}
+                        
+                    </form>
+                </div>
                 
-            </form>
+                {%if profile_data and not profile_data.get('error')%}
+                <div class="col-md-4">
+                    <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
+                        <div class="card-body">
+                            <h4 style="display: flex; flex-direction: row-reverse;"><span class="fab fa-{{profile_data.get('platform_name_english').lower()}} me-2"></span>{{ profile_data.get('username') }}</h4>
+                            <h3 class="h5 card-title mt-3">{{ profile_data.get('public_profile_name') }}</h3>
+                            <p class="card-text">المنصة: {{ profile_data.get('platform') }}</p>
+                            <p class="card-text">عدد المتابعين: {{ profile_data.get('followers') }}</p>
+                            <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
+                            <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
+                            <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
+                            <p class="card-text">رابط الملف: <a href="{{ profile_data.get('external_url') }}" target="_blank">إضغط هنا</a></p>
+                            <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </section>
 </main>

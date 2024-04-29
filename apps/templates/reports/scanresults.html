@@ -1,0 +1,110 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} بيانات المسح {% endblock %} 
+{% block header_title %} بيانات المسح {% endblock %}
+{% block header_profile_image %}/static/assets/img/illustrations/reading-side.svg{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+        <!-- Hero -->
+        <section class="section-header">
+            <div class="container">
+                <form method="GET" action="{{ url_for('reports_blueprint.scanresults') }}" class="search-bar">
+                    <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='ScanResults') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
+                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
+                    </div>
+                    <div class="date-picker">
+                            <a href="{{ url_for('reports_blueprint.scanresults') }}" class="btn btn-primary">إلغاء التصفية</a>
+                            <button type="submit" class="btn btn-primary">تصفية</button>
+                            <div class="form-group">
+                                <div class="input-group input-group-border">
+                                    <span class="input-group-text" id="basic-addonDate3"><span class="fas far fa-calendar-alt"></span></span>
+                                    <input class="form-control" data-datepicker="" id="to_date" name="to_date" placeholder="إلى تاريخ" type="text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group input-group-border">
+                                    <span class="input-group-text" id="basic-addonDate2"><span class="fas far fa-calendar-alt"></span></span>
+                                    <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="من تاريخ" type="text">
+                                </div>
+                            </div>
+                    </div>
+                </form>
+
+
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="col">إسم ملف</th>
+                            <th scope="col">إسم المستخدم</th>
+                            <th scope="col">المنصة</th>
+                            <th scope="col">التاريخ</th>
+                            <th scope="col">الوقت</th>
+                            <th scope="col">الإسم الشائع</th>
+                            <th scope="col">عنوان فرعي</th>
+                            <th scope="col">عدد المتابعين</th>
+                            <th scope="col">الإعجابات</th>
+                            <th scope="col">المنشورات</th>
+                            <th scope="col">صورة الملف</th>
+                        </tr>
+                        
+                        {% for scanresult in scanresults %}
+                            <tr>
+                                <td scope="row">{{ scanresult.socialaccount.influencer.full_name }}</td>
+                                <td scope="row">{{ scanresult.socialaccount.username }}</td>
+                                <td scope="row">{{ scanresult.socialaccount.platform.name }}</td>
+                                <td scope="row">{{ scanresult.creation_date }}</td>
+                                <td scope="row">{{ scanresult.creation_time.strftime('%H:%M') if scanresult.creation_time else '00:00' }}</td>
+                                <td scope="row">{{ scanresult.public_profile_name }}</td>
+                                <td scope="row">{{ scanresult.bio_text }}</td>
+                                <td scope="row">{{ scanresult.followers }}</td>
+                                <td scope="row">{{ scanresult.likes }}</td>
+                                <td scope="row">{{ scanresult.posts }}</td>
+                                <td scope="row"><img src="{{ scanresult.profile_picture }}" alt="Profile Picture" class="thumbnail"></td>
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+                
+                <br>
+                <nav aria-label="Blog page navigation">
+                    <ul class="pagination">
+                        {% for page in scanresults.iter_pages() %}
+                            {% if page %}
+                                {% if scanresults.page == page %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ page }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('reports_blueprint.scanresults', page=page, from_date=from_date, to_date=to_date) }}">{{ page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">...</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

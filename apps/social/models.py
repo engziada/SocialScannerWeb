@@ -6,12 +6,14 @@ from os import path, makedirs
 from flask import current_app
 from icecream import ic
 import datetime
+from sqlalchemy import event
 
 
 class Platform(db.Model):
     __tablename__ = "platforms"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
+    name_english = db.Column(db.String, nullable=False, unique=True)
     # social_accounts = db.relationship("SocialAccount", backref="platform", lazy=True)
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
@@ -32,18 +34,18 @@ class SocialAccount(db.Model):
     influencer_id = db.Column(db.Integer, db.ForeignKey("influencers.id"), nullable=False)
     platform_id = db.Column(db.Integer, db.ForeignKey("platforms.id"), nullable=False)
     platform = db.relationship("Platform", backref="socialaccounts", lazy=True)
-    username = db.Column(db.String, nullable=False, unique=True)
+    username = db.Column(db.String(255), nullable=False, unique=True)
     contents = db.relationship("Content", secondary="socialaccount_content", backref="socialaccounts", lazy=True)
-    description = db.Column(db.Text)
-    profile_picture = db.Column(db.String)
-    scan_logs = db.relationship("ScanLog", back_populates="socialaccount", lazy=True)
+    bio_text = db.Column(db.Text)
+    profile_picture = db.Column(db.String(255))
+    
+    public_profile_name = db.Column(db.String(100))
+    external_url = db.Column(db.String(255))
+
+    scan_results = db.relationship("ScanResults",  lazy=True)
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
-    created_by = db.Column(
-        db.Integer,
-        db.ForeignKey("Users.id"),
-        nullable=True,
-    )
+    created_by = db.Column(db.Integer,db.ForeignKey("Users.id"),nullable=True,)
     # scanlogs = db.relationship("ScanLog", back_populates="socialaccount")
 
     def __repr__(self):
@@ -84,9 +86,6 @@ class SocialAccount_Content(db.Model):
     def __repr__(self):
         return f"SocialAccount_Content(socialaccount_id={self.socialaccount_id}, content_id={self.content_id})"
     
-
-
-from sqlalchemy import event
 
 
 @event.listens_for(SocialAccount, "before_insert")

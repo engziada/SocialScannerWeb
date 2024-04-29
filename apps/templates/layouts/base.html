@@ -44,7 +44,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Blaka+Hollow&family=Lalezar&family=Vibes&display=swap" rel="stylesheet">
-        
+        <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
         <!-- Specific Page JS goes HERE  -->    
         {% block stylesheets %}{% endblock stylesheets %}
 
@@ -94,7 +94,7 @@
                                 </a>
                                 <div class="dropdown-menu py-0" aria-labelledby="xPagesDropdown">
                                     <a class="dropdown-item rounded-top" href="{{ url_for('home_blueprint.search') }}">بحث<i class="fas fa-search"></i></a>
-                                    <a class="dropdown-item " href="{{ url_for('profiles_blueprint.influencer_add') }}">إضافة<i class="fas fa-plus"></i></a>
+                                    <!-- <a class="dropdown-item " href="{{ url_for('profiles_blueprint.influencer_add') }}">إضافة<i class="fas fa-plus"></i></a> -->
                                     <a class="dropdown-item rounded-bottom" href="{{ url_for('profiles_blueprint.influencers') }}">عرض<i class="fas fa-list"></i></a>
                                 </div>
                             </li>
@@ -118,7 +118,8 @@
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
                                 <div class="dropdown-menu py-0" aria-labelledby="zPagesDropdown">
-                                    <a class="dropdown-item rounded-top rounded-bottom" href="{{ url_for('reports_blueprint.scanlog') }}">عمليات المسح</a>
+                                    <a class="dropdown-item rounded-top rounded-top" href="{{ url_for('reports_blueprint.scanLog') }}">عمليات المسح</a>
+                                    <a class="dropdown-item rounded-top rounded-bottom" href="{{ url_for('reports_blueprint.scanResults') }}">بيانات المسح</a>
                                 </div>
                             </li>
         

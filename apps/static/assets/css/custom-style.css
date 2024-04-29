@@ -113,10 +113,18 @@ body {
 .search-bar{
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-wrap: wrap;
     padding-bottom: 20px;
     direction: ltr;
+    align-items: flex-end;
+    border-bottom: solid;
+    border-bottom-color: #242e4ce6;
+    gap: 10px;
+}
+
+.search-bar > .input-group {
+    max-width: fit-content;
 }
 
 .search-bar input{
@@ -125,6 +133,16 @@ body {
 
 .search-bar span{
     cursor: pointer;
+}
+
+.search-result{
+    padding: 45px;
+
+}
+
+.search-result ul{
+    list-style-type: none;
+    padding-inline: 0;
 }
 
 .checkbox-list{    
@@ -171,4 +189,36 @@ body {
     border-color: white;
     border-width: 10px;
     border-style: solid;
+}
+
+table {
+    width: 100%;
+    min-width: 780px;
+
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.pagination{
+    direction: ltr;
+}
+
+.date-picker{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.card-body{
+    overflow-x: scroll;
+    padding: 1.25rem 1rem;
+}
+
+tr{
+    vertical-align: middle;
 }

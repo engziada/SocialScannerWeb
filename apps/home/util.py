@@ -1,7 +1,8 @@
 
-import datetime
+from datetime import datetime
 from genericpath import isfile
 from os import listdir, makedirs, path
+import profile
 import random
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
@@ -13,9 +14,10 @@ from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 from apps.profiles.models import Influencer
-from apps.reports.models import ScanLog
+from apps.reports.models import ScanResults
 from apps.social.models import Platform, SocialAccount
 from apps.authentication.models import Users
+
 
 from apps import db
 
@@ -34,32 +36,37 @@ from apps import db
 #     "Error": ''
 # }
 
-def search_user_profile(username:str, platform:str) -> dict:
+
+def search_user_profile(username:str, platform_id) -> dict:
     """
     Search for a user profile on a specific platform
     :param username: The username to search for
     :param platform: The platform to search on
     :return: A dictionary containing the user's profile data
     """
-    t1 = datetime.datetime.now()
+    t1 = datetime.now()
 
-    if platform == '1':
-        profile_data = snapchat(username)
-    elif platform == '2':
-        profile_data = instagram(username)
-    elif platform == '3':
-        profile_data = tiktok(username)
+    platform = Platform.query.get(platform_id)
+    if platform:
+        platform_name_english = platform.name_english.lower().strip()
+        function_name = f"{platform_name_english}(username)"
+        profile_data = eval(function_name)
     else:
-        raise ValueError("Invalid platform value")
+        raise ValueError("المنصة غبر موجودة في قاعدة البيانات")
     
-    duration = datetime.datetime.now() - t1
+    duration = datetime.now() - t1
     profile_data["time_taken"] = f"{duration.total_seconds():.1f} ثانية"
+    profile_data["platform_id"] = platform_id
+    profile_data["username"] = username
+    profile_data["platform"] = platform.name
+    profile_data["platform_name_english"] = platform.name_english
+    
     # ic(profile_data)
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
-def tiktok(username:str)->dict:
+def tiktok(username: str) -> dict:
     profile_data = {}
     url = f"https://www.tiktok.com/@{username}"
 
@@ -102,8 +109,8 @@ def tiktok(username:str)->dict:
         return profile_data
 
     profile_data: dict = {
-        "username": username,
-        "platform": "TikTok",
+        # "username": username,
+        # "platform": "TikTok",
         "public_profile_name": user_data["nickname"],
         "followers": stats_data['followerCount'],
         "likes": stats_data['heartCount'],
@@ -111,13 +118,14 @@ def tiktok(username:str)->dict:
         "profile_picture": user_data['avatarLarger'],
         "bio_text": user_data['signature'],
         "external_url": url,
+        # "platform_id": platform_id,
         # "time_taken": duration.total_seconds(),
     }  
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
-def snapchat(username:str)->dict:
+def snapchat(username: str) -> dict:
     profile_data = {}
     url = f"https://www.snapchat.com/add/{username}"
 
@@ -157,8 +165,8 @@ def snapchat(username:str)->dict:
     # address = profile_section.find("address").text.strip()
 
     profile_data: dict = {
-        "username": username,
-        "platform": "SnapChat",
+        # "username": username,
+        # "platform": "SnapChat",
         "public_profile_name": profile_name,
         "followers": format_numbers_snapchat(follower_count),
         "likes": 0,
@@ -167,13 +175,14 @@ def snapchat(username:str)->dict:
         "bio_text": subtitle,
         # "address": address,
         "external_url": url,
+        # "platform_id": platform_id,
         # "time_taken": duration.total_seconds(),
     }
     return profile_data
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
-def instagram(username:str)-> dict:
+def instagram(username: str) -> dict:
     profile_data = {}
     L = instaloader.Instaloader()
 
@@ -188,7 +197,7 @@ def instagram(username:str)-> dict:
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
-    ic(profile.external_url)
+    # ic(profile.external_url)
     # # Get profile details
     # ic(profile.followees)
     # ic(profile.external_url)
@@ -216,8 +225,8 @@ def instagram(username:str)-> dict:
     
 
     profile_data: dict = {
-        "username": profile.username,
-        "platform": "Instagram",
+        # "username": profile.username,
+        # "platform": "Instagram",
         "public_profile_name": profile.full_name,
         "followers": profile.followers,
         "likes": 0,
@@ -226,6 +235,7 @@ def instagram(username:str)-> dict:
         "bio_text": profile.biography,
         "external_url": profile.external_url,
         # "time_taken": duration.total_seconds(),
+        # "platform_id": platform_id,
     }
     return profile_data
 
@@ -264,20 +274,24 @@ def get_summerized_report()->dict:
         "total_users": Users.query.count(),
         "total_profiles": Influencer.query.count(),
         "total_accounts": SocialAccount.query.count(),
-        "total_scans": ScanLog.query.with_entities(ScanLog.creation_date)
+        "total_scans": ScanResults.query.with_entities(ScanResults.creation_date)
         .distinct()
         .count(),
-        "last_scan_date": ScanLog.query.order_by(ScanLog.creation_date.desc())
+        "last_scan_date": ScanResults.query.order_by(ScanResults.creation_date.desc())
         .first()
-        .creation_date if ScanLog.query.first() else None,
-        "last_scan_time": ScanLog.query.order_by(ScanLog.creation_time.desc())
+        .creation_date
+        if ScanResults.query.first()
+        else None,
+        "last_scan_time": ScanResults.query.order_by(ScanResults.creation_time.desc())
         .first()
-        .creation_time if ScanLog.query.first() else None,
+        .creation_time
+        if ScanResults.query.first()
+        else None,
         "platforms": (
-            db.session.query(Platform.name, func.count(ScanLog.id))
+            db.session.query(Platform.name, func.count(ScanResults.id))
             .select_from(Platform)
             .join(SocialAccount)
-            .join(ScanLog)
+            .join(ScanResults)
             .group_by(Platform.name)
             .all()
         ),

@@ -10,6 +10,7 @@ from apps.content_types.models import Content
 from icecream import ic
 
 from apps.home.models import Log
+from apps.social.models import SocialAccount, SocialAccount_Content
 
 
 @blueprint.route("/contents")
@@ -60,7 +61,15 @@ def content_edit(content_id):
     if not content:
         flash("المحتوى غير موجود", "danger")
         return redirect(url_for("content_blueprint.contents"))
-
+    
+    socialaccounts = db.session.query(SocialAccount).\
+        join(SocialAccount_Content).\
+        join(Content).\
+        filter(Content.id == content_id).\
+        all()
+        
+    ic(socialaccounts)
+    
     form = ContentForm(obj=content)  # Create an instance of the form
     if form.validate_on_submit():
                 content.name = form.name.data
@@ -71,4 +80,4 @@ def content_edit(content_id):
                 return redirect(url_for("content_blueprint.contents"))
     
     return render_template(
-        "content/content_edit.html", form=form, content=content)
+        "content/content_edit.html", form=form, content=content, socialaccounts=socialaccounts)

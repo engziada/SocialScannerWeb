@@ -1,0 +1,121 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} تقرير المسح {% endblock %} 
+{% block header_title %} إستعراض عمليات المسح {% endblock %}
+{% block header_profile_image %}/static/assets/img/illustrations/reading-side.svg{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+        <!-- Hero -->
+        <section class="section-header">
+            <div class="container">
+                <form method="GET" action="{{ url_for('reports_blueprint.scanLog') }}" class="search-bar">
+                    <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='ScanLog') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
+                    <!-- <div class="input-group">
+                        <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
+                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
+                    </div> -->
+                    <div class="date-picker">
+                            <a href="{{ url_for('reports_blueprint.scanLog') }}" class="btn btn-primary">إلغاء التصفية</a>
+                            <button type="submit" class="btn btn-primary">تصفية</button>
+                            <div class="form-group">
+                                <div class="input-group input-group-border">
+                                    <span class="input-group-text" id="basic-addonDate3"><span class="fas far fa-calendar-alt"></span></span>
+                                    <input class="form-control" data-datepicker="" id="to_date" name="to_date" placeholder="إلى تاريخ" type="text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group input-group-border">
+                                    <span class="input-group-text" id="basic-addonDate2"><span class="fas far fa-calendar-alt"></span></span>
+                                    <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="من تاريخ" type="text">
+                                </div>
+                            </div>
+                    </div>
+                </form>
+
+
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="col">التاريخ</th>
+                            <th scope="col">الوقت</th>
+                            <th scope="col">الوقت المستغرق</th>
+                            <th scope="col">العمليات الناجحة</th>
+                            <th scope="col">العمليات الفاشلة</th>
+                            <th scope="col">الأخطاء</th>
+                        </tr>
+                        
+                        {% for scanlog_record in scanlog.items %}
+                            <tr>
+                                <td scope="row">{{ scanlog_record.creation_date }}</td>
+                                <td scope="row">{{ scanlog_record.creation_time.strftime('%H:%M') if scanlog_record.creation_time else '00:00' }}</td>
+                                <td scope="row">{{ scanlog_record.time_taken }}</td>
+                                <td scope="row">
+                                    {% for key, value in scanlog_record.success_count.items() %}
+                                    {{ key }}: {{ value }}
+                                    <br>
+                                    {% endfor %}
+                                </td>
+                                <td scope="row">
+                                    {% for key, value in scanlog_record.failure_count.items() %}
+                                    {{ key }}: {{ value }}
+                                    <br>
+                                    {% endfor %}
+                                </td>
+                                <td scope="row">
+                                    {% for key, value in scanlog_record.failures.items() %}
+                                        {{ key }}
+                                        <hr>
+                                        <div style="font-size: 12px; direction: ltr;">
+                                        {% for sub_key, sub_value in value.items() %}
+                                            {{ sub_key }}: {{ sub_value }}
+                                            <br>
+                                        {%endfor%}
+                                        </div>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+                
+                <br>
+                <nav aria-label="Blog page navigation">
+                    <ul class="pagination">
+                        {% for page in scanlog.iter_pages() %}
+                            {% if page %}
+                                {% if scanlog.page == page %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ page }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('reports_blueprint.scanLog', page=page, from_date=from_date, to_date=to_date) }}">{{ page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">...</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

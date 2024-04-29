@@ -1,4 +1,5 @@
-from flask import render_template, request, flash, session
+import datetime
+from flask import g, render_template, request, flash, send_file, session
 from apps.home import blueprint
 from flask_login import login_required
 from jinja2 import TemplateNotFound
@@ -58,15 +59,25 @@ def get_segment(request):
 #////////////////////////////////////////////////////////////////////////////////////////
 
 
-@blueprint.route("/log")
+@blueprint.route("/log", methods=["GET", "POST"])
 # @login_required
 def log():
+    page = request.args.get("page", 1, type=int)
+    per_page = 50  # Number of logs per page
+
+    from_date = request.args.get("from_date", datetime.date.min)
+    to_date = request.args.get("to_date", datetime.date.max)
+    from_date=from_date if from_date else datetime.date.min
+    to_date=to_date if to_date else datetime.date.max
+
     logs = (
-        Log.query.order_by(Log.creation_time.desc())
+        Log.query.filter(Log.creation_date >= from_date, Log.creation_date <= to_date)
         .order_by(Log.creation_date.desc())
-        .all()
-    )  # Fetch all influencers ordered by creation_time descending
-    return render_template("home/log.html", logs=logs)
+        .order_by(Log.creation_time.desc())
+        .paginate(page=page, per_page=per_page)
+    )
+
+    return render_template("home/log.html", logs=logs, from_date=from_date, to_date=to_date)
 
 #////////////////////////////////////////////////////////////////////////////////////////
 

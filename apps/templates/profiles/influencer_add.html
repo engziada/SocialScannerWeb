@@ -101,15 +101,16 @@
                 {%if profile_data and not profile_data.get('error')%}
                 <div class="col-md-4">
                     <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
-                        <div class="card-body"><span class="h6 icon-tertiary small" style="display: flex; flex-direction: row-reverse;"><span class="fas fa-medal me-2"></span>{{ profile_data.get('username') }}</span>
+                        <div class="card-body"><h4 style="display: flex; flex-direction: row-reverse;"><span class="fab fa-{{profile_data.get('platform_name_english')}} me-2"></span>{{ profile_data.get('username') }}</h4>
                             <h3 class="h5 card-title mt-3">{{ profile_data.get('public_profile_name') }}</h3>
                             <p class="card-text">المنصة: {{ profile_data.get('platform') }}</p>
                             <p class="card-text">عدد المتابعين: {{ profile_data.get('followers') }}</p>
                             <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
                             <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
                             <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
-                            <!-- <p class="card-text">العنوان: {{ profile_data.get('address') }}</p> -->
+                            <p class="card-text">رابط الملف: <a href="{{ profile_data.get('external_url') }}" target="_blank">إضغط هنا</a></p>
                             <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
+
                         </div>
                     </div>
                 </div>

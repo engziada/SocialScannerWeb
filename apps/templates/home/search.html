@@ -13,7 +13,6 @@
 
     {% include 'includes/preloader.html' %}
 
-    <section class="section section-md">
         <div class="container">
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('home_blueprint.search') }}">
                 {{ form.hidden_tag() }}
@@ -54,40 +53,60 @@
                 </ul>
                 {% endif %}
                 {% endwith %}
-        </div>
-    </section>
 
-    {% if profile_data and not profile_data.get('error') %}
-    <section class="section section-md">
-        <div class="search-result">
-            <h2>بيانات الملف الشخصي</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <ul>
-                        <li><a href="{{ profile_data.get('external_url') }}" class="form-control">رابط الملف الشخصي</a></li>
-                        <li><div class="label">المنصة</div><div class="form-control">{{ profile_data.get('platform') }}</div></li>
-                        <li><div class="label">الإسم بالكامل</div> <div class="form-control">{{ profile_data.get('public_profile_name') }}</div></li>
-                        <li><div class="label">عدد المتابعين</div> <div class="form-control">{{ profile_data.get('followers') }}</div></li>
-                        <li><div class="label">عدد الإعجابات</div> <div class="form-control">{{ profile_data.get('likes') }}</div></li>
-                        <li><div class="label">عدد المقاطع المنشورة</div> <div class="form-control">{{ profile_data.get('posts') }}</div></li>
-                        <li><div class="label">نص البايو</div> <div class="form-control">{{ profile_data.get('bio_text') }}</div></li>
-                        <li><div class="label">الوقت المستغرق</div> <div class="form-control">{{ profile_data.get('time_taken') }}</div></li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-control" style="height: 100%;">
-                        <img src="{{ profile_data.profile_picture }}" alt="Profile Image" style="height: 100%; width: auto;">
+            {% if profile_data and not profile_data.get('error') %}
+            <div class="search-result">
+                <h2>بيانات الملف الشخصي<span class="fab fa-{{profile_data.get('platform_name_english').lower()}} me-2"></span></h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li>
+                                <a href="{{ profile_data.get('external_url') }}" class="form-control" target="_blank">رابط الملف الشخصي</a>
+                            </li>
+                            <li>
+                                <div class="label">المنصة</div>
+                                <div class="form-control">{{ profile_data.get('platform') }}</div>
+                            </li>
+                            <li>
+                                <div class="label">الإسم بالكامل</div>
+                                <div class="form-control">{{ profile_data.get('public_profile_name') }}</div>
+                            </li>
+                            <li>
+                                <div class="label">عدد المتابعين</div>
+                                <div class="form-control">{{ "{:,}".format(profile_data.get('followers')) }}</div>
+                            </li>
+                            <li>
+                                <div class="label">عدد الإعجابات</div>
+                                <div class="form-control">{{ "{:,}".format(profile_data.get('likes')) }}</div>
+                            </li>
+                            <li>
+                                <div class="label">عدد المقاطع المنشورة</div>
+                                <div class="form-control">{{ "{:,}".format(profile_data.get('posts')) }}</div>
+                            </li>
+                            <li>
+                                <div class="label">نص البايو</div>
+                                <div class="form-control">{{ profile_data.get('bio_text') }}</div>
+                            </li>
+                            <li>
+                                <div class="label">الوقت المستغرق</div>
+                                <div class="form-control">{{ profile_data.get('time_taken') }}</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-control" style="height: 100%;">
+                            <img src="{{ profile_data.profile_picture }}" alt="Profile Image" style="height: 100%; width: auto;">
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% if not profile_data.existingRecord %}
+                {% if not profile_data.existingRecord %}
                 <div class="btn-bar">
                     <a href="{{ url_for('profiles_blueprint.influencer_add') }}" class="btn btn-primary">إضافة ملف شخصي</a>
                 </div>
+                {% endif %}
+            </div>
             {% endif %}
         </div>
-    </section>
-    {% endif %}
 
 </main>
 
