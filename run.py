@@ -63,6 +63,6 @@ sched.add_job(id="scan", func=scheduled_job, trigger=CronTrigger(hour=6, minute=
 sched.start()
 
 if __name__ == "__main__":
-    # app.run()
-    app.run(host="0.0.0.0", debug=DEBUG, port=4000)
+    app.run()
+    # app.run(host="0.0.0.0", debug=DEBUG, port=4000)
 
