@@ -59,7 +59,7 @@ def scheduled_job():
         scan_database(app, db.session)
 
 sched.add_job(id="scan", func=scheduled_job, trigger=CronTrigger(hour=6, minute=0))  # trigger="interval", seconds=10)#
-scheduled_job()
+# scheduled_job()
 sched.start()
 
 if __name__ == "__main__":

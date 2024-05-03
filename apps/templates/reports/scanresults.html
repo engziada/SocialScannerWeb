@@ -2,7 +2,11 @@
 
 {% block title %} بيانات المسح {% endblock %} 
 {% block header_title %} بيانات المسح {% endblock %}
-{% block header_profile_image %}/static/assets/img/illustrations/reading-side.svg{% endblock %}
+{% block header_profile_image %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+    <path d="M0 448V64h18v384H0zm26.9-.3V64H36v383.7h-9.1zm27.1 0V64h8.9v383.7H54zm44.9 0V64h8.9v383.7h-8.9zm36 0V64h17.7v383.7h-17.7zm44.9 0V64h8.9v383.7h-8.9zm18 0V64h8.9v383.7h-8.9zm18 0V64h8.9v383.7h-8.9zm35.7 0V64h18v383.7h-18zm44.9 0V64h18v383.7h-18zm36 0V64h18v383.7h-18zm36 0V64h18v383.7h-18zm26.9 0V64h18v383.7h-18zm45.1 0V64h26.9v383.7h-26.9zm35.7 0V64h9.1v383.7H476zm18 .3V64h18v384h-18z" />
+</svg>
+{% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -15,14 +19,14 @@
         <!-- Hero -->
         <section class="section-header">
             <div class="container">
-                <form method="GET" action="{{ url_for('reports_blueprint.scanresults') }}" class="search-bar">
+                <form method="GET" action="{{ url_for('reports_blueprint.scanResults') }}" class="search-bar">
                     <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='ScanResults') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
                         <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
                     </div>
                     <div class="date-picker">
-                            <a href="{{ url_for('reports_blueprint.scanresults') }}" class="btn btn-primary">إلغاء التصفية</a>
+                            <a href="{{ url_for('reports_blueprint.scanResults') }}" class="btn btn-primary">إلغاء التصفية</a>
                             <button type="submit" class="btn btn-primary">تصفية</button>
                             <div class="form-group">
                                 <div class="input-group input-group-border">
@@ -71,7 +75,6 @@
                                 <td scope="row"><img src="{{ scanresult.profile_picture }}" alt="Profile Picture" class="thumbnail"></td>
                             </tr>
                         {% endfor %}
-
                     </table>
                 </div>
                 
@@ -86,7 +89,7 @@
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="{{ url_for('reports_blueprint.scanresults', page=page, from_date=from_date, to_date=to_date) }}">{{ page }}</a>
+                                        <a class="page-link" href="{{ url_for('reports_blueprint.scanResults', page=page, from_date=from_date, to_date=to_date) }}">{{ page }}</a>
                                     </li>
                                 {% endif %}
                             {% else %}

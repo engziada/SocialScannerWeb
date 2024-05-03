@@ -3,7 +3,9 @@
 {% block title %} إضافة حساب {% endblock %}
 {% block header_title %} إضافة حساب{% endblock %}
 {% block header_sub_title %} {{influencer.full_name}}{% endblock %}
-{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
+{% block header_profile_image %}
+<img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}"/>
+{% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}

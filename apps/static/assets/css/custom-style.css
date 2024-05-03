@@ -2,28 +2,46 @@ body {
     min-width: 290px;
 }
 
+.header-global{
+    overflow: hidden;
+    height: 400px;
+}
+
 .header-profile-picture {
-    width: 220px;
-    height: 220px;
+    width: 350px;
+    height: 350px;
     border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     background-color: white;
-    border-color: white;
-    border-style: solid;
-    border-width: 1px;
     z-index: 3;
-    box-shadow: 0px 15px 20px 0px #242e4ce6;
+    mix-blend-mode: color-dodge;
 }
 
 @media screen and (min-width: 770px) {
     .header-profile-picture {
-        top: -30px;
+        top: -80px;
         position: relative;
         left: -15px;
     }
 }
+
+@media screen and (max-width: 590px) {
+    .header-profile-picture {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+.header-profile-picture svg {
+    width: 340px;
+    height: 200px;
+
+}
+
+.header-profile-picture img{
+    border-radius: 50%;
+    width: 100%;
+}
+
 
 .col-center {
     text-align: center;
@@ -76,9 +94,11 @@ body {
     font-family: "vibes", system-ui;
     font-weight: 400;
     font-style: normal;
+    padding-bottom: 120px;
+
 }
 
-@media screen and (max-width: 588px) {
+@media screen and (max-width: 585px) {
     .header-title {
         font-size: 4rem;
     }
@@ -89,8 +109,15 @@ body {
     }
 }
 
+@media screen and (max-width: 380px) {
+    .header-title {
+        padding-bottom: 0;
+    }
+}
+
 .header-title h1{
     font-size: calc(2.75rem + 1.5vw);
+    /* padding-bottom: 120px; */
 }
 
 .btn-bar{
@@ -111,13 +138,13 @@ body {
 }
 
 .search-bar{
-    display: flex;
+display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     flex-wrap: wrap;
     padding-bottom: 20px;
     direction: ltr;
-    align-items: flex-end;
+    align-items: baseline;
     border-bottom: solid;
     border-bottom-color: #242e4ce6;
     gap: 10px;
@@ -133,6 +160,10 @@ body {
 
 .search-bar span{
     cursor: pointer;
+}
+
+.search-bar > .input-group button{
+    padding: 0px;
 }
 
 .search-result{

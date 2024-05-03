@@ -24,9 +24,6 @@ class ScanResults(db.Model):
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
     time_taken = db.Column(db.String(20))
 
-    def __repr__(self):
-        return f"ScanResults(id={self.id}, scan_date='{self.scan_date}', platform='{self.socialaccount.platform}')"
-    
     def save_profile_picture(self, picture_file):
         if picture_file:
             upload_folder = path.join(current_app.root_path, "static", "profile_pictures")

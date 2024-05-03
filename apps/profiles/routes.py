@@ -7,6 +7,7 @@ from flask import (
     flash,
 )
 from flask_wtf.file import FileField
+from sqlalchemy import desc
 
 from apps.home.models import Log
 from apps.profiles import blueprint
@@ -19,6 +20,7 @@ from apps.profiles.models import Influencer
 from icecream import ic
 from sqlalchemy.exc import IntegrityError
 
+from apps.reports.models import ScanResults
 from apps.social.models import SocialAccount
 
 
@@ -122,15 +124,29 @@ def influencer_delete(influencer_id):
 # @login_required
 @Log.add_log("تعديل ملف")
 def influencer_edit(influencer_id):
-    profile_data = {}
-    if session.get("profile_data"):
-        profile_data = session["profile_data"]
-        # session.pop("profile_data")
+    # profile_data = {}
+    # if session.get("profile_data"):
+    #     profile_data = session["profile_data"]
+    #     # session.pop("profile_data")
 
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
         return redirect(url_for("profiles_blueprint.influencers"))
+
+    # Prepare the data for the template
+    scanresults=[]
+    socialaccounts = influencer.socialaccounts
+    for socialaccount in socialaccounts:
+        scan_result = (
+            db.session.query(ScanResults)
+            .filter_by(socialaccount_id=socialaccount.id)
+            .order_by(desc(ScanResults.creation_date))
+            .limit(5)
+            .all()
+        )
+        scanresults.extend(scan_result)
+
 
     form = InfluencerForm(obj=influencer)  # Create an instance of the form
     if form.validate_on_submit():
@@ -150,5 +166,8 @@ def influencer_edit(influencer_id):
         return redirect(url_for("profiles_blueprint.influencers"))
 
     return render_template(
-        "profiles/influencer_edit.html", form=form, influencer=influencer
+        "profiles/influencer_edit.html",
+        form=form,
+        influencer=influencer,
+        scanresults=scanresults,
     )

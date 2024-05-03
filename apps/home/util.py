@@ -33,7 +33,8 @@ from apps import db
 #     "bio_text": '',
 #     "external_url": '',
 #     "time_taken": 0,
-#     "Error": ''
+#     "error": ''
+#     "existing_record":""
 # }
 
 
@@ -105,7 +106,7 @@ def tiktok(username: str) -> dict:
         user_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["user"]
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
     except KeyError:
-        profile_data["Error"] = "Could not find the required data in the JSON structure."
+        profile_data["error"] = "Could not find the required data in the JSON structure."
         return profile_data
 
     profile_data: dict = {

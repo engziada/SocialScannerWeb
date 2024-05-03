@@ -1,0 +1,134 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} تقرير المتابعة {% endblock %} 
+{% block header_title %} تقرير المتابعة {% endblock %}
+{% block header_profile_image %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+    <path d="M496 384H64V80c0-8.8-7.2-16-16-16H16C7.2 64 0 71.2 0 80v336c0 17.7 14.3 32 32 32h464c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zM464 96H345.9c-21.4 0-32.1 25.9-17 41l32.4 32.4L288 242.8l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0l-68.7 68.7c-6.3 6.3-6.3 16.4 0 22.6l22.6 22.6c6.3 6.3 16.4 6.3 22.6 0L192 237.3l73.4 73.4c12.5 12.5 32.8 12.5 45.3 0l96-96 32.4 32.4c15.1 15.1 41 4.4 41-17V112c0-8.8-7.2-16-16-16z" />
+</svg>
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+        <!-- Hero -->
+        <section class="section-header">
+            <div class="container">
+                <form method="GET" action="{{ url_for('reports_blueprint.scanResults_report') }}" class="search-bar">
+                    <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='ScanResults') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
+                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
+                    </div>
+                    <div class="date-picker" style="flex-direction: column;">
+                        <div class="form-group">
+                            <div class="input-group input-group-border">
+                                <span class="input-group-text" id="basic-addonDate3"><span class="fas far fa-calendar-alt"></span></span>
+                                <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="تاريخ بدء المدة" type="text">
+                            </div>
+                        </div>
+                        <div class="btn-bar">
+                            <a href="{{ url_for('reports_blueprint.scanResults_report') }}" class="btn btn-primary">إلغاء التصفية</a>
+                            <button type="submit" class="btn btn-primary">تصفية</button>
+                        </div>
+                    </div>
+                    <fieldset style="direction: rtl;">
+                        <legend class="h6">المدة</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="intervalRadios" id="intervalRadios1" value="weekly" >
+                            <label class="form-check-label" for="intervalRadios1">
+                                أسبوعيا
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="intervalRadios" id="intervalRadios2" value="monthly" checked>
+                            <label class="form-check-label" for="intervalRadios2">
+                                شهريا
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="intervalRadios" id="intervalRadios3" value="yearly" >
+                            <label class="form-check-label" for="intervalRadios3">
+                                سنويا
+                            </label>
+                        </div>
+                        <!-- End of Radio -->
+                    </fieldset>
+                </form>
+
+
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <tr>
+                            <th>إسم المستخدم</th>
+                            <th>المنصة</th>
+                            {% for date in dates %}
+                            <th>{{ date }}</th>
+                            {% endfor %}
+                        </tr>
+                        
+                        {% for row in results_table %}
+                        <tr>
+                            <td>{{ row[0] }}</td> <!-- Username -->
+                            <td>{{ row[1] }}</td> <!-- Platform -->
+                            {% for count in row[2:] %}
+                            <td>{{ count }}</td> <!-- Counts for each date -->
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                <br>
+                <nav aria-label="Blog page navigation">
+                    <ul class="pagination">
+                        {% if total_pages > 1 %}
+                        {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.scanResults_report', page=1, from_date=from_date) }}">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.scanResults_report', page=page - 1, from_date=from_date) }}">Previous</a>
+                        </li>
+                        {% endif %}
+
+                        {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                        <li class="page-item active">
+                            <a class="page-link" href="#">{{ p }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.scanResults_report', page=p, from_date=from_date) }}">{{ p }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page < total_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.scanResults_report', page=page + 1, from_date=from_date) }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.scanResults_report', page=total_pages, from_date=from_date) }}">Last</a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

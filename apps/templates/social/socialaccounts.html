@@ -41,7 +41,7 @@
                                 </td>
                                 <td scope="row">{{ socialaccount.platform.name }}</td>
                                 <td scope="row">
-                                    <a href="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
+                                    <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}">
                                         {{ socialaccount.username }}
                                     </a>
                                 </td>
@@ -50,7 +50,7 @@
                                 <td scope="row"><img src="{{ url_for('static', filename='profile_pictures/' +  socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150'}}" alt="Profile Picture" class="thumbnail"></td>
                                 <td scope="row">
                                     <div class="btn-bar">
-                                        <a href="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a>
+                                        <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a>
                                         <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete',influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}');">حذف</a>
                                     </div>
                                 </td>

@@ -2,9 +2,10 @@
 
 {% block title %} تفاصيل ملف {% endblock %} 
 {% block header_title %} تفاصيل الملف {% endblock %}
-{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
+{% block header_profile_image %}
+<img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}"/>
+{% endblock %}
 
-<!-- /static/assets/img/illustrations/reading-side.svg -->
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -109,8 +110,8 @@
                 </div>
                 
                 {% if influencer.socialaccounts %}
-                <hr>
-                <h3>الحسابات</h3>
+                <br><br>
+                <h3 style="border-bottom: 3px double #000;">الحسابات</h3>
                 <div class="table-container">
                     <table class="table table-hover">
                         <tr>
@@ -127,7 +128,7 @@
                             <td scope="row">{{ influencer.full_name }}</td>
                             <td scope="row">{{ socialaccount.platform.name }}</td>
                             <td scope="row">
-                                <a href="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
+                                <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}">
                                     {{ socialaccount.username }}
                                 </a>
                             </td>
@@ -139,6 +140,33 @@
                     </table>
                 </div>
                 {% endif %}
+
+                <br><br>
+                <h3 style="border-bottom: 3px double #000;">آخر 5 عمليات المسح</h3>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="col">المنصة</th>
+                            <th scope="col">التاريخ</th>
+                            <th scope="col">الوقت</th>
+                            <th scope="col">عدد المتابعين</th>
+                            <th scope="col">الإعجابات</th>
+                            <th scope="col">المنشورات</th>
+                        </tr>
+                    
+                        {% for scanresult in scanresults %}
+                            <tr>
+                                <td scope="row">{{ scanresult.socialaccount.platform.name }}</td>
+                                <td scope="row">{{ scanresult.creation_date }}</td>
+                                <td scope="row">{{ scanresult.creation_time.strftime('%H:%M') if scanresult.creation_time else '00:00' }}</td>
+                                <td scope="row">{{ scanresult.followers }}</td>
+                                <td scope="row">{{ scanresult.likes }}</td>
+                                <td scope="row">{{ scanresult.posts }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
 
             </div>
             </section>

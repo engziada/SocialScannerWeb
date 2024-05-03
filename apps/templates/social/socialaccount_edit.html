@@ -3,7 +3,9 @@
 {% block title %} تعديل حساب {% endblock %}
 {% block header_title %} تعديل حساب{% endblock %}
 {% block header_sub_title %} {{influencer.full_name}}{% endblock %}
-{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
+{% block header_profile_image %}
+<img src="{{ url_for('static', filename='profile_pictures/' + socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150' }}"/>
+{% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,11 +21,11 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_edit', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}">
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}">
                         {{ form.hidden_tag() }}
                         {{ form.platform.label }}
                         <div class="form-group">
-                            {{ form.platform(class_='form-select',size=1) }}
+                            {{ form.platform(class_='form-select', size=1, readonly=True) }}
                             {% for error in form.platform.errors %}
                             <span class="error">{{ error }}</span>
                             {% endfor %}
@@ -32,6 +34,13 @@
                         <div class="form-group">
                             {{ form.username(class_='form-control',size=30) }}
                             {% for error in form.username.errors %}
+                            <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.public_profile_name.label }}
+                        <div class="form-group">
+                            {{ form.public_profile_name(class_='form-control',size=30) }}
+                            {% for error in form.public_profile_name.errors %}
                             <span class="error">{{ error }}</span>
                             {% endfor %}
                         </div>
@@ -60,17 +69,10 @@
                             <span class="error">{{ error }}</span>
                             {% endfor %}
                         </div>
-                        {{ form.public_profile_name.label }}
-                        <div class="form-group">
-                            {{ form.public_profile_name(class_='form-control',size=30) }}
-                            {% for error in form.public_profile_name.errors %}
-                            <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
                             {{ form.profile_picture(class_='form-control') }}
                         <hr>
                         <div class="btn-bar">
-                            <button type="submit" class="btn btn-primary" id="submitButton" disabled>حفظ</button>
+                            <button type="submit" class="btn btn-primary" id="submitButton" {% if not form.is_edited %}disabled{% endif %}>{% if form.is_edited %}تم تحديث البيانات, حفظ؟{%else%}حفظ{% endif %}</button>
                             <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('social_blueprint.socialaccounts', influencer_id=influencer.id) }}'">الغاء</button>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete', influencer_id=influencer.id, socialaccount_id=socialaccount.id) }}');">حذف</button>
                         </div>

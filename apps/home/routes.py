@@ -1,5 +1,6 @@
 import datetime
-from flask import g, render_template, request, flash, send_file, session
+import re
+from flask import g, redirect, render_template, request, flash, send_file, session, url_for
 from apps.home import blueprint
 from flask_login import login_required
 from jinja2 import TemplateNotFound
@@ -81,6 +82,21 @@ def log():
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
+# profile_data: dict = {
+#     "username": '',
+#     "platform": '',
+#     "public_profile_name": '',
+#     "followers": 0,
+#     "likes": 0,
+#     "posts": 0,
+#     "profile_picture": '',
+#     "bio_text": '',
+#     "external_url": '',
+#     "time_taken": 0,
+#     "error": ''
+#     "existing_record":""
+# }
+
 
 @blueprint.route("/search", methods=["GET", "POST"])
 # @login_required
@@ -99,10 +115,23 @@ def search():
             profile_data = search_user_profile(username, platform)
             if profile_data.get("error") is not None:
                 flash(profile_data["error"], "danger")
-            existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first() is not None
-            profile_data["existing_record"] = existingRecord
-            if profile_data and not existingRecord:
-                session["profile_data"] = profile_data
+            existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first()
+            if existingRecord:
+                profile_data["existing_record"] = existingRecord
+                flash("الحساب موجود بالفعل, تم تحويلك على صفحة تعديل/عرض الحساب", "danger")
+                return redirect(
+                    url_for(
+                        "social_blueprint.socialaccount_edit",
+                        socialaccount_id=existingRecord.id,
+                    )
+                )
+                # return render_template(
+                #     "social/socialaccount_edit.html",
+                #     form=form,
+                #     socialaccount=existingRecord,
+                #     influencer=existingRecord.influencer,
+                #     profile_data=profile_data,
+                # )
         except Exception as e:
             flash(f"Error: {str(e)}")  # Handle backend errors gracefully
 
