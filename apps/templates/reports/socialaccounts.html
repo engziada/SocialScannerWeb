@@ -73,6 +73,7 @@
 
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">إسم بالكامل</th>
                             <th scope="col">المنصة</th>
@@ -83,7 +84,8 @@
                             <th scope="col">صورة الحساب</th>
                             <th scope="col"></th>
                         </tr>
-                        
+                        </thead>
+                        <tbody>
                         {% for socialaccount in socialaccounts %}
                             <tr>
                                 <td scope="row">
@@ -103,12 +105,13 @@
                                 <td scope="row"><img src="{{ url_for('static', filename='profile_pictures/' +  socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150'}}" alt="Profile Picture" class="thumbnail"></td>
                                 <td scope="row">
                                     <div class="btn-bar">
-                                        <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a>
+                                        <!-- <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a> -->
                                         <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-default" onclick="openConfirmationModal('هل أنت متأكد من الحذف ؟','{{ url_for('social_blueprint.socialaccount_delete',influencer_id=socialaccount.influencer_id, socialaccount_id=socialaccount.id) }}');">حذف</a>
                                     </div>
                                 </td>
                             </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
                 <br>

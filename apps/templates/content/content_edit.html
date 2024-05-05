@@ -56,12 +56,15 @@
                 <h3>أمثلة على الحسابات</h3>
                 {% if socialaccounts %}
                 <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th scope="col">إسم بالكامل</th>
                         <th scope="col">المنصة</th>
                         <th scope="col">إسم المستخدم</th>
                         <th scope="col">صورة الحساب</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     {% for socialaccount in socialaccounts %}
                     <tr>
                         <td>{{ socialaccount.influencer.full_name }}</td>
@@ -70,6 +73,7 @@
                         <td><img src="{{ url_for('static', filename='profile_pictures/' + socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150' }}" alt="{{ socialaccount.username }}" class="img-thumbnail" width="50"></td>
                     </tr>
                     {% endfor %}
+                    </tbody>
                 </table>
                 {% else %}
                 <p>لا يوجد حسابات</p>

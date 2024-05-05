@@ -51,5 +51,4 @@ def download_excel(model_name) -> str:
 
     # Get the full path of the excel file
     full_path = path.abspath(excel_file_path)
-    ic(full_path)
     return full_path

@@ -1,0 +1,149 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}التقرير اليومي {% endblock %}
+{% block header_title %}التقرير اليومي{% endblock %}
+{% block header_profile_image %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+    <path d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm320-196c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM192 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM64 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z" />
+</svg>
+{% endblock %}
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+
+        <section class="section-header">
+            <div class="container">
+                <form method="GET" action="{{ url_for('reports_blueprint.daily_report') }}" class="search-bar">
+                    <!-- <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='SocialAccount') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a> -->
+                    <button onclick="exportTableToExcel()" class="btn" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</button>                    
+                    <!-- <div class="mb-3">
+                        <select class="form-select" id="contentOptions" aria-label="contentOptions" name="content">
+                            <option value="" selected>إختر المحتوى</option>
+                            {% for content in contents %}
+                            <option value="{{ content.name }}">{{ content.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <select class="form-select" id="platformOptions" aria-label="platformOptions" name="platform">
+                            <option value="" selected>إختر المنصة</option>
+                            {% for platform in platforms %}
+                            <option value="{{ platform.name }}">{{ platform.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div> -->
+                </form>
+
+                <div class="table-container">
+                    <table class="table table-hover" id="myTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" rowspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">إسم المؤثر</th>
+                                <th scope="col" rowspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">الجنس</th>
+
+                                {% for platform in platforms %}
+                                <th scope="colgroup" colspan="{{platforms|length}}" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; text-align: center;">{{ platform.name }}</th>
+                                {% endfor %}
+
+                                <th scope="colgroup" colspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">بيانات الاتصال</th>
+                            </tr>
+                            <tr>
+                                {% for platform in platforms %}
+                                <th scope="col" style="border-right: 1px solid #bfbfbf;">المستخدم</th>
+                                <th scope="col">المحتوى</th>
+                                <th scope="col" style="border-left: 1px solid #bfbfbf;">المتابعين</th>
+                                {% endfor %}
+                                <th scope="col" style="border-right: 1px solid #bfbfbf;">التليفون</th>
+                                <th scope="col" style="border-left: 1px solid #bfbfbf;">البريد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for influencer in influencers %}
+                                <tr>
+                                    <td scope="row" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">
+                                        <a href="{{ url_for('profiles_blueprint.influencer_edit', influencer_id=influencer.id) }}">
+                                        {{ influencer.full_name }}
+                                        </a>
+                                    </td>
+                                    <td scope="row" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">{{ influencer.gender }}</td>
+
+                                    {% for platform in platforms %}
+                                    {% set socialaccount = influencer.socialaccounts|selectattr('platform_id', 'eq', platform.id)|list %}
+                                    {% if socialaccount %}
+                                    {% set account = socialaccount[0] %}
+                                    <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ account.username}}</td>
+                                    <td scope="row">{{ account.contents|map(attribute='name')|join(', ') }}</td>
+                                    <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ (account.scan_results|sort(attribute='creation_date')|last).followers }}</td>
+                                    {% else %}
+                                    <td scope="row" style="border-right: 1px solid #bfbfbf;"></td>
+                                    <td scope="row"></td>
+                                    <td scope="row" style="border-left: 1px solid #bfbfbf;"></td>
+                                    {% endif %}
+                                    {% endfor %}
+
+                                    <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ influencer.phone }}</td>
+                                    <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ influencer.email }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <nav aria-label="Blog page navigation">
+                    <ul class="pagination">
+                        {% for page in influencers.iter_pages() %}
+                        {% if page %}
+                        {% if influencers.page == page %}
+                        <li class="page-item active">
+                            <a class="page-link" href="#">{{ page }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('reports_blueprint.daily_report', page=page) }}">{{ page }}</a>
+                        </li>
+                        {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://unpkg.com/file-saver"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/tableexport.jquery.plugin/tableexport.min.js"></script>
+<script>
+    function exportTableToExcel() {
+        var wb = XLSX.utils.table_to_book(document.getElementById('myTable'), { sheet: "Sheet 1" });
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'table.xlsx');
+    }
+
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+</script>
+{% endblock javascripts %}

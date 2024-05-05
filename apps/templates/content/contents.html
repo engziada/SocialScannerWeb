@@ -21,12 +21,14 @@
             <div class="container">
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">المحتوى</th>
                             <th scope="col">الوصف</th>
                             <th scope="col"></th>
                         </tr>
-                        
+                        </thead>
+                        <tbody>                         
                         {% for content in contents %}
                             <tr>
                                 <td scope="row">
@@ -45,6 +47,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
                 <hr>

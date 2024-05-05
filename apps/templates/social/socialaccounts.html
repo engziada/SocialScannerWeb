@@ -3,7 +3,9 @@
 {% block title %} الحسابات {% endblock %}
 {% block header_title %} الحسابات{% endblock %}
 {% block header_sub_title %} {{influencer.full_name}}{% endblock %}
-{% block header_profile_image %}{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}{% endblock %}
+{% block header_profile_image %}
+<img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}">
+{% endblock %}
 
 
 <!-- Specific Page CSS goes HERE  -->
@@ -22,6 +24,7 @@
                 </div>                
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">إسم بالكامل</th>
                             <th scope="col">المنصة</th>
@@ -31,7 +34,8 @@
                             <th scope="col">صورة الحساب</th>
                             <th scope="col"></th>
                         </tr>
-                        
+                        </thead>
+                        <tbody>
                         {% for socialaccount in socialaccounts %}
                             <tr>
                                 <td scope="row">
@@ -56,6 +60,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
                 <br>

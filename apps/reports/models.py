@@ -1,3 +1,4 @@
+import shutil
 from apps import db
 from werkzeug.utils import secure_filename
 from os import path, makedirs
@@ -24,18 +25,23 @@ class ScanResults(db.Model):
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
     time_taken = db.Column(db.String(20))
 
-    def save_profile_picture(self, picture_file):
-        if picture_file:
-            upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
-            if not path.exists(upload_folder):
-                makedirs(upload_folder)
-            filename = secure_filename(picture_file.filename)
-            current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-            new_filename = f'{current_time}.{filename.split(".")[-1]}'
-            filepath = path.join(upload_folder, new_filename)
-            picture_file.save(filepath)
-            self.profile_picture = new_filename
-            db.session.commit()
+    # def save_profile_picture(self, picture_file=None, existing_file_path=None):
+    #     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    #     if not path.exists(upload_folder):
+    #         makedirs(upload_folder)
+    #     current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+    #     if picture_file:
+    #         filename = secure_filename(picture_file.filename)
+    #         new_filename = f'{current_time}.{filename.split(".")[-1]}'
+    #         filepath = path.join(upload_folder, new_filename)
+    #         picture_file.save(filepath)
+    #     elif existing_file_path:
+    #         filename = path.basename(existing_file_path)
+    #         new_filename = f"{current_time}.jpg"
+    #         filepath = path.join(upload_folder, new_filename)
+    #         shutil.copy(existing_file_path, filepath)
+    #     self.profile_picture = new_filename
+    #     db.session.commit()
 
 
 class ScanLog(db.Model):

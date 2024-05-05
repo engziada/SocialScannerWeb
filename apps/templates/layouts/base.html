@@ -121,6 +121,7 @@
                                     <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
                                 </a>
                                 <div class="dropdown-menu py-0" aria-labelledby="zPagesDropdown">
+                                    <a class="dropdown-item rounded-top" href="{{ url_for('reports_blueprint.daily_report') }}">التقرير اليومي<i class="fas fa-calendar-alt"></i></a>
                                     <a class="dropdown-item rounded-top" href="{{ url_for('reports_blueprint.scanResults_report') }}">تقرير المتابعة<i class="fas fa-sort-numeric-up-alt"></i></a>
                                     <a class="dropdown-item " href="{{ url_for('reports_blueprint.scanLog') }}">تقرير الأدآء<i class="fas fa-cogs"></i></a>
                                     <a class="dropdown-item " href="{{ url_for('reports_blueprint.contents_report') }}">تقرير المحتوى<i class="fas fa-microphone"></i></a>

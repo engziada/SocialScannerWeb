@@ -21,6 +21,7 @@
             <div class="container">
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">المحتوى</th>
                             <th scope="col">الإجمالي</th>
@@ -29,7 +30,8 @@
                             <th scope="col">إناث</th>
                             <th scope="col">الأخرى</th>
                         </tr>
-                        
+                        </thead>
+                        <tbody>
                         {% for content in data %}
                             <tr>
                                 <td scope="row">{{ content.content_type }}</td>
@@ -40,6 +42,7 @@
                                 <td scope="row">{{ content.other_percentage }}% {{ content.other}}</td>
                             </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
                 <hr>

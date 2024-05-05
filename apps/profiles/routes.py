@@ -1,3 +1,5 @@
+from apps import db
+
 from flask import (
     render_template,
     redirect,
@@ -8,17 +10,14 @@ from flask import (
 )
 from flask_wtf.file import FileField
 from sqlalchemy import desc
-
-from apps.home.models import Log
-from apps.profiles import blueprint
-
-from apps import db
-
-from apps.profiles.forms import InfluencerForm
-from apps.profiles.models import Influencer
-
 from icecream import ic
 from sqlalchemy.exc import IntegrityError
+
+from apps.home.models import Log
+from apps.home.util import search_user_profile
+from apps.profiles import blueprint
+from apps.profiles.forms import InfluencerForm
+from apps.profiles.models import Influencer
 
 from apps.reports.models import ScanResults
 from apps.social.models import SocialAccount
@@ -76,7 +75,7 @@ def influencer_add():
             if profile_data and profile_data["profile_picture"] and set_as_default_profile_picture:
                 new_influencer.download_image(profile_data["profile_picture"])
             elif form.profile_picture.data:
-                new_influencer.save_profile_picture(form.profile_picture.data)
+                new_influencer.save_profile_picture(picture_file=form.profile_picture.data)
 
             db.session.add(new_influencer)
             db.session.commit()
@@ -147,6 +146,10 @@ def influencer_edit(influencer_id):
         )
         scanresults.extend(scan_result)
 
+    profile_data_list = []
+    for socialaccount in socialaccounts:
+        profile_data = search_user_profile(socialaccount.username, socialaccount.platform_id)
+        profile_data_list.append(profile_data)
 
     form = InfluencerForm(obj=influencer)  # Create an instance of the form
     if form.validate_on_submit():
@@ -159,7 +162,7 @@ def influencer_edit(influencer_id):
         # influencer.profile_picture=form.profile_picture.data
         
         if type(form.profile_picture) == FileField and form.profile_picture.data:
-            influencer.save_profile_picture(form.profile_picture.data)
+            influencer.save_profile_picture(picture_file=form.profile_picture.data)
 
         db.session.commit()
         flash("تم تعديل الملف", "success")
@@ -170,4 +173,5 @@ def influencer_edit(influencer_id):
         form=form,
         influencer=influencer,
         scanresults=scanresults,
+        profile_data_list=profile_data_list,
     )

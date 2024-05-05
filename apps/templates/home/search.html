@@ -105,7 +105,11 @@
                 </div>
                 <div class="btn-bar">
                 {% if not profile_data.get('existing_record') %}
+                    {% if session.get('current_influencer_id') %}
+                    <a href="{{ url_for('social_blueprint.socialaccount_add',influencer_id=session.get('current_influencer_id')) }}" class="btn btn-primary">إضافة الحساب</a>
+                    {% else %}
                     <a href="{{ url_for('profiles_blueprint.influencer_add') }}" class="btn btn-primary">إضافة ملف شخصي</a>
+                    {% endif %}
                 {% endif %}
                 </div>
             </div>

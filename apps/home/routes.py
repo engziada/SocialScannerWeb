@@ -19,7 +19,6 @@ from icecream import ic
 # @login_required
 def index():
     statistics = get_summerized_report()
-    ic(statistics)
     return render_template('home/index.html', segment='index', stats=statistics)
 
 
@@ -112,11 +111,11 @@ def search():
         username = form.username.data
 
         try:
+            existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first()
             profile_data = search_user_profile(username, platform)
             if profile_data.get("error") is not None:
                 flash(profile_data["error"], "danger")
-            existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first()
-            if existingRecord:
+            elif existingRecord:
                 profile_data["existing_record"] = existingRecord
                 flash("الحساب موجود بالفعل, تم تحويلك على صفحة تعديل/عرض الحساب", "danger")
                 return redirect(
@@ -125,14 +124,10 @@ def search():
                         socialaccount_id=existingRecord.id,
                     )
                 )
-                # return render_template(
-                #     "social/socialaccount_edit.html",
-                #     form=form,
-                #     socialaccount=existingRecord,
-                #     influencer=existingRecord.influencer,
-                #     profile_data=profile_data,
-                # )
+            else:
+                session["profile_data"] = profile_data
         except Exception as e:
+            ic('Search=>',e)
             flash(f"Error: {str(e)}")  # Handle backend errors gracefully
 
     return render_template("home/search.html", form=form, profile_data=profile_data)

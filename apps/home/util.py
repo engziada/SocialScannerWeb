@@ -1,8 +1,7 @@
-
 from datetime import datetime
 from genericpath import isfile
 from os import listdir, makedirs, path
-import profile
+import os
 import random
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
@@ -183,17 +182,33 @@ def snapchat(username: str) -> dict:
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
-def instagram(username: str) -> dict:
+def instagram(query: str) -> dict:
+    # Define session file path
+    # session_file_path = os.path.join(".", f"engziada_session")
+    # ic(session_file_path)
+    # if os.path.exists(session_file_path):
+    #     ic("Removing session file")
+    #     os.remove(session_file_path)
+
     profile_data = {}
+    # Create Instaloader instance
     L = instaloader.Instaloader()
 
-    # Login (if required)
-    # L.login("engziada", "mazisvip")
-    # L.two_factor_login(two_factor_code)
-    # L.load_session_from_file('engziada')
+    # Login using provided username and password
+    username = "humandynasser@gmail.com"
+    password = "123kdd123kdd@"
+
+    try:
+        # L.load_session_from_file(username)
+        L.load_session_from_file(username, filename=os.path.join('.', f'{username}_session'))
+    except FileNotFoundError:
+        L.login(username, password)  # Log in
+        L.save_session_to_file(filename=os.path.join(".", f"{username}_session"))  # Save session to a file
+        # L.context.log("Logging in...")
+        # L.context.log_in(username, password)  # Log in programmatically
 
     # Retrieve profile details
-    profile = instaloader.Profile.from_username(L.context, username)
+    profile = instaloader.Profile.from_username(L.context, query)
     if not profile:
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data

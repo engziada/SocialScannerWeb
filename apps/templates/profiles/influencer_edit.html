@@ -108,12 +108,34 @@
                     </div>
                     {% endif %}
                 </div>
+                <br>
+                <div class="row">
+                    {% for profile_data in profile_data_list %}
+                    <div class="col" style="max-width: 350px;">
+                        <div class="card shadow"><img src="{{ profile_data.get('profile_picture') }}" class="card-img-top rounded-top" alt="{{ profile_data.get('username') }}">
+                            <div class="card-body">
+                                <h4 style="display: flex; flex-direction: row-reverse;"><span class="fab fa-{{profile_data.get('platform_name_english')}} me-2"></span>{{ profile_data.get('username') }}</h4>
+                                <h3 class="h5 card-title mt-3">{{ profile_data.get('public_profile_name') }}</h3>
+                                <p class="card-text">المنصة: {{ profile_data.get('platform') }}</p>
+                                <p class="card-text">عدد المتابعين: {{ profile_data.get('followers') }}</p>
+                                <p class="card-text">عدد الإعجابات: {{ profile_data.get('likes') }}</p>
+                                <p class="card-text">عدد المقاطع المنشورة: {{ profile_data.get('posts') }}</p>
+                                <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
+                                <p class="card-text">رابط الملف: <a href="{{ profile_data.get('external_url') }}" target="_blank">إضغط هنا</a></p>
+                                <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
+                    
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
                 
                 {% if influencer.socialaccounts %}
                 <br><br>
                 <h3 style="border-bottom: 3px double #000;">الحسابات</h3>
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">إسم بالكامل</th>
                             <th scope="col">المنصة</th>
@@ -122,7 +144,8 @@
                             <th scope="col">الرابط</th>
                             <th scope="col">صورة الحساب</th>
                         </tr>
-                
+                        </thead>
+                        <tbody>                
                         {% for socialaccount in influencer.socialaccounts %}
                         <tr>
                             <td scope="row">{{ influencer.full_name }}</td>
@@ -137,14 +160,16 @@
                             <td scope="row"><img src="{{ url_for('static', filename='profile_pictures/' +  socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150'  }} " alt="Profile Picture" class="thumbnail"></td>
                         </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
                 {% endif %}
 
                 <br><br>
-                <h3 style="border-bottom: 3px double #000;">آخر 5 عمليات المسح</h3>
+                <h3 style="border-bottom: 3px double #000;">آخر 5 تحديثات</h3>
                 <div class="table-container">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">المنصة</th>
                             <th scope="col">التاريخ</th>
@@ -153,7 +178,8 @@
                             <th scope="col">الإعجابات</th>
                             <th scope="col">المنشورات</th>
                         </tr>
-                    
+                        </thead>
+                        <tbody>
                         {% for scanresult in scanresults %}
                             <tr>
                                 <td scope="row">{{ scanresult.socialaccount.platform.name }}</td>
@@ -164,6 +190,7 @@
                                 <td scope="row">{{ scanresult.posts }}</td>
                             </tr>
                         {% endfor %}
+                        </tbody>
                     </table>
                 </div>
 

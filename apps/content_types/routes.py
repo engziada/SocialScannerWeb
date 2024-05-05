@@ -67,9 +67,7 @@ def content_edit(content_id):
         join(Content).\
         filter(Content.id == content_id).\
         all()
-        
-    ic(socialaccounts)
-    
+            
     form = ContentForm(obj=content)  # Create an instance of the form
     if form.validate_on_submit():
                 content.name = form.name.data

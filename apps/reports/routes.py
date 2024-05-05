@@ -2,7 +2,7 @@ from calendar import c
 import datetime
 import math
 from flask import render_template, request
-from sqlalchemy import func
+from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import aliased
 
 
@@ -76,10 +76,6 @@ def scanLog():
         .paginate(page=page, per_page=per_page)
     )
     
-    for item in scanlog.items:
-        ic(item.failures.items)
-        # = literal_eval(item.failures)
-
     return render_template(
         "reports/scanlog.html",
         scanlog=scanlog,
@@ -106,27 +102,48 @@ def socialaccounts():
     platform= request.args.get("platform", "")
     gender= request .args.get("gender", "")
     
-    ic(content, platform)
+    # ic(content, platform)
     
     contents = Content.query.all()
     platforms=Platform.query.all()
     
 
-    # filter influencers
-    socialaccounts = SocialAccount.query.filter(
-        SocialAccount.influencer.has(
-            (Influencer.full_name.ilike(f"%{search_terms}%"))
-            | (SocialAccount.username.ilike(f"%{search_terms}%"))
-        ),
-        SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")),
-        SocialAccount.contents.any(Content.name.ilike(f"%{content}%")),
-        SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")),
-        SocialAccount.creation_date >= from_date,
-        SocialAccount.creation_date <= to_date,
-    ).paginate(page=page, per_page=per_page)
+    # # filter influencers
+    # socialaccounts = SocialAccount.query.filter(
+    #     SocialAccount.influencer.has(
+    #         (Influencer.full_name.ilike(f"%{search_terms}%"))
+    #         | (SocialAccount.username.ilike(f"%{search_terms}%"))
+    #     ),
+    #     SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")),
+    #     SocialAccount.contents.any(Content.name.ilike(f"%{content}%")),
+    #     SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")),
+    #     SocialAccount.creation_date >= from_date,
+    #     SocialAccount.creation_date <= to_date,
+    # ).paginate(page=page, per_page=per_page)
     
-    # socialaccounts = SocialAccount.query.paginate(page=page, per_page=per_page)
-    # Fetch social accounts for a specific influencer
+    query = SocialAccount.query
+    if search_terms:
+        search_condition = or_(
+            Influencer.full_name.ilike(f"%{search_terms}%"),
+            SocialAccount.username.ilike(f"%{search_terms}%")
+        )
+        query = query.filter(SocialAccount.influencer.has(search_condition))
+    if gender:
+        query = query.filter(SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")))
+    if content:
+        query = query.filter(SocialAccount.contents.any(Content.name.ilike(f"%{content}%")))
+    if platform:
+        query = query.filter(SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")))
+    if from_date and to_date:
+        date_condition = and_(
+            SocialAccount.creation_date >= from_date,
+            SocialAccount.creation_date <= to_date
+        )
+        query = query.filter(date_condition)
+    socialaccounts = query.paginate(page=page, per_page=per_page)
+    ic(search_terms, from_date, to_date, content, platform, gender)
+    ic(socialaccounts.items)
+
     return render_template(
         "reports/socialaccounts.html",
         socialaccounts=socialaccounts,
@@ -317,3 +334,40 @@ def contents_report():
     )
     # ic(data)
     return render_template("reports/contents_report.html", data=data)
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
+
+@blueprint.route("/daily_report")
+# @login_required
+def daily_report():
+    page = request.args.get("page", 1, type=int)
+    per_page = 50  # Number of logs per page
+
+    content = request.args.get("content", "")
+    platform = request.args.get("platform", "")
+
+    contents = Content.query.all()
+    platforms = Platform.query.all()
+    
+    # filter influencers
+    influencers = (
+        Influencer.query.filter(
+            Influencer.socialaccounts.any(
+                SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%"))
+            )
+            | Influencer.socialaccounts.any(
+                SocialAccount.contents.any(Content.name.ilike(f"%{content}%"))
+            )
+        )
+    ).paginate(page=page, per_page=per_page)
+
+    return render_template(
+        "reports/daily_report.html",
+        influencers=influencers,
+        contents=contents,
+        platforms=platforms,
+    )
+
+
+# ////////////////////////////////////////////////////////////////////////////////////////

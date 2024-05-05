@@ -43,6 +43,12 @@ def socialaccounts(influencer_id):
 # @login_required
 @Log.add_log("إضافة حساب")
 def socialaccount_add(influencer_id):
+    referer = request.headers.get("Referer")
+    if referer:
+        ic(f"This route was redirected from {referer}")
+        if referer.endswith("influencers"):
+            session.pop("profile_data")
+
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
@@ -53,11 +59,11 @@ def socialaccount_add(influencer_id):
         profile_data = session["profile_data"]
         # session.pop("profile_data")
     else:
+        session["current_influencer_id"] = influencer_id
         return redirect(url_for("home_blueprint.search"))
 
     
     form = SocialAccountForm()  # Create an instance of the form
-    # form.content_type.choices = [(content.id, content.name) for content in Content.query.all()]
     form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
     form.platform.data = profile_data.get("platform_id") if profile_data.get("platform_id") else 1
     form.username.data = profile_data.get("username") if profile_data.get("username") else ""
@@ -82,22 +88,21 @@ def socialaccount_add(influencer_id):
 
             db.session.add(new_socialaccount)
             db.session.commit()
-            ic(new_socialaccount.id)
             flash("تم إضافة الحساب", "success")
             session.pop("profile_data")
             return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
         except IntegrityError:
-            ic("IntegrityError")
+            ic("SocialAccount_Add=>", "IntegrityError")
             db.session.rollback()
             flash("إسم الحساب موجود بالفعل", "danger")
         except Exception as e:
-            ic(e)
+            ic("SocialAccount_Add=>", e)
             db.session.rollback()
             flash(f"حدث خطأ أثناء تسجيل البيانات\n{e}", "danger")
     else:
         # Form validation failed
         errors = form.errors
-        ic(errors)
+        ic("SocialAccount_Add=>", errors)
     return render_template("social/socialaccount_add.html", form=form, influencer=influencer, profile_data=profile_data)
 
 
@@ -196,7 +201,7 @@ def socialaccount_edit(socialaccount_id):
         )
     else:
         errors = form.errors
-        ic(errors)
+        ic("SocialAccount_Edit=>", errors)
 
     return render_template("social/socialaccount_edit.html", form=form, socialaccount=socialaccount, influencer=socialaccount.influencer, profile_data=profile_data)
 

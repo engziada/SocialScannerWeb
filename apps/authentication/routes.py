@@ -1,6 +1,7 @@
 from flask import render_template, redirect, request, url_for
 from flask_login import (
     current_user,
+    login_required,
     login_user,
     logout_user
 )
@@ -58,6 +59,7 @@ def login():
 
 @blueprint.route('/register', methods=['GET', 'POST'])
 @Log.add_log("إضافة مستخدم")
+@login_required
 def register():
     create_account_form = CreateAccountForm(request.form)
     if 'register' in request.form:
