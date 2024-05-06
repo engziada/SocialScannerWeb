@@ -9,11 +9,6 @@ body {
     min-width: 290px;
 }
 
-.header-global{
-    overflow: hidden;
-    height: 400px;
-}
-
 .header-profile-picture {
     width: 350px;
     height: 350px;
@@ -272,4 +267,30 @@ tbody tr{
     text-align: center;
     border-left: 1px solid var(--tertiary-color); 
     border-right: 1px solid var(--tertiary-color);
+}
+
+
+
+.header-global{
+    overflow: hidden;
+    /* height: 400px; */
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 992px) { 
+    .navbar-nav .dropdown-menu {
+        display: block;
+    }
+}
+
+@media (max-width: 991px) {
+    .navbar-nav .dropdown-menu {
+        position: absolute; 
+    }
+
+    .d-flex.align-items-center {
+        order: 1;
+        flex-wrap: wrap;
+    }
 }

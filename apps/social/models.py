@@ -27,6 +27,12 @@ class Platform(db.Model):
     def __repr__(self):
         return f"Platform(id={self.id}, name='{self.name}')"
 
+# profile_data: dict = {
+#     "followers": 0,
+#     "likes": 0,
+#     "posts": 0,
+# }
+
 
 # Define Subprofiles Model
 class SocialAccount(db.Model):
@@ -39,10 +45,11 @@ class SocialAccount(db.Model):
     contents = db.relationship("Content", secondary="socialaccount_content", backref="socialaccounts", lazy=True)
     bio_text = db.Column(db.Text)
     profile_picture = db.Column(db.String(255))
-    
     public_profile_name = db.Column(db.String(100))
     external_url = db.Column(db.String(255))
-
+    followers = db.Column(db.Integer)
+    likes = db.Column(db.Integer)
+    posts = db.Column(db.Integer)
     scan_results = db.relationship("ScanResults",  lazy=True)
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())

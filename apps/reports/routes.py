@@ -2,6 +2,7 @@ from calendar import c
 import datetime
 import math
 from flask import render_template, request
+from numpy import Inf
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import aliased
 
@@ -73,6 +74,7 @@ def scanLog():
             ScanLog.creation_date >= from_date,
             ScanLog.creation_date <= to_date,
         )
+        .order_by(ScanLog.creation_date.desc())  # Add this line to order by creation_date descending
         .paginate(page=page, per_page=per_page)
     )
     
@@ -344,28 +346,21 @@ def daily_report():
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
-    content = request.args.get("content", "")
+    # content = request.args.get("content", "")
     platform = request.args.get("platform", "")
 
-    contents = Content.query.all()
+    # contents = Content.query.all()
     platforms = Platform.query.all()
     
     # filter influencers
-    influencers = (
-        Influencer.query.filter(
-            Influencer.socialaccounts.any(
-                SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%"))
-            )
-            | Influencer.socialaccounts.any(
-                SocialAccount.contents.any(Content.name.ilike(f"%{content}%"))
-            )
-        )
-    ).paginate(page=page, per_page=per_page)
+    # influencers = Influencer.query.paginate(page=page, per_page=per_page)
+    influencers = (Influencer.query.filter(Influencer.socialaccounts.any(SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%"))))).paginate(page=page, per_page=per_page)
+    
 
     return render_template(
         "reports/daily_report.html",
         influencers=influencers,
-        contents=contents,
+        platform=platform,
         platforms=platforms,
     )
 

@@ -123,7 +123,7 @@
                                 <p class="card-text">نص البايو: {{ profile_data.get('bio_text') }}</p>
                                 <p class="card-text">رابط الملف: <a href="{{ profile_data.get('external_url') }}" target="_blank">إضغط هنا</a></p>
                                 <p class="card-text">الوقت المستغرق: {{ profile_data.get('time_taken') }}</p>
-                    
+                                <button type="button" class="btn btn-primary" id="downloadButton" data-influencer-id="{{ influencer.id }}" data-picture-url="{{ profile_data.get('profile_picture') }}">تحديث صورة الملف</button>
                             </div>
                         </div>
                     </div>
@@ -218,6 +218,29 @@
             // Enable the submit button when the form has changes
             document.getElementById('submitButton').disabled = false;
             document.getElementById('addButton').disabled = true;
+        });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#downloadButton").click(function () {
+                var influencerId = $(this).data('influencer-id');
+                var pictureUrl = $(this).data('picture-url');
+                $.ajax({
+                    url: '/influencer/update_picture',  // Replace with the actual URL of the update_image function
+                    type: 'post',
+                    data: {
+                        'influencer_id': influencerId,
+                        'picture_url': pictureUrl
+                    },
+                    success: function (response) {
+                        window.location.href = response.redirect_url;
+                    },
+                    error: function (error) {
+                        window.location.href = response.redirect_url;
+                    }
+                });
+            });
         });
     </script>
 {% endblock javascripts %}

@@ -81,7 +81,9 @@
                             <th scope="col">الجنس</th>
                             <th scope="col">نوع المحتوى</th>
                             <th scope="col">تاريخ الإضافة</th>
-                            <th scope="col">صورة الحساب</th>
+                            <th scope="col">المتابعين</th>
+                            <th scope="col">المنشورات</th>
+                            <th scope="col">الإعجابات</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -102,7 +104,9 @@
                                 <td scope="row">{{ socialaccount.influencer.gender }}</td>
                                 <td scope="row">{{ socialaccount.contents|map(attribute='name')|join(', ') }}</td>
                                 <td scope="row">{{ socialaccount.creation_date }}</td>
-                                <td scope="row"><img src="{{ url_for('static', filename='profile_pictures/' +  socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150'}}" alt="Profile Picture" class="thumbnail"></td>
+                                <td scope="row">{{ socialaccount.followers }}</td>
+                                <td scope="row">{{ socialaccount.posts }}</td>
+                                <td scope="row">{{ socialaccount.likes }}</td>
                                 <td scope="row">
                                     <div class="btn-bar">
                                         <!-- <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a> -->

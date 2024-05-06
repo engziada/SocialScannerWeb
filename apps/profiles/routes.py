@@ -1,6 +1,7 @@
 from apps import db
 
 from flask import (
+    jsonify,
     render_template,
     redirect,
     request,
@@ -174,4 +175,26 @@ def influencer_edit(influencer_id):
         influencer=influencer,
         scanresults=scanresults,
         profile_data_list=profile_data_list,
+    )
+    
+    
+@blueprint.route("/influencer/update_picture", methods=["POST"])
+# @login_required
+@Log.add_log("تعديل صورة ملف")
+def influencer_update_picture():
+    influencer_id = request.form.get('influencer_id')
+    picture_url = request.form.get('picture_url')
+    # get influencer
+    influencer = Influencer.query.get(influencer_id)
+    if not influencer:
+        flash("الملف غير موجود", "danger")
+        return jsonify({"redirect_url": url_for("profiles_blueprint.influencers")})
+    influencer.download_image(picture_url)
+    flash("تم تعديل الصورة", "success")
+    return jsonify(
+        {
+            "redirect_url": url_for(
+                "profiles_blueprint.influencer_edit", influencer_id=influencer_id
+            )
+        }
     )

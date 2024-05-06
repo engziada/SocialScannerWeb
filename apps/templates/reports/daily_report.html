@@ -30,7 +30,9 @@
                             <option value="{{ content.name }}">{{ content.name }}</option>
                             {% endfor %}
                         </select>
-                    </div>
+                    </div>-->
+                    <a href="{{ url_for('reports_blueprint.daily_report') }}" class="btn btn-primary">إلغاء التصفية</a>
+                    <button type="submit" class="btn btn-primary">تصفية</button>
                     <div class="mb-3">
                         <select class="form-select" id="platformOptions" aria-label="platformOptions" name="platform">
                             <option value="" selected>إختر المنصة</option>
@@ -38,7 +40,7 @@
                             <option value="{{ platform.name }}">{{ platform.name }}</option>
                             {% endfor %}
                         </select>
-                    </div> -->
+                    </div> 
                 </form>
 
                 <div class="table-container">
@@ -48,18 +50,32 @@
                                 <th scope="col" rowspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">إسم المؤثر</th>
                                 <th scope="col" rowspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">الجنس</th>
 
-                                {% for platform in platforms %}
-                                <th scope="colgroup" colspan="{{platforms|length}}" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; text-align: center;">{{ platform.name }}</th>
-                                {% endfor %}
+                                {% if not platform %}
+                                    {% for platform in platforms %}
+                                        <th scope="colgroup" colspan="5" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; text-align: center;">{{ platform.name }}</th>
+                                    {% endfor %}
+                                {% else %}
+                                    <th scope="colgroup" colspan="5" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; text-align: center;">{{ platform }}</th>
+                                {% endif %}
 
                                 <th scope="colgroup" colspan="2" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">بيانات الاتصال</th>
                             </tr>
                             <tr>
-                                {% for platform in platforms %}
-                                <th scope="col" style="border-right: 1px solid #bfbfbf;">المستخدم</th>
-                                <th scope="col">المحتوى</th>
-                                <th scope="col" style="border-left: 1px solid #bfbfbf;">المتابعين</th>
-                                {% endfor %}
+                                {% if not platform %}
+                                    {% for platform in platforms %}
+                                        <th scope="col" style="border-right: 1px solid #bfbfbf;">المستخدم</th>
+                                        <th scope="col">المحتوى</th>
+                                        <th scope="col">المتابعين</th>
+                                        <th scope="col">الإعجابات</th>
+                                        <th scope="col" style="border-left: 1px solid #bfbfbf;">المنشورات</th>
+                                    {% endfor %}
+                                {% else %}
+                                    <th scope="col" style="border-right: 1px solid #bfbfbf;">المستخدم</th>
+                                    <th scope="col">المحتوى</th>
+                                    <th scope="col">المتابعين</th>
+                                    <th scope="col">الإعجابات</th>
+                                    <th scope="col" style="border-left: 1px solid #bfbfbf;">المنشورات</th>
+                                {% endif %}
                                 <th scope="col" style="border-right: 1px solid #bfbfbf;">التليفون</th>
                                 <th scope="col" style="border-left: 1px solid #bfbfbf;">البريد</th>
                             </tr>
@@ -73,20 +89,42 @@
                                         </a>
                                     </td>
                                     <td scope="row" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">{{ influencer.gender }}</td>
-
-                                    {% for platform in platforms %}
-                                    {% set socialaccount = influencer.socialaccounts|selectattr('platform_id', 'eq', platform.id)|list %}
-                                    {% if socialaccount %}
-                                    {% set account = socialaccount[0] %}
-                                    <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ account.username}}</td>
-                                    <td scope="row">{{ account.contents|map(attribute='name')|join(', ') }}</td>
-                                    <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ (account.scan_results|sort(attribute='creation_date')|last).followers }}</td>
+                                    
+                                    {% if not platform %}
+                                        {% for platform in platforms %}
+                                            {% set socialaccount = influencer.socialaccounts|selectattr('platform_id', 'eq', platform.id)|list %}
+                                            {% if socialaccount %}
+                                                {% set account = socialaccount[0] %}
+                                                <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ account.username}}</td>
+                                                <td scope="row">{{ account.contents|map(attribute='name')|join(', ') }}</td>
+                                                <td scope="row">{{ account.followers }}</td>
+                                                <td scope="row">{{ account.likes }}</td>
+                                                <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ account.posts }}</td>
+                                            {% else %}
+                                                <td scope="row" style="border-right: 1px solid #bfbfbf;"></td>
+                                                <td scope="row"></td>
+                                                <td scope="row"></td>
+                                                <td scope="row"></td>
+                                                <td scope="row" style="border-left: 1px solid #bfbfbf;"></td>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% else %}
-                                    <td scope="row" style="border-right: 1px solid #bfbfbf;"></td>
-                                    <td scope="row"></td>
-                                    <td scope="row" style="border-left: 1px solid #bfbfbf;"></td>
+                                        {% set socialaccount = influencer.socialaccounts|selectattr('platform.name', 'eq', platform)|list %}
+                                        {% if socialaccount %}
+                                            {% set account = socialaccount[0] %}
+                                            <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ account.username}}</td>
+                                            <td scope="row">{{ account.contents|map(attribute='name')|join(', ') }}</td>
+                                                <td scope="row">{{ account.followers }}</td>
+                                                <td scope="row">{{ account.likes }}</td>
+                                                <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ account.posts }}</td>
+                                        {% else %}
+                                            <td scope="row" style="border-right: 1px solid #bfbfbf;"></td>
+                                            <td scope="row"></td>
+                                            <td scope="row"></td>
+                                            <td scope="row"></td>
+                                            <td scope="row" style="border-left: 1px solid #bfbfbf;"></td>
+                                        {% endif %}
                                     {% endif %}
-                                    {% endfor %}
 
                                     <td scope="row" style="border-right: 1px solid #bfbfbf;">{{ influencer.phone }}</td>
                                     <td scope="row" style="border-left: 1px solid #bfbfbf;">{{ influencer.email }}</td>

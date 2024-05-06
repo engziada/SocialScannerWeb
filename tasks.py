@@ -8,7 +8,7 @@ from apps.profiles.models import Influencer
 
 from icecream import ic
 
-from apps.social.models import Platform
+from apps.social.models import Platform, SocialAccount
 
 scan_log = {
     "success_count": {},
@@ -28,21 +28,47 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
         try:
             profile_data = search_user_profile(username, str(platform_id))
 
-            new_scanresults = ScanResults(
-                socialaccount_id=socialaccount_id,
-                public_profile_name=profile_data["public_profile_name"],
-                bio_text=profile_data["bio_text"],
-                profile_picture=profile_data["profile_picture"],
-                followers=profile_data["followers"],
-                likes=profile_data["likes"],
-                posts=profile_data["posts"],
-                external_url=profile_data["external_url"],
-                time_taken=profile_data["time_taken"],
-            )
-            db_session.add(new_scanresults)
-            db_session.commit()
-            # ic(f"Scan completed for {username} on platform {platform_id}")
+            # check first if the profile_data has errors and raise an exception
+            if profile_data.get("error"):
+                raise Exception(profile_data["error"])
+            # ic(profile_data)
             
+            # check if ScanResults has existing record with the same profile data
+            existing_scanresult = (
+                db_session.query(ScanResults)
+                .filter(ScanResults.socialaccount_id == socialaccount_id)
+                .filter(ScanResults.public_profile_name == profile_data["public_profile_name"])
+                .filter(ScanResults.bio_text == profile_data["bio_text"])
+                .filter(ScanResults.profile_picture == profile_data["profile_picture"])
+                .filter(ScanResults.followers == profile_data["followers"])
+                .filter(ScanResults.likes == profile_data["likes"])
+                .filter(ScanResults.posts == profile_data["posts"])
+                .filter(ScanResults.external_url == profile_data["external_url"])
+                .first()
+            )
+            if not existing_scanresult:
+                new_scanresults = ScanResults(
+                    socialaccount_id=socialaccount_id,
+                    public_profile_name=profile_data["public_profile_name"],
+                    bio_text=profile_data["bio_text"],
+                    profile_picture=profile_data["profile_picture"],
+                    followers=profile_data["followers"],
+                    likes=profile_data["likes"],
+                    posts=profile_data["posts"],
+                    external_url=profile_data["external_url"],
+                    time_taken=profile_data["time_taken"],
+                )
+                db_session.add(new_scanresults)
+                # update the socialaccount with the new scanresults
+                socialaccount = SocialAccount.query.get(socialaccount_id)
+                socialaccount.public_profile_name = profile_data["public_profile_name"]
+                socialaccount.bio_text = profile_data["bio_text"]
+                socialaccount.followers = profile_data["followers"]
+                socialaccount.likes = profile_data["likes"]
+                socialaccount.posts = profile_data["posts"]
+                db_session.commit()
+                
+            # ic(f"Scan completed for {username} on platform {platform_id}")
             # save the log, check if the platform is already in the log dictionary, add to success count
             scan_log["success_count"][platform_name] = scan_log.get("success_count", {}).get(platform_name, 0) + 1
                 
@@ -68,16 +94,18 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
 def scan_database(app,db_session):
     try:
         start_time = datetime.datetime.now()
-        profiles = Influencer.query.all()
-        socialaccounts = []
-        for profile in profiles:
-            for socialaccount in profile.socialaccounts:
-                socialaccounts.append({
-                    'id': socialaccount.id,
-                    'platform_id': socialaccount.platform_id,
-                    'username': socialaccount.username
-                })
-        # ic(socialaccounts)
+        socialaccounts=SocialAccount.query.all()
+        
+        # profiles = Influencer.query.all()
+        # socialaccounts = []
+        # for profile in profiles:
+        #     for socialaccount in profile.socialaccounts:
+        #         socialaccounts.append({
+        #             'id': socialaccount.id,
+        #             'platform_id': socialaccount.platform_id,
+        #             'username': socialaccount.username
+        #         })
+        # # ic(socialaccounts)
 
         with ThreadPoolExecutor() as executor:
             futures = []
@@ -87,9 +115,12 @@ def scan_database(app,db_session):
                         process_username,
                         app,
                         db_session,
-                        socialaccount["platform_id"],
-                        socialaccount["username"],
-                        socialaccount["id"],
+                        # socialaccount["platform_id"],
+                        # socialaccount["username"],
+                        # socialaccount["id"],
+                        socialaccount.platform_id,
+                        socialaccount.username,
+                        socialaccount.id,
                     )
                 )
             for future in futures:
