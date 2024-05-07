@@ -53,7 +53,8 @@
 
     <body>
 
-        <header class="header-global">
+
+<header class="header-global">
 
         <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary headroom navbar-dark">
             <div class="container position-relative">
@@ -61,12 +62,7 @@
                     <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Logo light">
                     <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Logo dark">
                 </a>
-        
-                <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-        
-                <div class="collapse navbar-collapse" id="navbar_global">
+                <div class="navbar-collapse collapse me-auto" id="navbar_global">
                     <div class="navbar-collapse-header">
                         <div class="row">
                             <div class="col-6 collapse-brand">
@@ -80,7 +76,6 @@
                         </div>
                     </div>
                     <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
-
                         <li class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" id="xPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
                                 <i class="fas fa-portrait"></i>
@@ -141,162 +136,95 @@
                             </div>
                         </li>
                     </ul>
-        
-                    <div class="d-flex align-items-center">
-                        {% if current_user.is_authenticated %}
-                        <a class="nav-link" href="{{ url_for('authentication_blueprint.logout') }}">خروج <i class="fas fa-sign-out-alt"></i></a>
-                        {% else %}
-                        <a class="nav-link" href="{{ url_for('authentication_blueprint.login') }}">دخول <i class="fas fa-sign-in-alt"></i></a>
-                        {% endif %}
-                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('authentication_blueprint.logout') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-out-alt me-2"></span> خروج</a>
+                    {% else %}
+                    <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-in-alt me-2"></span> دخول</a>
+                    {% endif %}
+                    <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                 </div>
             </div>
         </nav>
-
-        <section class="section-header bg-secondary text-white header-image">
-                <div class="header-title">
-                    <h1> {% block header_title %}{% endblock %} </h1>
-                    <h5> {% block header_sub_title %}{% endblock %}</h5>
-                </div>
-                <div class="header-profile-picture">
-                    {% block header_profile_image %}{% endblock %}
-                </div> 
-                <figure class="position-absolute bottom-0 left-0 w-100 d-none d-md-block mb-n2 header-figure">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" preserveAspectRatio="none">
-                        <path fill="#ffffff" d="M0,100 Q125,50 250,100 Q375,150 500,100 Q625,50 750,100 Q875,150 1000,100 L1000,200 L0,200 Z"></path>
-                    </svg>
-                </figure>
-        </section>
-
-            <!-- <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary headroom navbar-dark">
-                <div class="container position-relative">
-                    <a class="navbar-brand me-lg-5" href="{{ url_for('home_blueprint.index') }}">
-                        <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Logo light">
-                        <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Logo dark">
-                    </a>
-                    <div class="navbar-collapse collapse me-auto" id="navbar_global">
-                        <div class="navbar-collapse-header">
-                            <div class="row">
-                                <div class="col-6 collapse-brand">
-                                    <a href="{{ url_for('home_blueprint.index') }}">
-                                        <img src="/static/assets/img/brand/dark.svg" alt="logo">
-                                    </a>
-                                </div>
-                                <div class="col-6 collapse-close">
-                                    <a href="#navbar_global" class="fas fa-times" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" title="close" aria-label="Toggle navigation"></a>
-                                </div>
-                            </div>
-                        </div>
-                        <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="xPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
-                                    <i class="fas fa-portrait"></i>
-                                    المشاهير
-                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
-                                </a>
-                                <div class="dropdown-menu py-0" aria-labelledby="xPagesDropdown">
-                                    <a class="dropdown-item rounded-top" href="{{ url_for('home_blueprint.search') }}">بحث<i class="fas fa-search"></i></a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item " href="{{ url_for('reports_blueprint.socialaccounts') }}">عرض الحسابات<i class="fas fa-hashtag"></i></a>
-                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('profiles_blueprint.influencers') }}">عرض الملفات<i class="fas fa-list"></i></a>
-                                </div>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="yPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
-                                    <i class="fas fa-microphone-alt"></i>
-                                    المحتوى
-                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
-                                </a>
-                                <div class="dropdown-menu py-0" aria-labelledby="yPagesDropdown">
-                                    <a class="dropdown-item rounded-top" href="{{ url_for('content_blueprint.content_add') }}">إضافة<i class="fas fa-plus"></i></a>
-                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('content_blueprint.contents') }}">عرض<i class="fas fa-list"></i></a>
-                                </div>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="zPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
-                                    <i class="far fa-newspaper"></i>
-                                    التقارير
-                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
-                                </a>
-                                <div class="dropdown-menu py-0" aria-labelledby="zPagesDropdown">
-                                    <a class="dropdown-item rounded-top" href="{{ url_for('reports_blueprint.daily_report') }}">التقرير اليومي<i class="fas fa-calendar-alt"></i></a>
-                                    <a class="dropdown-item rounded-top" href="{{ url_for('reports_blueprint.scanResults_report') }}">تقرير المتابعة<i class="fas fa-sort-numeric-up-alt"></i></a>
-                                    <a class="dropdown-item " href="{{ url_for('reports_blueprint.scanLog') }}">تقرير الأدآء<i class="fas fa-cogs"></i></a>
-                                    <a class="dropdown-item " href="{{ url_for('reports_blueprint.contents_report') }}">تقرير المحتوى<i class="fas fa-microphone"></i></a>
-                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('reports_blueprint.scanResults') }}">بيانات المسح<i class="fas fa-barcode"></i></a>
-                                </div>
-                            </li>
         
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" id="wPagesDropdown" aria-expanded="false" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user"></i>
-                                    المستخدم
-                                    <span class="fas fa-angle-down nav-link-arrow ms-1"></span>
-                                </a>
-                                <div class="dropdown-menu py-0" aria-labelledby="wPagesDropdown">
-                                    <a class="dropdown-item rounded-top" href="{{ url_for('home_blueprint.log') }}">سجل الأحداث<i class="fas fa-clipboard-list"></i></a>
-                                    <a class="dropdown-item rounded" href="{{ url_for('authentication_blueprint.register') }}">مستخدم جديد<i class="fas fa-user-plus"></i></a>
-                                    <div class="dropdown-divider"></div>
-                                    {% if current_user.is_authenticated %}
-                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('authentication_blueprint.logout') }}">خروج<i class="fas fa-sign-out-alt"></i></a>
-                                    {% else %}
-                                    <a class="dropdown-item rounded-bottom" href="{{ url_for('authentication_blueprint.login') }}">دخول<i class="fas fa-sign-in-alt"></i></a>
-                                    {% endif %}
-
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('authentication_blueprint.logout') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-out-alt me-2"></span> خروج</a>
-                        {% else %}
-                        <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-in-alt me-2"></span> دخول</a>
-                        {% endif %}
-                        <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                    </div>
+    <!-- <div class="neonav">
+        <div class="neonav-item">
+            <a href="#" class="neonav-dropdown-toggle" onclick="toggleDropdown('Dropdown1')">
+                <i class="fas fa-portrait"></i>
+                المشاهير
+                <span class="fas fa-angle-down"></span>
+            </a>
+            <div class="neonav-dropdown" id="Dropdown1">
+                <div class="neonav-dropdown-menu">
+                    <a href="/search">بحث <i class="fas fa-search"></i></a>
+                    <a href="/socialaccounts">عرض الحسابات <i class="fas fa-hashtag"></i></a>
+                    <a href="/influencers">عرض الملفات <i class="fas fa-list"></i></a>
                 </div>
-            </nav> -->
-        </header>
+            </div>
+        </div>
 
-                        <!-- Modal Content -->
-                        <div class="modal fade " id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h2 class="h6 modal-title">تأكيد</h2>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p id="modal-message"></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <input type="hidden" id="callback-url" value="">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirm-delete-btn">موافق</button>
-                                        <button type="button" class="btn btn-link ms-auto" data-bs-dismiss="modal">إلغاء</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="neonav-item">
+            <a href="#" class="neonav-dropdown-toggle" onclick="toggleDropdown('Dropdown2')">
+                <i class="fas fa-portrait"></i>
+                المشاهير
+                <span class="fas fa-angle-down"></span>
+            </a>
+            <div class="neonav-dropdown" id="Dropdown2">
+                <div class="neonav-dropdown-menu">
+                    <a href="/search">بحث <i class="fas fa-search"></i></a>
+                    <a href="/socialaccounts">عرض الحسابات <i class="fas fa-hashtag"></i></a>
+                    <a href="/influencers">عرض الملفات <i class="fas fa-list"></i></a>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <section class="section-header bg-secondary text-white header-image">
+        <div class="header-title">
+            <h1> {% block header_title %}{% endblock %} </h1>
+            <h5> {% block header_sub_title %}{% endblock %}</h5>
+        </div>
+        <div class="header-profile-picture">
+            {% block header_profile_image %}{% endblock %}
+        </div>
+        <figure class="position-absolute bottom-0 left-0 w-100 d-none d-md-block mb-n2 header-figure">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                <path fill="#ffffff" d="M0,100 Q125,50 250,100 Q375,150 500,100 Q625,50 750,100 Q875,150 1000,100 L1000,200 L0,200 Z"></path>
+            </svg>
+        </figure>
+    </section>
+
+
+</header>
+
+<!-- Modal Content -->
+<div class="modal fade " id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="h6 modal-title">تأكيد</h2>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="callback-url" value="">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirm-delete-btn">موافق</button>
+                <button type="button" class="btn btn-link ms-auto" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
         {% block content %}{% endblock content %}
 
         {% include 'includes/scripts.html' %}
 
-        <!-- Specific Page JS goes HERE  -->
         {% block javascripts %}{% endblock javascripts %}
 
     </body>
 </html>
-
-<!-- <script>
-    document.getElementById('delete-form').addEventListener('submit', function (e) {
-        var confirmed = confirm('Are you sure you want to delete this data?');
-        if (!confirmed) {
-            e.preventDefault(); // Prevent form submission if not confirmed
-        }
-    });
-</script> -->
