@@ -40,10 +40,10 @@ window.addEventListener('resize', function() {
     });
 
     // Disable collapse functionality
-    var collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
-    collapseToggles.forEach(toggle => {
-        toggle.setAttribute('disabled', true);
-    });
+    // var collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    // collapseToggles.forEach(toggle => {
+    //     toggle.setAttribute('disabled', true);
+    // });
   } else {
     // Restore default behavior (if desired)
     var navItems = document.querySelectorAll('.navbar-collapse .dropdown');
@@ -52,9 +52,9 @@ window.addEventListener('resize', function() {
       item.querySelector('.dropdown-menu').classList.remove('show');
     });
 
-    var collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
-    collapseToggles.forEach(toggle => {
-        toggle.removeAttribute('disabled');
-    });
+    // var collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    // collapseToggles.forEach(toggle => {
+    //     toggle.removeAttribute('disabled');
+    // });
   }
 });
