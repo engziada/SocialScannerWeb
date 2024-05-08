@@ -33,12 +33,14 @@ class Influencer(db.Model):
     def __repr__(self):
         return f"Influencer(id={self.id}, full_name='{self.full_name}'), email='{self.email}', phone='{self.phone}', country='{self.country}', city='{self.city}', profile_picture='{self.profile_picture}', socialaccounts='{self.socialaccounts}'"
 
-    def save_profile_picture(self, picture_file=None, existing_file_path=None):
+    def save_profile_picture(self, picture_file):
         upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
         if not path.exists(upload_folder):
             makedirs(upload_folder)
         current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
         if picture_file:
+            if path.exists(path.join(upload_folder, picture_file)):
+                return
             filename = secure_filename(picture_file.filename)
             new_filename = f'{current_time}.{filename.split(".")[-1]}'
             filepath = path.join(upload_folder, new_filename)

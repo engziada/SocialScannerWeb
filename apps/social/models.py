@@ -59,7 +59,7 @@ class SocialAccount(db.Model):
     def __repr__(self):
         return f"SocialAccount(id={self.id}, platform='{self.platform}', username='{self.username}')"
 
-    def save_profile_picture(self, picture_file=None):
+    def save_profile_picture(self, picture_file):
         upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
         if not path.exists(upload_folder):
             makedirs(upload_folder)

@@ -182,7 +182,7 @@ def snapchat(username: str) -> dict:
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
-def instagram(query: str) -> dict:
+def instagram2(query: str) -> dict:
     # Define session file path
     # session_file_path = os.path.join(".", f"engziada_session")
     # ic(session_file_path)
@@ -254,6 +254,61 @@ def instagram(query: str) -> dict:
         # "platform_id": platform_id,
     }
     return profile_data
+
+
+def instagram(query: str) -> dict:
+    profile_data = {}
+
+    url = "https://instagram-scraper-2022.p.rapidapi.com/ig/info_username/"
+
+    querystring = {"user": query}
+
+    headers = {
+        "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
+        "X-RapidAPI-Host": "instagram-scraper-2022.p.rapidapi.com",
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+    json_data = response.json()
+    
+    if json_data.get("status","") != "ok":
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
+        return profile_data
+
+        
+    user_data = json_data["user"]
+
+    # ic(
+    #     user_data["username"],
+    #     user_data["full_name"],
+    #     user_data["biography"],
+    #     user_data["follower_count"],
+    #     user_data["hd_profile_pic_url_info"]["url"],
+    #     user_data["hd_profile_pic_versions"][0]["url"],
+    #     user_data["hd_profile_pic_versions"][1]["url"],
+    #     user_data["profile_pic_url"],
+    #     user_data["external_url"],
+    #     user_data["contact_phone_number"],
+    #     user_data["city_name"],
+    #     user_data["page_name"],
+    # )
+
+    # Retrieve profile details
+    profile_data: dict = {
+        # "username": profile.username,
+        # "platform": "Instagram",
+        "public_profile_name": user_data["full_name"],
+        "followers": user_data["follower_count"],
+        "likes": 0,
+        "posts": user_data["media_count"],
+        "profile_picture": download_profile_image_instagram(user_data["profile_pic_url"]),
+        "bio_text": user_data["biography"],
+        "external_url": user_data["external_url"],
+        # "time_taken": duration.total_seconds(),
+        # "platform_id": platform_id,
+    }
+    return profile_data
+
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
