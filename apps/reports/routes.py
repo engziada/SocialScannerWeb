@@ -1,11 +1,11 @@
-from calendar import c
 import datetime
 import math
+
 from flask import render_template, request
-from numpy import Inf
+from flask_login import login_required
+
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import aliased
-
 
 from apps.content_types.models import Content
 from apps.reports import blueprint
@@ -22,8 +22,21 @@ from dateutil import parser
 
 
 @blueprint.route("/scanresults")
-# @login_required
+@login_required
 def scanResults():
+    """
+    Retrieves scan results based on the specified search criteria and paginates the results.
+
+    Returns:
+        A rendered HTML template of the scan results page, including the paginated scan results,
+        the specified search terms, the specified date range, and the current page number.
+
+    Parameters:
+        None
+
+    Raises:
+        None
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
@@ -56,8 +69,21 @@ def scanResults():
 
 
 @blueprint.route("/scanlog")
-# @login_required
+@login_required
 def scanLog():
+    """
+    Retrieves scan logs based on the specified date range and paginates the results.
+
+    Returns:
+        A rendered HTML template of the scan log page, including the paginated scan logs,
+        the specified date range, and the current page number.
+
+    Parameters:
+        None
+
+    Raises:
+        None
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
@@ -90,8 +116,19 @@ def scanLog():
 
 
 @blueprint.route("/socialaccounts")
-# @login_required
+@login_required
 def socialaccounts():
+    """
+    Route decorator for the "/socialaccounts" endpoint.
+    Requires the user to be logged in.
+    
+    Parameters:
+    None
+    
+    Returns:
+    A rendered HTML template of the social accounts page, including the paginated social accounts,
+    the specified date range, and the search terms.
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
@@ -159,8 +196,22 @@ def socialaccounts():
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 @blueprint.route("/scanresults_report")
-# @login_required
+@login_required
 def scanResults_report():
+    """
+    Renders the scan results report page.
+
+    This function is a route handler for the "/scanresults_report" endpoint. It is responsible for rendering the scan results report page, which displays a table of social media account information including the username, platform, and followers count for each account. The function retrieves the necessary data from the database based on the specified search terms, date range, and pagination parameters.
+
+    Parameters:
+        None
+
+    Returns:
+        A rendered HTML template of the scan results report page, including the paginated results table, the specified search terms, the specified date range, and the current page number.
+
+    Raises:
+        None
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
@@ -230,8 +281,17 @@ def scanResults_report():
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 @blueprint.route("/contents_report")
-# @login_required
+@login_required
 def contents_report():
+    """
+    Renders the contents report page.
+
+    This function fetches distinct content types from the database and counts the total number of social accounts for each content type. It also counts the number of social accounts for each gender for each content type. Additionally, it counts the total number of uncategorized social accounts and their genders.
+
+    Returns:
+        A rendered template for the contents report page.
+
+    """
     # Fetch distinct content types
     content_types = db.session.query(Content.name).distinct().all()
 
@@ -341,8 +401,17 @@ def contents_report():
 
 
 @blueprint.route("/daily_report")
-# @login_required
+@login_required
 def daily_report():
+    """
+    Renders the daily report page with influencer data based on the specified platform.
+
+    Parameters:
+        None
+
+    Returns:
+        HTML template rendering the daily report with influencer data including influencers, platform, and platforms.
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 

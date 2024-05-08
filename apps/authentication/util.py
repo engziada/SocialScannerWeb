@@ -1,13 +1,6 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import os
 import hashlib
 import binascii
-
-# Inspiration -> https://www.vitoshacademy.com/hashing-passwords-in-python/
 
 
 def hash_pass(password):
@@ -36,6 +29,16 @@ def verify_pass(provided_password, stored_password):
 
 # Create the default admin user (you can modify this data as needed)
 def create_default_admin(Users,db):
+    """
+    Creates a default admin user if one does not already exist in the database.
+
+    Args:
+        Users (class): The Users model class representing the user table in the database.
+        db (SQLAlchemy): The SQLAlchemy database object.
+
+    Returns:
+        None
+    """
     username = "admin"
     password = "admin"
     email = "admin@email.com"

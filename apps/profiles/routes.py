@@ -10,6 +10,8 @@ from flask import (
     flash,
 )
 from flask_wtf.file import FileField
+from flask_login import login_required
+
 from sqlalchemy import desc
 from icecream import ic
 from sqlalchemy.exc import IntegrityError
@@ -25,8 +27,20 @@ from apps.social.models import SocialAccount
 
 
 @blueprint.route("/influencers")
-# @login_required
+@login_required
 def influencers():
+    """
+    Route decorator for the "/influencers" endpoint. This function is responsible for displaying a paginated list of influencers based on the search terms provided in the query string.
+
+    Parameters:
+        None
+
+    Returns:
+        A rendered HTML template "profiles/influencers.html" with the list of influencers.
+
+    Raises:
+        None
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50  # Number of logs per page
 
@@ -50,9 +64,24 @@ def influencers():
 
 
 @blueprint.route("/influencer_add", methods=["GET", "POST"])
-# @login_required
+@login_required
 @Log.add_log("إضافة ملف")
 def influencer_add():
+    """
+    Adds a new influencer to the database.
+
+    This function is a route handler for the "/influencer_add" endpoint. It requires the user to be logged in.
+    It also logs the action of adding a new influencer.
+
+    Parameters:
+    None
+
+    Returns:
+    If the form is valid and the new influencer is added successfully, it redirects to the "social_blueprint.socialaccount_add" endpoint with the newly created influencer's ID and profile data.
+    If there is an IntegrityError (duplicate influencer name), it redirects to the "profiles_blueprint.influencer_edit" endpoint with the existing influencer's ID and profile data.
+    If there is any other exception, it rolls back the database session and flashes an error message.
+    If the form is not valid, it renders the "profiles/influencer_add.html" template with the form and profile data.
+    """
     profile_data = {}
     if session.get("profile_data"):
         profile_data = session["profile_data"]
@@ -107,9 +136,19 @@ def influencer_add():
 
 
 @blueprint.route("/influencer_delete/<int:influencer_id>", methods=["POST"])
-# @login_required
+@login_required
 @Log.add_log("حذف ملف")
 def influencer_delete(influencer_id):
+    """
+    Deletes an influencer from the database.
+
+    Parameters:
+        influencer_id (int): The ID of the influencer to be deleted.
+
+    Returns:
+        redirect: A redirect to the 'influencers' page if the influencer is successfully deleted.
+                  Otherwise, a redirect to the 'influencers' page with a flash message indicating that the influencer does not exist.
+    """
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
@@ -121,9 +160,19 @@ def influencer_delete(influencer_id):
 
 
 @blueprint.route("/influencer_edit/<int:influencer_id>", methods=["GET", "POST"])
-# @login_required
+@login_required
 @Log.add_log("تعديل ملف")
 def influencer_edit(influencer_id):
+    """
+    Edit an influencer's profile.
+
+    Parameters:
+        influencer_id (int): The ID of the influencer to be edited.
+
+    Returns:
+        redirect: A redirect to the 'influencers' page if the influencer does not exist.
+                  Otherwise, a redirect to the 'influencers' page with a success message.
+    """
     # profile_data = {}
     # if session.get("profile_data"):
     #     profile_data = session["profile_data"]
@@ -180,9 +229,23 @@ def influencer_edit(influencer_id):
     
     
 @blueprint.route("/influencer/update_picture", methods=["POST"])
-# @login_required
+@login_required
 @Log.add_log("تعديل صورة ملف")
 def influencer_update_picture():
+    """
+    Updates the picture of an influencer.
+
+    This function is a route handler for the "/influencer/update_picture" endpoint. It is responsible for updating the picture of an influencer when a POST request is made to this endpoint.
+
+    Parameters:
+        None
+
+    Returns:
+        A JSON response containing the redirect URL to the influencer edit page if the picture update is successful. Otherwise, a JSON response with an error message is returned.
+
+    Raises:
+        None
+    """
     influencer_id = request.form.get('influencer_id')
     picture_url = request.form.get('picture_url')
     # get influencer

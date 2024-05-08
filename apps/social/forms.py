@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, StringField, SelectField, ValidationError
+from wtforms import HiddenField, StringField, SelectField, ValidationError
 from wtforms.validators import  DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 

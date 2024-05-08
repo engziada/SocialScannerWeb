@@ -4,19 +4,19 @@ from os import path
 from icecream import ic
 from werkzeug.utils import secure_filename
 
-from apps.profiles.models import Influencer
-from apps.reports.models import ScanResults, ScanLog
-from apps.social.models import Platform, SocialAccount
-from apps.authentication.models import Users
-from apps.home.models import Log
-
-import xlsxwriter
 import pandas as pd
 
 
-
-
 def download_excel(model_name) -> str:
+    """
+    Downloads data from a given model and saves it to an Excel file. 
+
+    Args:
+        model_name (str): The name of the model to download data from.
+
+    Returns:
+        str: The full path of the saved Excel file.
+    """
     model = globals().get(model_name)
     if not model:
         return ""

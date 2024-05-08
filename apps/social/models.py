@@ -1,4 +1,3 @@
-import shutil
 from flask_login import current_user
 import requests
 from apps import db
@@ -50,7 +49,7 @@ class SocialAccount(db.Model):
     followers = db.Column(db.Integer)
     likes = db.Column(db.Integer)
     posts = db.Column(db.Integer)
-    scan_results = db.relationship("ScanResults",  lazy=True)
+    scan_results = db.relationship("ScanResults", lazy=True, cascade="all, delete-orphan")
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
     created_by = db.Column(db.Integer,db.ForeignKey("Users.id"),nullable=True,)

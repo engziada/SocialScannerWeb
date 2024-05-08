@@ -4,6 +4,7 @@ from flask_login import current_user
 from apps import db
 
 from icecream import ic
+from sqlalchemy import event
 
 
 class Log(db.Model):
@@ -59,9 +60,19 @@ class Log(db.Model):
         return decorator
 
 
-from sqlalchemy import event
-
 @event.listens_for(Log, "before_insert")
 def before_insert_listener(mapper, connection, target):
+    """
+    Listens for the "before_insert" event on the Log model and sets the "created_by" attribute of the target
+    object to the id of the currently authenticated user.
+
+    Parameters:
+        mapper (Mapper): The mapper object that is used to map the data between the database and the object.
+        connection (Connection): The database connection object.
+        target (Log): The target object that is being inserted into the database.
+
+    Returns:
+        None
+    """
     if current_user.is_authenticated:
         target.created_by = current_user.id

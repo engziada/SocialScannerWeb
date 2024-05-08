@@ -2,10 +2,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import Email, DataRequired
 
-# login and registration
-
 
 class LoginForm(FlaskForm):
+    """
+    Represents a login form with fields for username and password in Arabic language.
+    """
     username = StringField('إسم المستخدم',
                          id='username_login',
                          validators=[DataRequired()])
@@ -15,6 +16,9 @@ class LoginForm(FlaskForm):
 
 
 class CreateAccountForm(FlaskForm):
+    """
+    Represents a form for creating a new account with fields for username, email, and password in Arabic language.
+    """
     username = StringField('إسم المستخدم',
                          id='username_create',
                          validators=[DataRequired()])

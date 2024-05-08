@@ -67,17 +67,60 @@ def search_user_profile(username:str, platform_id) -> dict:
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def tiktok(username: str) -> dict:
+    """
+    Retrieves the profile data of a user from the TikTok platform.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing the profile data of the user. The dictionary has the following keys:
+            - "public_profile_name" (str): The public profile name of the user.
+            - "followers" (int): The number of followers the user has.
+            - "likes" (int): The number of likes the user has.
+            - "posts" (int): The number of posts the user has.
+            - "profile_picture" (str): The URL of the user's profile picture.
+            - "bio_text" (str): The user's bio text.
+            - "external_url" (str): The URL of the user's TikTok profile.
+
+            If there is an error retrieving the profile data, the dictionary will also contain the following key:
+            - "error" (str): A description of the error that occurred.
+
+    Raises:
+        KeyError: If the required data is not found in the JSON structure.
+
+    Note:
+        - The function uses the TikTok API to retrieve the profile data.
+        - The function handles cases where the user's profile is not found on the TikTok platform.
+        - The function uses the BeautifulSoup library to parse the HTML content of the TikTok profile page.
+        - The function uses the requests library to send GET requests to the TikTok API and retrieve the profile data.
+
+    Example:
+        >>> tiktok("example_user")
+        {
+            "public_profile_name": "Example User",
+            "followers": 1000,
+            "likes": 5000,
+            "posts": 0,
+            "profile_picture": "https://example.com/profile_picture.jpg",
+            "bio_text": "This is an example user.",
+            "external_url": "https://www.tiktok.com/@example_user"
+        }
+    """
     profile_data = {}
     url = f"https://www.tiktok.com/@{username}"
 
-    payload = {
-        "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
-        "url": url,
-        "country_code": "eu",
-        "device_type": "desktop",
-        "session_number": 123,
-    }
-    r = requests.get("https://api.scraperapi.com/", params=payload)
+    # payload = {
+    #     "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
+    #     "url": url,
+    #     "country_code": "eu",
+    #     "device_type": "desktop",
+    #     "session_number": 123,
+    # }
+    # r = requests.get("https://api.scraperapi.com/", params=payload)
+    
+    # Send a GET request
+    r = requests.get(url)
 
     # Print the status code
     # ic(r.status_code)
@@ -126,18 +169,29 @@ def tiktok(username: str) -> dict:
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def snapchat(username: str) -> dict:
+    """
+    Retrieves Snapchat profile data for a given username.
+
+    Args:
+        username (str): The Snapchat username to retrieve profile data for.
+
+    Returns:
+        dict: A dictionary containing the retrieved profile data including the profile name, followers, likes, posts, profile picture, bio text, external URL.
+    """
     profile_data = {}
     url = f"https://www.snapchat.com/add/{username}"
 
-    # Fetch the URL using Scraper API
-    payload = {
-        "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
-        "url": url,
-        "country_code": "eu",
-        "device_type": "desktop",
-        "session_number": 345,
-    }
-    r = requests.get("https://api.scraperapi.com/", params=payload)
+    # # Fetch the URL using Scraper API
+    # payload = {
+    #     "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
+    #     "url": url,
+    #     "country_code": "eu",
+    #     "device_type": "desktop",
+    #     "session_number": 345,
+    # }
+    # r = requests.get("https://api.scraperapi.com/", params=payload)
+    # Send a GET request
+    r = requests.get(url)
 
     # Print the status code
     # ic(r.status_code)
@@ -183,6 +237,29 @@ def snapchat(username: str) -> dict:
 #////////////////////////////////////////////////////////////////////////////////////////
 
 def instagram2(query: str) -> dict:
+    """
+    Retrieves profile details from Instagram using the given query.
+
+    Args:
+        query (str): The username of the Instagram profile to retrieve details for.
+
+    Returns:
+        dict: A dictionary containing the profile details. The dictionary has the following keys:
+            - "public_profile_name" (str): The full name of the profile.
+            - "followers" (int): The number of followers the profile has.
+            - "likes" (int): The number of likes the profile has. Currently not implemented.
+            - "posts" (int): The number of posts the profile has. Currently not implemented.
+            - "profile_picture" (str): The URL of the profile picture.
+            - "bio_text" (str): The biography text of the profile.
+            - "external_url" (str): The external URL of the profile.
+
+            If the profile is not found, the dictionary will contain the following key:
+            - "error" (str): An error message indicating that the user does not exist on this platform.
+
+    Raises:
+        None
+
+    """
     # Define session file path
     # session_file_path = os.path.join(".", f"engziada_session")
     # ic(session_file_path)
@@ -257,6 +334,24 @@ def instagram2(query: str) -> dict:
 
 
 def instagram(query: str) -> dict:
+    """
+    Retrieves Instagram profile data for a given user.
+
+    Args:
+        query (str): The username of the Instagram account to retrieve data for.
+
+    Returns:
+        dict: A dictionary containing the profile data of the Instagram account. The dictionary has the following keys:
+            - "public_profile_name" (str): The full name of the Instagram account.
+            - "followers" (int): The number of followers the Instagram account has.
+            - "likes" (int): The number of likes the Instagram account has.
+            - "posts" (int): The number of posts the Instagram account has.
+            - "profile_picture" (str): The URL of the Instagram account's profile picture.
+            - "bio_text" (str): The biography text of the Instagram account.
+            - "external_url" (str): The external URL of the Instagram account.
+            If the Instagram account does not exist or there is an error, the dictionary will contain the following key:
+            - "error" (str): An error message indicating that the Instagram account does not exist or there was an error.
+    """
     profile_data = {}
 
     url = "https://instagram-scraper-2022.p.rapidapi.com/ig/info_username/"
@@ -313,6 +408,27 @@ def instagram(query: str) -> dict:
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def format_numbers_snapchat(follower_count_str):
+    """
+    Format the follower count string for Snapchat.
+
+    Parameters:
+        follower_count_str (str): The follower count string from Snapchat.
+
+    Returns:
+        int: The formatted follower count.
+
+    This function takes a follower count string from Snapchat and removes any unnecessary characters. It then converts the string to an integer based on the suffix ('m' for millions, 'k' for thousands) and returns the formatted follower count.
+
+    Example:
+        >>> format_numbers_snapchat("1.2m")
+        1200000
+
+        >>> format_numbers_snapchat("100k")
+        100000
+
+        >>> format_numbers_snapchat("12345")
+        12345
+    """
     # Remove ' Subscribers' from the string
     follower_count_str = follower_count_str.split(' ')[0]
     # Remove commas from the string    
@@ -325,6 +441,15 @@ def format_numbers_snapchat(follower_count_str):
 
 
 def download_profile_image_instagram(image_url):
+    """
+    Downloads the profile image from the provided image URL, saves it in the static folder, and returns the URL for the saved image.
+
+    Args:
+        image_url (str): The URL of the image to download.
+
+    Returns:
+        str: The URL for the saved profile picture.
+    """
     response = requests.get(image_url)
     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
     if not path.exists(upload_folder):
@@ -339,6 +464,20 @@ def download_profile_image_instagram(image_url):
 # ////////////////////////////////////////////////////////////////////////////////////////
 
 def get_summerized_report()->dict:
+    """
+    Generates a summary report of various statistics from the database.
+    
+    Returns:
+        dict: A dictionary containing the following statistics:
+            - total_users (int): The total number of users in the database.
+            - total_profiles (int): The total number of profiles in the database.
+            - total_accounts (int): The total number of accounts in the database.
+            - total_scans (int): The total number of scans in the database.
+            - last_scan_date (datetime.date or None): The date of the last scan in the database, or None if no scans exist.
+            - last_scan_time (datetime.time or None): The time of the last scan in the database, or None if no scans exist.
+            - platforms (list of tuples): A list of tuples containing the name of each platform and the count of scans for that platform.
+            - random_pictures (list of str): A list of filenames of randomly selected pictures from the "profile_pictures" folder.
+    """
     pictures_folder = path.join(current_app.root_path, "static", "profile_pictures")
     pictures = [f for f in listdir(pictures_folder) if isfile(path.join(pictures_folder, f))]
     report = {

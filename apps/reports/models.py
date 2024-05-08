@@ -1,10 +1,5 @@
-import shutil
 from apps import db
-from werkzeug.utils import secure_filename
-from os import path, makedirs
-from flask import current_app
 from icecream import ic
-import datetime
 from sqlalchemy.dialects.postgresql import JSONB
 
 
