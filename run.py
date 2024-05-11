@@ -51,7 +51,6 @@ if DEBUG:
     app.logger.info('DBMS             = ' + app_config.SQLALCHEMY_DATABASE_URI)
     app.logger.info('ASSETS_ROOT      = ' + app_config.ASSETS_ROOT )
 
-
 # Initialize scheduler instance
 sched = APScheduler()
 
