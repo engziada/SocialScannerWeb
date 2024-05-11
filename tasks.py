@@ -1,14 +1,17 @@
-# Function for your database scan and logic
 from concurrent.futures import ThreadPoolExecutor
 import datetime
 
 from apps.reports.models import ScanResults, ScanLog
 from apps.home.util import search_user_profile
-from apps.profiles.models import Influencer
 
 from icecream import ic
 
 from apps.social.models import Platform, SocialAccount
+
+from threading import Lock
+
+# Create a lock
+db_lock = Lock()
 
 scan_log = {
     "success_count": {},
@@ -37,13 +40,10 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
             existing_scanresult = (
                 db_session.query(ScanResults)
                 .filter(ScanResults.socialaccount_id == socialaccount_id)
-                .filter(ScanResults.public_profile_name == profile_data["public_profile_name"])
                 .filter(ScanResults.bio_text == profile_data["bio_text"])
-                .filter(ScanResults.profile_picture == profile_data["profile_picture"])
                 .filter(ScanResults.followers == profile_data["followers"])
                 .filter(ScanResults.likes == profile_data["likes"])
                 .filter(ScanResults.posts == profile_data["posts"])
-                .filter(ScanResults.external_url == profile_data["external_url"])
                 .first()
             )
             if not existing_scanresult:
@@ -58,7 +58,6 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
                     external_url=profile_data["external_url"],
                     time_taken=profile_data["time_taken"],
                 )
-                db_session.add(new_scanresults)
                 # update the socialaccount with the new scanresults
                 socialaccount = SocialAccount.query.get(socialaccount_id)
                 socialaccount.public_profile_name = profile_data["public_profile_name"]
@@ -66,7 +65,9 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
                 socialaccount.followers = profile_data["followers"]
                 socialaccount.likes = profile_data["likes"]
                 socialaccount.posts = profile_data["posts"]
-                db_session.commit()
+                with db_lock:
+                    db_session.add(new_scanresults)
+                    db_session.commit()
                 
             # ic(f"Scan completed for {username} on platform {platform_id}")
             # save the log, check if the platform is already in the log dictionary, add to success count
@@ -95,36 +96,22 @@ def scan_database(app,db_session):
     try:
         start_time = datetime.datetime.now()
         socialaccounts=SocialAccount.query.all()
-        
-        # profiles = Influencer.query.all()
-        # socialaccounts = []
-        # for profile in profiles:
-        #     for socialaccount in profile.socialaccounts:
-        #         socialaccounts.append({
-        #             'id': socialaccount.id,
-        #             'platform_id': socialaccount.platform_id,
-        #             'username': socialaccount.username
-        #         })
-        # # ic(socialaccounts)
 
         with ThreadPoolExecutor() as executor:
-            futures = []
+            tasks = []
             for socialaccount in socialaccounts:
-                futures.append(
+                tasks.append(
                     executor.submit(
                         process_username,
                         app,
                         db_session,
-                        # socialaccount["platform_id"],
-                        # socialaccount["username"],
-                        # socialaccount["id"],
                         socialaccount.platform_id,
                         socialaccount.username,
                         socialaccount.id,
                     )
                 )
-            for future in futures:
-                future.result()  # Wait for completion and handle exceptions if any
+            for task in tasks:
+                task.result()  # Wait for completion and handle exceptions if any
 
         # ic(scan_log)
         end_time = datetime.datetime.now()
@@ -133,6 +120,7 @@ def scan_database(app,db_session):
         minutes = round(time_taken.total_seconds() // 60)
         seconds = round(time_taken.total_seconds() % 60)
         scan_log["time_taken"] = f"{minutes} دقيقة {seconds} ثانية"
+        
         # insert into database
         new_scanlog = ScanLog(
             success_count=scan_log["success_count"],

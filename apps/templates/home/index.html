@@ -69,20 +69,24 @@
                                 <td>عدد مرات المسح حتى الآن</td>
                                 <td>{{stats.get('total_scans')}}</td>
                             </tr>
+
                             <tr>
-                                <td>آخر تاريخ للمسح</td>
-                                <td>{{stats.get('last_scan_date')}} @ {% if stats.get('last_scan_time') %}{{stats.get('last_scan_time').strftime('%H:%M')}}{% endif %}</td>
+                                <td class="h6">آخر عملية مسح</td>
                             </tr>
                             <tr>
-                                <td class="h6">عدد مرات المسح لكل منصة</td>
+                                <td>التاريخ</td>
+                                <td>{{stats.get('last_scan_date')}}</td>
                             </tr>
-                            {% for platform in stats.get('platforms')%}
-                                <tr>
-                                    <td>{{platform[0]}}</td>
-                                    <td>{{platform[1]}}</td>
-                                </tr>
-                            {% endfor %}
+                            <tr>
+                                <td>الوقت</td>
+                                <td>{{stats.get('last_scan_time').strftime('%H:%M') if stats.get('last_scan_time') else '00:00'}}</td>
+                            </tr>
+                            <tr>
+                                <td>المدة</td>
+                                <td>{{stats.get('last_scan_duration')}}</td>
+                            </tr>
                         </table>
+                    </div>
                 </div>
             </div>
         </section>

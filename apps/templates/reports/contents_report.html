@@ -19,8 +19,12 @@
         <!-- Hero -->
         <section class="section-header">
             <div class="container">
+                <form method="GET" action="{{ url_for('reports_blueprint.contents_report') }}" class="search-bar">
+                    <button onclick="exportTableToExcel()" class="btn" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</button>
+                </form>
+
                 <div class="table-container">
-                    <table class="table table-hover">
+                    <table class="table table-hover" id="myTable">
                         <thead>
                         <tr>
                             <th scope="col">المحتوى</th>
@@ -56,4 +60,23 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://unpkg.com/file-saver"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/tableexport.jquery.plugin/tableexport.min.js"></script>
+<script>
+    function exportTableToExcel() {
+        var wb = XLSX.utils.table_to_book(document.getElementById('myTable'), { sheet: "Sheet 1" });
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'table.xlsx');
+    }
+
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+</script>
+{% endblock javascripts %}

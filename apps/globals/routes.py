@@ -25,6 +25,7 @@ def export_to_excel(model_name):
         None
     """
     file_path: str = download_excel(model_name)#.replace("app/", "")
+    ic(file_path)
     if not file_path:
         flash("No data to export", "danger")
         return render_template("home/index.html", segment="index", stats=get_summerized_report())

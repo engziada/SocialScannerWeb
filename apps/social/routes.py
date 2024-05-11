@@ -61,7 +61,7 @@ def socialaccount_add(influencer_id):
     if referer:
         ic(f"This route was redirected from {referer}")
         if referer.endswith("influencers"):
-            session.pop("profile_data")
+            session.pop("profile_data", None)
 
     influencer = Influencer.query.get(influencer_id)
     if not influencer:

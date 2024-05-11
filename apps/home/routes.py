@@ -1,5 +1,5 @@
 import datetime
-from flask import g, redirect, render_template, request, flash, send_file, session, url_for
+from flask import redirect, render_template, request, flash, session, url_for
 from apps.home import blueprint
 from flask_login import login_required
 from jinja2 import TemplateNotFound

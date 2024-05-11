@@ -9,16 +9,12 @@ from icecream import ic
 import instaloader
 import json
 import requests
-from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 from apps.profiles.models import Influencer
-from apps.reports.models import ScanResults
+from apps.reports.models import ScanLog
 from apps.social.models import Platform, SocialAccount
 from apps.authentication.models import Users
-
-
-from apps import db
 
 
 # profile_data: dict = {
@@ -126,6 +122,8 @@ def tiktok(username: str) -> dict:
     # ic(r.status_code)
 
     if r.status_code != 200:
+        profile_data["username"] = username
+        profile_data["platform"] = "تيك توك"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
     
@@ -137,6 +135,8 @@ def tiktok(username: str) -> dict:
 
     # Check if the script element exists
     if script_element is None:
+        profile_data["username"] = username
+        profile_data["platform"] = "تيك توك"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
         return profile_data
 
@@ -148,20 +148,22 @@ def tiktok(username: str) -> dict:
         user_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["user"]
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
     except KeyError:
+        profile_data["username"] = username
+        profile_data["platform"] = "تيك توك"
         profile_data["error"] = "Could not find the required data in the JSON structure."
         return profile_data
 
     profile_data: dict = {
         # "username": username,
         # "platform": "TikTok",
-        "public_profile_name": user_data["nickname"],
-        "followers": stats_data['followerCount'],
-        "likes": stats_data['heartCount'],
-        "posts": 0,
-        "profile_picture": user_data['avatarLarger'],
-        "bio_text": user_data['signature'],
-        "external_url": url,
         # "platform_id": platform_id,
+        "public_profile_name": user_data["nickname"],
+        "followers": stats_data["followerCount"],
+        "likes": stats_data["heartCount"],
+        "posts": 0,
+        "profile_picture": user_data["avatarLarger"],
+        "bio_text": user_data["signature"],
+        "external_url": url,
         # "time_taken": duration.total_seconds(),
     }  
     return profile_data
@@ -197,6 +199,8 @@ def snapchat(username: str) -> dict:
     # ic(r.status_code)
 
     if r.status_code != 200:
+        profile_data["username"] = username
+        profile_data["platform"] = "سناب شات"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
@@ -206,6 +210,8 @@ def snapchat(username: str) -> dict:
     profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
 
     if profile_section is None:
+        profile_data["username"] = username
+        profile_data["platform"] = "سناب شات"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
         return profile_data
 
@@ -287,6 +293,8 @@ def instagram2(query: str) -> dict:
     # Retrieve profile details
     profile = instaloader.Profile.from_username(L.context, query)
     if not profile:
+        profile_data["username"] = username
+        profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
@@ -333,12 +341,12 @@ def instagram2(query: str) -> dict:
     return profile_data
 
 
-def instagram(query: str) -> dict:
+def instagram(username: str) -> dict:
     """
     Retrieves Instagram profile data for a given user.
 
     Args:
-        query (str): The username of the Instagram account to retrieve data for.
+        username (str): The username of the Instagram account to retrieve data for.
 
     Returns:
         dict: A dictionary containing the profile data of the Instagram account. The dictionary has the following keys:
@@ -356,7 +364,7 @@ def instagram(query: str) -> dict:
 
     url = "https://instagram-scraper-2022.p.rapidapi.com/ig/info_username/"
 
-    querystring = {"user": query}
+    querystring = {"user": username}
 
     headers = {
         "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
@@ -367,6 +375,8 @@ def instagram(query: str) -> dict:
     json_data = response.json()
     
     if json_data.get("status","") != "ok":
+        profile_data["username"] = username
+        profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
         return profile_data
 
@@ -480,31 +490,15 @@ def get_summerized_report()->dict:
     """
     pictures_folder = path.join(current_app.root_path, "static", "profile_pictures")
     pictures = [f for f in listdir(pictures_folder) if isfile(path.join(pictures_folder, f))]
+    last_scan = ScanLog.query.order_by(ScanLog.creation_date.desc(), ScanLog.creation_time.desc()).first()
     report = {
         "total_users": Users.query.count(),
         "total_profiles": Influencer.query.count(),
         "total_accounts": SocialAccount.query.count(),
-        "total_scans": ScanResults.query.with_entities(ScanResults.creation_date)
-        .distinct()
-        .count(),
-        "last_scan_date": ScanResults.query.order_by(ScanResults.creation_date.desc())
-        .first()
-        .creation_date
-        if ScanResults.query.first()
-        else None,
-        "last_scan_time": ScanResults.query.order_by(ScanResults.creation_time.desc())
-        .first()
-        .creation_time
-        if ScanResults.query.first()
-        else None,
-        "platforms": (
-            db.session.query(Platform.name, func.count(ScanResults.id))
-            .select_from(Platform)
-            .join(SocialAccount)
-            .join(ScanResults)
-            .group_by(Platform.name)
-            .all()
-        ),
+        "total_scans": ScanLog.query.count(),
+        "last_scan_date": last_scan.creation_date if last_scan else None,
+        "last_scan_time": last_scan.creation_time if last_scan else None,
+        "last_scan_duration": last_scan.time_taken if last_scan else None,
         "random_pictures": random.sample(pictures, 10),
     }
 

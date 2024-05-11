@@ -1,8 +1,8 @@
 import os
 
-from   flask_migrate import Migrate
-from   flask_minify  import Minify
-from   sys import exit
+from flask_migrate import Migrate
+from flask_minify  import Minify
+from sys import exit
 
 from apps.config import config_dict
 from apps import create_app, db
@@ -11,9 +11,9 @@ from icecream import ic
 from dotenv import load_dotenv
 
 from flask_apscheduler import APScheduler
-from tasks import scan_database
-
 from apscheduler.triggers.cron import CronTrigger
+
+from tasks import scan_database
 
 # dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 # load_dotenv(dotenv_path)
@@ -51,18 +51,37 @@ if DEBUG:
     app.logger.info('DBMS             = ' + app_config.SQLALCHEMY_DATABASE_URI)
     app.logger.info('ASSETS_ROOT      = ' + app_config.ASSETS_ROOT )
 
+
 # Initialize scheduler instance
 sched = APScheduler()
-sched.init_app(app)
+
 def scheduled_job():
     with app.app_context():  # noqa: F821
         scan_database(app, db.session)
 
-sched.add_job(id="scan", func=scheduled_job, trigger=CronTrigger(hour=6, minute=0))  # trigger="interval", seconds=10)#
-# scheduled_job()
+# Configuring the scheduler
+SCHEDULER_API_ENABLED = os.getenv("SCHEDULER_API_ENABLED", "True")
+SCHEDULER_TRIGGER_HOUR = os.getenv("SCHEDULER_TRIGGER_HOUR", 0)
+SCHEDULER_TRIGGER_MINUTE = os.getenv("SCHEDULER_TRIGGER_MINUTE", 0)
+ic(SCHEDULER_API_ENABLED, SCHEDULER_TRIGGER_HOUR, SCHEDULER_TRIGGER_MINUTE)
+app.config["SCHEDULER_API_ENABLED"] = SCHEDULER_API_ENABLED
+app.config["JOBS"] = [
+    {
+        "id": "job1",
+        "func": scheduled_job,
+        "args": [],
+        # "trigger": SCHEDULER_TRIGGER,
+        # "seconds": 60,  # Run every hour (adjust as needed)
+        "trigger": "cron",
+        "hour": SCHEDULER_TRIGGER_HOUR,  # Run daily at midnight
+        "minute": SCHEDULER_TRIGGER_MINUTE,
+    }
+]
+sched.init_app(app)
+# sched.add_job(id="scan", func=scheduled_job, trigger=CronTrigger(hour=6, minute=0))  # trigger="interval", seconds=10)#
+scheduled_job()
 sched.start()
 
 if __name__ == "__main__":
-    # app.run()
     app.run(host="0.0.0.0", port=4000)
 

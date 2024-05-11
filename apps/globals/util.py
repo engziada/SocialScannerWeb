@@ -1,8 +1,14 @@
 
-from datetime import datetime
+import datetime
 from os import path
 from icecream import ic
 from werkzeug.utils import secure_filename
+
+from apps.content_types.models import *
+from apps.home.models import *
+from apps.profiles.models import *
+from apps.reports.models import *
+from apps.social.models import *
 
 import pandas as pd
 
@@ -19,10 +25,12 @@ def download_excel(model_name) -> str:
     """
     model = globals().get(model_name)
     if not model:
+        ic("Model not found")
         return ""
 
     items = model.query.all()
     if not items:
+        ic("No data to export")
         return ""
 
     data = {}
@@ -36,7 +44,7 @@ def download_excel(model_name) -> str:
     df = pd.DataFrame(data)
 
     excel_file_path = (
-        f"{model_name}-{datetime.now().date()}-{datetime.now().time()}.xlsx"
+        f"{model_name}-{datetime.datetime.now().date()}-{datetime.datetime.now().time()}.xlsx"
     )
     excel_file_path = secure_filename(excel_file_path)
 
