@@ -73,18 +73,37 @@
                             <tr>
                                 <td class="h6">آخر عملية مسح</td>
                             </tr>
+                                <tr>
+                                    <td>التاريخ</td>
+                                    <td>{{stats.get('last_scan_date')}}</td>
+                                </tr>
+                                <tr>
+                                    <td>الوقت</td>
+                                    <td>{{stats.get('last_scan_time').strftime('%H:%M') if stats.get('last_scan_time') else '00:00'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>المدة</td>
+                                    <td>{{stats.get('last_scan_duration')}}</td>
+                                </tr>
                             <tr>
-                                <td>التاريخ</td>
-                                <td>{{stats.get('last_scan_date')}}</td>
+                                <td class="h6">بيانات الوصول لقاعدة البيانات</td>
                             </tr>
-                            <tr>
-                                <td>الوقت</td>
-                                <td>{{stats.get('last_scan_time').strftime('%H:%M') if stats.get('last_scan_time') else '00:00'}}</td>
-                            </tr>
-                            <tr>
-                                <td>المدة</td>
-                                <td>{{stats.get('last_scan_duration')}}</td>
-                            </tr>
+                                <tr>
+                                    <td>إسم الخادم</td>
+                                    <td>dpg-co9u07a0si5c739j3bh0-a</td>
+                                </tr>
+                                <tr>
+                                    <td>إسم قاعدة البيانات</td>
+                                    <td>socialscannerdb</td>
+                                </tr>
+                                <tr>
+                                    <td>إسم المستخدم</td>
+                                    <td>admin</td>
+                                </tr>
+                                <tr>
+                                    <td>رقم البورت</td>
+                                    <td>5432</td>
+                                </tr>
                         </table>
                     </div>
                 </div>

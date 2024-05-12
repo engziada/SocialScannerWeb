@@ -1,7 +1,7 @@
 import datetime
 import math
 
-from flask import render_template, request
+from flask import Response, flash, jsonify, render_template, request
 from flask_login import login_required
 
 from sqlalchemy import and_, func, or_
@@ -19,7 +19,7 @@ from icecream import ic
 from dateutil.relativedelta import relativedelta
 
 from dateutil import parser
-
+import tablib
 
 @blueprint.route("/scanresults")
 @login_required
@@ -141,24 +141,8 @@ def socialaccounts():
     platform= request.args.get("platform", "")
     gender= request .args.get("gender", "")
     
-    # ic(content, platform)
-    
     contents = Content.query.all()
     platforms=Platform.query.all()
-    
-
-    # # filter influencers
-    # socialaccounts = SocialAccount.query.filter(
-    #     SocialAccount.influencer.has(
-    #         (Influencer.full_name.ilike(f"%{search_terms}%"))
-    #         | (SocialAccount.username.ilike(f"%{search_terms}%"))
-    #     ),
-    #     SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")),
-    #     SocialAccount.contents.any(Content.name.ilike(f"%{content}%")),
-    #     SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")),
-    #     SocialAccount.creation_date >= from_date,
-    #     SocialAccount.creation_date <= to_date,
-    # ).paginate(page=page, per_page=per_page)
     
     query = SocialAccount.query
     if search_terms:
@@ -180,9 +164,7 @@ def socialaccounts():
         )
         query = query.filter(date_condition)
     socialaccounts = query.paginate(page=page, per_page=per_page)
-    ic(search_terms, from_date, to_date, content, platform, gender)
-    ic(socialaccounts.items)
-
+    
     return render_template(
         "reports/socialaccounts.html",
         socialaccounts=socialaccounts,
@@ -192,6 +174,50 @@ def socialaccounts():
         contents=contents,
         platforms=platforms,
     )
+
+
+@blueprint.route("/export_socialaccounts")
+def export_socialaccounts():
+    try:
+        socialaccounts = SocialAccount.query.all()
+        headers = [
+            "إسم الملف",
+            "إسم الحساب",
+            "المنصة",
+            "الجنس",
+            "المحتوى",
+            "المتابعين",
+            "الإعجابات",
+            "البريد الإلكتروني",
+            "رقم الهاتف",
+        ]
+        data = [
+            [
+                socialaccount.influencer.full_name,
+                socialaccount.username,
+                socialaccount.platform.name,
+                socialaccount.influencer.gender,
+                ", ".join(map(lambda content: content.name, socialaccount.contents)),
+                socialaccount.followers,
+                socialaccount.likes,
+                socialaccount.influencer.email,
+                socialaccount.influencer.phone,
+            ]
+            for socialaccount in socialaccounts
+        ]
+
+        # Clean Data (Optional)
+        data = [[str(item) if item is not None else "" for item in row] for row in data]
+
+        dataset = tablib.Dataset(*data)  # You don't need to pass headers again here
+        dataset.headers = headers
+        response = Response(dataset.export('xlsx'), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response.headers["Content-Disposition"] = "attachment;filename=social_accounts.xlsx"
+        return response
+
+    except Exception as e:
+        flash(f"An error occurred while exporting the social accounts: {str(e)}", "danger")
+
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 

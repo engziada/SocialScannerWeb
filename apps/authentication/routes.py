@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import flash, render_template, redirect, request, url_for
 from flask_login import (
     current_user,
     login_required,
@@ -119,6 +119,28 @@ def logout():
     """
     logout_user()
     return redirect(url_for('authentication_blueprint.login'))
+
+
+@blueprint.route('/users', methods=['GET'])
+@Log.add_log("عرض جميع المستخدمين")
+@login_required
+def users():
+    users = Users.query.all()  # Assuming User is your user model
+    return render_template('accounts/users.html', users=users)
+
+
+@blueprint.route('/delete_user/<int:user_id>', methods=['POST'])
+@Log.add_log("حذف المستخدم")
+@login_required
+def delete_user(user_id):
+    user = Users.query.get(user_id)
+    if not user:
+        flash('المستخدم غير موجود', 'danger')
+        return redirect(url_for("authentication_blueprint.users"))
+    db.session.delete(user)  # Assuming db is your SQLAlchemy instance
+    db.session.commit()
+    flash('تم حذف المستخدم', 'success')
+    return redirect(url_for("authentication_blueprint.users"))
 
 
 # Errors

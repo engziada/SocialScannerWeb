@@ -18,7 +18,9 @@ class Log(db.Model):
         db.ForeignKey("Users.id"),
         nullable=True
     )
-    user = db.relationship("Users", backref="log", lazy=True)
+    # user = db.relationship(
+    #     "Users", backref="log", lazy=True, cascade="all, delete-orphan"
+    # )
     user_ip = db.Column(db.String(255), nullable=True)
 
     def add_log(log_text:str):
@@ -35,6 +37,7 @@ class Log(db.Model):
                             db.session.commit()
                     except Exception as e:
                         flash("فشل في تسجيل الحدث", "danger")
+                        ic(e)
                     finally:
                         return result
                 else:

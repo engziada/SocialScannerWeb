@@ -1,12 +1,10 @@
 from datetime import datetime
 from genericpath import isfile
 from os import listdir, makedirs, path
-import os
 import random
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
 from icecream import ic
-import instaloader
 import json
 import requests
 from werkzeug.utils import secure_filename
@@ -106,14 +104,6 @@ def tiktok(username: str) -> dict:
     profile_data = {}
     url = f"https://www.tiktok.com/@{username}"
 
-    # payload = {
-    #     "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
-    #     "url": url,
-    #     "country_code": "eu",
-    #     "device_type": "desktop",
-    #     "session_number": 123,
-    # }
-    # r = requests.get("https://api.scraperapi.com/", params=payload)
     
     # Send a GET request
     r = requests.get(url)
@@ -183,20 +173,7 @@ def snapchat(username: str) -> dict:
     profile_data = {}
     url = f"https://www.snapchat.com/add/{username}"
 
-    # # Fetch the URL using Scraper API
-    # payload = {
-    #     "api_key": "e5b023a283332ce09fcbf4112d9d9cb5",
-    #     "url": url,
-    #     "country_code": "eu",
-    #     "device_type": "desktop",
-    #     "session_number": 345,
-    # }
-    # r = requests.get("https://api.scraperapi.com/", params=payload)
-    # Send a GET request
     r = requests.get(url)
-
-    # Print the status code
-    # ic(r.status_code)
 
     if r.status_code != 200:
         profile_data["username"] = username
@@ -216,11 +193,10 @@ def snapchat(username: str) -> dict:
         return profile_data
 
     # Extract profile details
-    profile_name = profile_section.find(
-        "span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x
-    ).text.strip()
+    profile_name = profile_section.find("span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x).text.strip()
     follower_count = profile_section.find("div",class_=lambda x: x and "SubscriberText" in x).text.strip()
     subtitle = soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x).text.strip()
+    subtitle_line2 = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x).text.strip()
     profile_image = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x).find("img")["srcset"]
     # address = profile_section.find("address").text.strip()
 
@@ -232,7 +208,7 @@ def snapchat(username: str) -> dict:
         "likes": 0,
         "posts": 0,
         "profile_picture": profile_image,
-        "bio_text": subtitle,
+        "bio_text": subtitle+'\n'+subtitle_line2,
         # "address": address,
         "external_url": url,
         # "platform_id": platform_id,
@@ -241,105 +217,6 @@ def snapchat(username: str) -> dict:
     return profile_data
 
 #////////////////////////////////////////////////////////////////////////////////////////
-
-def instagram2(query: str) -> dict:
-    """
-    Retrieves profile details from Instagram using the given query.
-
-    Args:
-        query (str): The username of the Instagram profile to retrieve details for.
-
-    Returns:
-        dict: A dictionary containing the profile details. The dictionary has the following keys:
-            - "public_profile_name" (str): The full name of the profile.
-            - "followers" (int): The number of followers the profile has.
-            - "likes" (int): The number of likes the profile has. Currently not implemented.
-            - "posts" (int): The number of posts the profile has. Currently not implemented.
-            - "profile_picture" (str): The URL of the profile picture.
-            - "bio_text" (str): The biography text of the profile.
-            - "external_url" (str): The external URL of the profile.
-
-            If the profile is not found, the dictionary will contain the following key:
-            - "error" (str): An error message indicating that the user does not exist on this platform.
-
-    Raises:
-        None
-
-    """
-    # Define session file path
-    # session_file_path = os.path.join(".", f"engziada_session")
-    # ic(session_file_path)
-    # if os.path.exists(session_file_path):
-    #     ic("Removing session file")
-    #     os.remove(session_file_path)
-
-    profile_data = {}
-    # Create Instaloader instance
-    L = instaloader.Instaloader()
-
-    # Login using provided username and password
-    username = "humandynasser@gmail.com"
-    password = "123kdd123kdd@"
-
-    try:
-        # L.load_session_from_file(username)
-        L.load_session_from_file(username, filename=os.path.join('.', f'{username}_session'))
-    except FileNotFoundError:
-        L.login(username, password)  # Log in
-        L.save_session_to_file(filename=os.path.join(".", f"{username}_session"))  # Save session to a file
-        # L.context.log("Logging in...")
-        # L.context.log_in(username, password)  # Log in programmatically
-
-    # Retrieve profile details
-    profile = instaloader.Profile.from_username(L.context, query)
-    if not profile:
-        profile_data["username"] = username
-        profile_data["platform"] = "إنستاجرام"
-        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
-        return profile_data
-
-    # ic(profile.external_url)
-    # # Get profile details
-    # ic(profile.followees)
-    # ic(profile.external_url)
-    # ic(profile.is_private)
-    # ic(profile.is_verified)
-    # ic(profile.igtvcount)
-    # ic(profile.mediacount)
-    # ic(profile.total_igtv_count)
-    # ic(profile.total_saved_media_count)
-    # ic(profile.total_timeline_mediacount)
-    # ic(profile.timeline_mediacount)
-    # ic(profile.timeline_media)
-    # ic(profile.timeline_likes)
-    # ic(profile.timeline_comments)
-    # ic(profile.timeline_caption)
-    # ic(profile.timeline)
-    # ic(profile.biography)
-    # ic(profile.profile_pic_url)
-    # ic(profile.profile_pic_url_hd)
-    # ic(profile.full_name)
-    # ic(profile.username)
-    # ic(profile.userid)
-    # ic(profile.followers)
-    
-    
-
-    profile_data: dict = {
-        # "username": profile.username,
-        # "platform": "Instagram",
-        "public_profile_name": profile.full_name,
-        "followers": profile.followers,
-        "likes": 0,
-        "posts": 0,
-        "profile_picture": download_profile_image_instagram(profile.profile_pic_url),
-        "bio_text": profile.biography,
-        "external_url": profile.external_url,
-        # "time_taken": duration.total_seconds(),
-        # "platform_id": platform_id,
-    }
-    return profile_data
-
 
 def instagram(username: str) -> dict:
     """

@@ -20,6 +20,7 @@ class Users(db.Model, UserMixin):
     username = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64), unique=True)
     password = db.Column(db.LargeBinary)
+    logs = db.relationship("Log", backref="user", lazy=True, cascade="all, delete-orphan")
 
     def __init__(self, **kwargs):
         """
