@@ -113,14 +113,22 @@ def tiktok(username: str) -> dict:
     """
     profile_data = {}
     url = f"https://www.tiktok.com/@{username}"
-
     
-    # Send a GET request
-    r = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    # proxies = {
+    #     "http": "http://10.10.1.10:3128",
+    #     "https": "http://10.10.1.10:1080",
+    # }
+
+    # r = requests.get(url, headers=headers, proxies=proxies, timeout=5)
+    r = requests.get(url, headers=headers, timeout=30)
 
     # Print the status code
     # ic(r.status_code)
 
+    # ic(r.status_code)
     if r.status_code != 200:
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
@@ -129,9 +137,13 @@ def tiktok(username: str) -> dict:
     
     # Parse the HTML content
     soup = BeautifulSoup(r.text, "html.parser")
+    # Save the soup to a file
+    # with open("tiktok_soup.html", "w", encoding="utf-8") as file:
+    #     file.write(str(soup))
 
     # Find the script element by ID
     script_element = soup.find("script", id="__UNIVERSAL_DATA_FOR_REHYDRATION__")
+    # ic("script_element found" if script_element else "script_element not found")
 
     # Check if the script element exists
     if script_element is None:
@@ -147,7 +159,9 @@ def tiktok(username: str) -> dict:
     try:
         user_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["user"]
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
+        # ic(user_data, stats_data)
     except KeyError:
+        # ic(json_data)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "Could not find the required data in the JSON structure."
@@ -183,7 +197,16 @@ def snapchat(username: str) -> dict:
     profile_data = {}
     url = f"https://www.snapchat.com/add/{username}"
 
-    r = requests.get(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+    # proxies = {
+    #     "http": "http://10.10.1.10:3128",
+    #     "https": "http://10.10.1.10:1080",
+    # }
+    
+    # r = requests.get(url, headers=headers, proxies=proxies)
+    r = requests.get(url, headers=headers, timeout=30)
 
     if r.status_code != 200:
         profile_data["username"] = username
@@ -206,7 +229,7 @@ def snapchat(username: str) -> dict:
     profile_name = profile_section.find("span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x).text.strip()
     follower_count = profile_section.find("div",class_=lambda x: x and "SubscriberText" in x).text.strip()
     subtitle = soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x).text.strip()
-    subtitle_line2 = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x).text.strip()
+    subtitle_line2 = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x).text.strip() if soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x) else ""
     profile_image = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x).find("img")["srcset"]
     # address = profile_section.find("address").text.strip()
 
@@ -256,12 +279,14 @@ def instagram(username: str) -> dict:
     headers = {
         "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
         "X-RapidAPI-Host": "instagram-scraper-2022.p.rapidapi.com",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
     }
 
-    response = requests.get(url, headers=headers, params=querystring)
+    response = requests.get(url, headers=headers, params=querystring, timeout=30)
     json_data = response.json()
+    ic(json_data)
     
-    if json_data.get("status","") != "ok":
+    if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad":
         profile_data["username"] = username
         profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -269,6 +294,7 @@ def instagram(username: str) -> dict:
 
         
     user_data = json_data["user"]
+    # ic(user_data)
 
     # ic(
     #     user_data["username"],
@@ -378,14 +404,19 @@ def get_summerized_report()->dict:
     pictures_folder = path.join(current_app.root_path, "static", "profile_pictures")
     pictures = [f for f in listdir(pictures_folder) if isfile(path.join(pictures_folder, f))]
     last_scan = ScanLog.query.order_by(ScanLog.creation_date.desc(), ScanLog.creation_time.desc()).first()
+    platforms = Platform.query.all()
+    platform_counts = [(platform.name, SocialAccount.query.filter_by(platform_id=platform.id).count()) for platform in platforms]
+    
     report = {
         "total_users": Users.query.count(),
         "total_profiles": Influencer.query.count(),
         "total_accounts": SocialAccount.query.count(),
+        "accounts_per_platform": platform_counts,
         "total_scans": ScanLog.query.count(),
         "last_scan_date": last_scan.creation_date if last_scan else None,
         "last_scan_time": last_scan.creation_time if last_scan else None,
         "last_scan_duration": last_scan.time_taken if last_scan else None,
+        "platforms": platform_counts,
         "random_pictures": random.sample(pictures, 10),
     }
 

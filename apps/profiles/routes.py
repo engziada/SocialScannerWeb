@@ -211,7 +211,7 @@ def influencer_edit(influencer_id):
         influencer.email = form.email.data
         # influencer.profile_picture=form.profile_picture.data
         
-        ic(form.profile_picture.data)
+        # ic(form.profile_picture.data)
         if type(form.profile_picture) == FileField and form.profile_picture.data:
             influencer.save_profile_picture(picture_file=form.profile_picture.data)
 

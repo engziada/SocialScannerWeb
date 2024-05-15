@@ -1,8 +1,8 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} أمواج المشاهير {% endblock %}
-{% block header_title %} أمواج المشاهير{% endblock %}
-{% block header_sub_title %}{% endblock %}
+{% block title %} الصفحة الرئيسية {% endblock %}
+{% block header_title %} رصد {% endblock %}
+{% block header_sub_title %}الصفحة الرئيسية{% endblock %}
 {% block header_profile_image %}
 <svg version="1.1" id="Layer_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 78.4" style="enable-background:new 0 0 64 78.4;" xml:space="preserve">
     <path id="Rectangle_14" class="st0" d="M10,0h1.2v11.2H0V10C0,4.5,4.5,0,10,0z" />
@@ -62,14 +62,22 @@
                                 <td>{{stats.get('total_profiles')}}</td>
                             </tr>
                             <tr>
-                                <td>عدد حسابات مواقع التواصل الإجتماعي</td>
-                                <td>{{stats.get('total_accounts')}}</td>
-                            </tr>
-                            <tr>
                                 <td>عدد مرات المسح حتى الآن</td>
                                 <td>{{stats.get('total_scans')}}</td>
                             </tr>
-
+                            <tr>
+                                <td class="h6">عدد حسابات مواقع التواصل الإجتماعي</td>
+                            </tr>
+                            {% for platform, count in stats.get('accounts_per_platform') %}
+                                <tr>
+                                    <td>{{platform}}</td>
+                                    <td>{{count}}</td>
+                                </tr>
+                            {% endfor %}
+                                <tr>
+                                    <td>الإجمالي</td>
+                                    <td>{{stats.get('total_accounts')}}</td>
+                                </tr>                                
                             <tr>
                                 <td class="h6">آخر عملية مسح</td>
                             </tr>
@@ -89,10 +97,6 @@
                                 <td class="h6">بيانات الوصول لقاعدة البيانات</td>
                             </tr>
                                 <tr>
-                                    <td>إسم الخادم</td>
-                                    <td>dpg-co9u07a0si5c739j3bh0-a</td>
-                                </tr>
-                                <tr>
                                     <td>إسم قاعدة البيانات</td>
                                     <td>socialscannerdb</td>
                                 </tr>
@@ -104,6 +108,13 @@
                                     <td>رقم البورت</td>
                                     <td>5432</td>
                                 </tr>
+                            <tr>
+                                <td class="h6" colspan="2" style="text-align: center;">إسم الخادم</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">dpg-co9u07a0si5c739j3bh0-a.oregon-postgres.render.com</td>
+                            </tr>
+
                         </table>
                     </div>
                 </div>

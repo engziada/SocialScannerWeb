@@ -79,13 +79,13 @@ class Influencer(db.Model):
 
         if image_url.startswith("/static"):
             root_dir = os.path.dirname(os.path.abspath(__file__))
-            ic(root_dir)
+            # ic(root_dir)
             source_path = os.path.join(
                 root_dir, upload_folder, "temp_insta_profile_image.jpg"
             )
-            ic(source_path)
+            # ic(source_path)
             destination_path = os.path.join(root_dir, upload_folder, new_filename)
-            ic(destination_path)
+            # ic(destination_path)
             shutil.copyfile(source_path, destination_path)
         else:
             response = requests.get(image_url)

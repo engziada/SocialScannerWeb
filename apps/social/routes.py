@@ -59,7 +59,7 @@ def socialaccount_add(influencer_id):
     """
     referer = request.headers.get("Referer")
     if referer:
-        ic(f"This route was redirected from {referer}")
+        # ic(f"This route was redirected from {referer}")
         if referer.endswith("influencers"):
             session.pop("profile_data", None)
 
