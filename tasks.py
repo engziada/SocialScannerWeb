@@ -8,7 +8,7 @@ from icecream import ic
 
 from apps.social.models import Platform, SocialAccount
 
-# from threading import Lock
+from itertools import zip_longest, chain
 
 # # Create a lock
 # db_lock = Lock()
@@ -95,11 +95,23 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
 def scan_database(app,db_session):
     try:
         start_time = datetime.datetime.now()
-        socialaccounts=SocialAccount.query.all()
+        # Get all distinct platform IDs
+        platform_ids = [row[0] for row in db_session.query(SocialAccount.platform_id).distinct()]
+        # Create a dictionary to hold the lists of SocialAccounts for each platform
+        platforms_accounts = {}
+        # Query SocialAccount for each platform ID
+        for platform_id in platform_ids:
+            platforms_accounts[platform_id] = SocialAccount.query.filter_by(platform_id=platform_id).all()
+        # Get the lists of SocialAccounts for each platform
+        social_account_lists = platforms_accounts.values()
+        # Use zip_longest to interleave the items from the lists
+        interleaved = zip_longest(*social_account_lists)
+        # Flatten the list of tuples and remove None values
+        all_social_accounts = [item for item in chain(*interleaved) if item is not None]
 
         with ThreadPoolExecutor() as executor:
             tasks = []
-            for socialaccount in socialaccounts:
+            for socialaccount in all_social_accounts:
                 tasks.append(
                     executor.submit(
                         process_username,

@@ -14,8 +14,8 @@ from sqlalchemy import event
 class Platform(db.Model):
     __tablename__ = "platforms"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-    name_english = db.Column(db.String, nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
+    name_english = db.Column(db.String(255), nullable=False, unique=True)
     # social_accounts = db.relationship("SocialAccount", backref="platform", lazy=True)
     creation_date = db.Column(db.Date, nullable=True, default=db.func.current_date())
     creation_time = db.Column(db.Time, nullable=True, default=db.func.current_time())
@@ -45,7 +45,7 @@ class SocialAccount(db.Model):
     username = db.Column(db.String(255), nullable=False, unique=True)
     contents = db.relationship("Content", secondary="socialaccount_content", backref="socialaccounts", lazy=True)
     bio_text = db.Column(db.Text)
-    profile_picture = db.Column(db.String(255))
+    profile_picture = db.Column(db.Text)
     public_profile_name = db.Column(db.String(100))
     external_url = db.Column(db.String(255))
     followers = db.Column(db.Integer)

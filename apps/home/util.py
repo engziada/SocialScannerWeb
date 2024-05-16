@@ -272,29 +272,38 @@ def instagram(username: str) -> dict:
     """
     profile_data = {}
 
-    url = "https://instagram-scraper-2022.p.rapidapi.com/ig/info_username/"
-
-    querystring = {"user": username}
-
+    # url = "https://instagram-scraper-2022.p.rapidapi.com/ig/info_username/"
+    # querystring = {"user": username}
+    # headers = {
+    #     "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
+    #     "X-RapidAPI-Host": "instagram-scraper-2022.p.rapidapi.com",
+    #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+    # }
+    
+    url = "https://instagram-scraper-api2.p.rapidapi.com/v1/info"
+    querystring = {"username_or_id_or_url":username,"include_about":"false","url_embed_safe":"true"}
     headers = {
         "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
-        "X-RapidAPI-Host": "instagram-scraper-2022.p.rapidapi.com",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "X-RapidAPI-Host": "instagram-scraper-api2.p.rapidapi.com",
+        # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     }
 
     response = requests.get(url, headers=headers, params=querystring, timeout=30)
     json_data = response.json()
-    ic(json_data)
     
-    if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad":
+    # if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad" or response.status_code != 200:
+    if response.status_code != 200:
+        ic(response.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
+        ic(json_data)
         return profile_data
 
         
-    user_data = json_data["user"]
+    # user_data = json_data["user"]
     # ic(user_data)
+    user_data = json_data["data"]
 
     # ic(
     #     user_data["username"],
@@ -319,7 +328,7 @@ def instagram(username: str) -> dict:
         "followers": user_data["follower_count"],
         "likes": 0,
         "posts": user_data["media_count"],
-        "profile_picture": download_profile_image_instagram(user_data["profile_pic_url"]),
+        "profile_picture": user_data["profile_pic_url_hd"],#download_profile_image_instagram(user_data["profile_pic_url"]),
         "bio_text": user_data["biography"],
         "external_url": user_data["external_url"],
         # "time_taken": duration.total_seconds(),
