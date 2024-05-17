@@ -105,8 +105,8 @@ def socialaccount_add(influencer_id):
             flash("تم إضافة الحساب", "success")
             session.pop("profile_data")
             return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
-        except IntegrityError:
-            ic("SocialAccount_Add=>", "IntegrityError")
+        except IntegrityError as e:
+            ic("SocialAccount_Add=>", e.orig)
             db.session.rollback()
             flash("إسم الحساب موجود بالفعل", "danger")
         except Exception as e:
