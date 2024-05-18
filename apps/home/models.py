@@ -37,7 +37,7 @@ class Log(db.Model):
                             db.session.commit()
                     except Exception as e:
                         flash("فشل في تسجيل الحدث", "danger")
-                        ic(e)
+                        ic("Error in <add_log>: ", e)
                     finally:
                         return result
                 else:
@@ -56,6 +56,7 @@ class Log(db.Model):
                         db.session.add(new_log, user_ip=user_ip)
                         db.session.commit()
                 except Exception as e:
+                    ic("Error in <add_log_early>: ", e)
                     flash("فشل في تسجيل الحدث", "danger")
                 finally:
                     return func(*args, **kwargs)

@@ -9,7 +9,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
-
+from icecream import ic
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -34,13 +34,13 @@ def configure_database(app):
             db.create_all()
         except Exception as e:
 
-            print('> Error: DBMS Exception: ' + str(e) )
+            ic('DBMS Exception: ',str(e) )
 
             # fallback to SQLite
             basedir = os.path.abspath(os.path.dirname(__file__))
             app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
 
-            print('> Fallback to SQLite ')
+            ic('Fallback to SQLite ')
             db.create_all()
 
     @app.teardown_request

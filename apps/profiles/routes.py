@@ -110,7 +110,8 @@ def influencer_add():
             db.session.commit()
             flash("تم إضافة الملف", "success")
             return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=new_influencer.id,profile_data=profile_data,))
-        except IntegrityError:
+        except IntegrityError as e:
+            ic("IntegrityError in <influencer_add>: ", e)
             db.session.rollback()
             flash(
                 "إسم الملف موجود بالفعل, تم تحويلك إلى صفحة تعديل الملف",
@@ -129,6 +130,7 @@ def influencer_add():
             )
 
         except Exception as e:
+            ic("Error in <influencer_add>: ", e)
             db.session.rollback()
             flash(f"حدث خطأ أثناء إضافة الملف\n{e}", "danger")
     return render_template("profiles/influencer_add.html", form=form, profile_data=profile_data)

@@ -37,7 +37,8 @@ ic(get_config_mode)
 try:
     # Load the configuration using the default values
     app_config = config_dict[get_config_mode.capitalize()]
-except KeyError:
+except KeyError as e:
+    ic("Error: Invalid <config_mode>. Expected values [Debug, Production] ",e)
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production] ')
 
 app = create_app(app_config)

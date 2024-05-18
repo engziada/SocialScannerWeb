@@ -19,10 +19,8 @@ from apps.content_types.models import Content
 from apps import db
 
 import pandas as pd
-from sqlalchemy.exc import IntegrityError
 
 from werkzeug.datastructures.file_storage import FileStorage
-from werkzeug.utils import secure_filename
 
 
 # profile_data: dict = {
@@ -161,7 +159,7 @@ def tiktok(username: str) -> dict:
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
         # ic(user_data, stats_data)
     except KeyError:
-        # ic(json_data)
+        ic("Error in Tiktok data: ",json_data)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "Could not find the required data in the JSON structure."
@@ -447,6 +445,7 @@ def import_content_from_excel(file:FileStorage,selected_option:str) -> bool:
         with open(file_path, 'wb') as f:
             f.write(file.read())
     except Exception as e:
+        ic("Error while copying the file in <import_content_from_excel>: ", e)
         flash(f"خطأ أثناء نسخ الملف: {e}", "danger")
         return False
 
@@ -545,7 +544,7 @@ def import_content_from_excel(file:FileStorage,selected_option:str) -> bool:
         db.session.commit()
         return True
     except Exception as e:
+        ic("Error while importing the data in <import_content_from_excel>: ", e)
         db.session.rollback()
         flash(f"خطأ أثناء إستيراد البيانات: {e}", "danger")
-        ic(e)
         return False

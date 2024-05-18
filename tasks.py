@@ -74,8 +74,7 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
             scan_log["success_count"][platform_name] = scan_log.get("success_count", {}).get(platform_name, 0) + 1
                 
         except Exception as e:
-            # msg = f"{username} : {e}"
-            # ic(msg)
+            ic(f"Error in process_username: {e}")
             # save the log, check if the platform is already in the log dictionary, add to success count
             scan_log["failure_count"][platform_name] = scan_log.get("failure_count", {}).get(platform_name, 0) + 1
             

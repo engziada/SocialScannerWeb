@@ -106,11 +106,11 @@ def socialaccount_add(influencer_id):
             session.pop("profile_data")
             return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
         except IntegrityError as e:
-            ic("SocialAccount_Add=>", e.orig)
+            ic("IntegrityError in <SocialAccount_Add>:", e)
             db.session.rollback()
             flash("إسم الحساب موجود بالفعل", "danger")
         except Exception as e:
-            ic("SocialAccount_Add=>", e)
+            ic("Error in <SocialAccount_Add>: ", e)
             db.session.rollback()
             flash(f"حدث خطأ أثناء تسجيل البيانات\n{e}", "danger")
     else:
@@ -176,6 +176,7 @@ def socialaccount_edit(socialaccount_id):
         else:
             session["profile_data"] = profile_data
     except Exception as e:
+        ic("Error in <SocialAccount_Edit>: ", e)
         flash(f"Error: {str(e)}")  # Handle backend errors gracefully
 
     form = SocialAccountForm()  # Create an instance of the form and populate it with existing data

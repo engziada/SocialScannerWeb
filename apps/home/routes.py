@@ -191,7 +191,7 @@ def search():
             else:
                 session["profile_data"] = profile_data
         except Exception as e:
-            ic('Search=>',e)
+            ic('Error in Search: ',e)
             flash(f"Error: {str(e)}")  # Handle backend errors gracefully
 
     return render_template("home/search.html", form=form, profile_data=profile_data)
