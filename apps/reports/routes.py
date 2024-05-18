@@ -1,7 +1,7 @@
 import datetime
 import math
 
-from flask import Response, flash, jsonify, render_template, request
+from flask import Response, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 
 from sqlalchemy import and_, func, or_
@@ -41,26 +41,24 @@ def scanResults():
     per_page = 50  # Number of logs per page
 
     search_terms = request.args.get("q", "")
-    from_date = request.args.get("from_date", datetime.date.min)
-    to_date = request.args.get("to_date",datetime.date.max)
-    from_date=from_date if from_date else datetime.date.min
-    to_date=to_date if to_date else datetime.date.max
+    from_date = request.args.get("from_date", "01/01/2024")
+    to_date = request.args.get("to_date", datetime.datetime.today().strftime("%m/%d/%Y"))
+    from_date = from_date if from_date else "01/01/2024"
+    to_date = to_date if to_date else datetime.datetime.today().strftime("%m/%d/%Y")
 
     # filter influencers
-    scanresults = (
-        ScanResults.query.filter(
-            ScanResults.socialaccount.has(
-                (
-                    SocialAccount.influencer.has(
-                        (Influencer.full_name.ilike(f"%{search_terms}%"))
-                        | (SocialAccount.username.ilike(f"%{search_terms}%"))
-                    )
+    scanresults = ScanResults.query.filter(
+        ScanResults.socialaccount.has(
+            (
+                SocialAccount.influencer.has(
+                    (Influencer.full_name.ilike(f"%{search_terms}%"))
+                    | (SocialAccount.username.ilike(f"%{search_terms}%"))
                 )
-            ),
-            ScanResults.creation_date >= from_date,
-            ScanResults.creation_date <= to_date,
-        ).paginate(page=page, per_page=per_page)
-    )
+            )
+        ),
+        ScanResults.creation_date >= from_date,
+        ScanResults.creation_date <= to_date,
+    ).paginate(page=page, per_page=per_page, error_out=False)
 
     # scanlogs = ScanLog.query.all()  # Fetch all influencers
     return render_template("reports/scanresults.html", scanresults=scanresults, from_date=from_date, to_date=to_date, search_terms=search_terms)
@@ -88,20 +86,21 @@ def scanLog():
     per_page = 50  # Number of logs per page
 
     # search_terms = request.args.get("q", "")
-    from_date = request.args.get("from_date", datetime.date.min)
-    to_date = request.args.get("to_date", datetime.date.max)
-    from_date = from_date if from_date else datetime.date.min
-    to_date = to_date if to_date else datetime.date.max
+    from_date = request.args.get("from_date", "01/01/2024")
+    to_date = request.args.get("to_date", datetime.datetime.today().strftime("%m/%d/%Y"))
+    from_date = from_date if from_date else "01/01/2024"
+    to_date = to_date if to_date else datetime.datetime.today().strftime("%m/%d/%Y")
 
     # filter influencers
     scanlog = (
-        ScanLog.query
-        .filter(
+        ScanLog.query.filter(
             ScanLog.creation_date >= from_date,
             ScanLog.creation_date <= to_date,
         )
-        .order_by(ScanLog.creation_date.desc())  # Add this line to order by creation_date descending
-        .paginate(page=page, per_page=per_page)
+        .order_by(
+            ScanLog.creation_date.desc()
+        )  # Add this line to order by creation_date descending
+        .paginate(page=page, per_page=per_page, error_out=False)
     )
     
     return render_template(
@@ -133,10 +132,10 @@ def socialaccounts():
     per_page = 50  # Number of logs per page
 
     search_terms = request.args.get("q", "")
-    from_date = request.args.get("from_date", datetime.date.min)
-    to_date = request.args.get("to_date", datetime.date.max)
-    from_date = from_date if from_date else datetime.date.min
-    to_date = to_date if to_date else datetime.date.max
+    from_date = request.args.get("from_date", '01/01/2024')
+    to_date = request.args.get("to_date", datetime.datetime.today().strftime("%m/%d/%Y"))
+    from_date = from_date if from_date else "01/01/2024"
+    to_date = to_date if to_date else datetime.datetime.today().strftime("%m/%d/%Y")
     content= request.args.get("content", "")
     platform= request.args.get("platform", "")
     gender= request .args.get("gender", "")
@@ -163,7 +162,7 @@ def socialaccounts():
             SocialAccount.creation_date <= to_date
         )
         query = query.filter(date_condition)
-    socialaccounts = query.paginate(page=page, per_page=per_page)
+    socialaccounts = query.paginate(page=page, per_page=per_page, error_out=False)
     
     return render_template(
         "reports/socialaccounts.html",
@@ -173,13 +172,50 @@ def socialaccounts():
         search_terms=search_terms,
         contents=contents,
         platforms=platforms,
+        selected_content=content,
+        selected_platform=platform,
+        selected_gender=gender,
     )
 
 
 @blueprint.route("/export_socialaccounts")
 def export_socialaccounts():
     try:
-        socialaccounts = SocialAccount.query.all()
+        # ic(request.args)
+        # Get the filter parameters from the query string
+        search_terms = request.args.get('q', '')
+        from_date = request.args.get("from_date", '01/01/2024')
+        to_date = request.args.get("to_date", datetime.datetime.today().strftime("%m/%d/%Y"))
+        from_date = from_date if from_date else "01/01/2024"
+        to_date = to_date if to_date else datetime.datetime.today().strftime("%m/%d/%Y")
+        content = request.args.get('content', '')
+        platform = request.args.get('platform', '')
+        gender = request.args.get('gender', '')
+
+            # Apply the filters to the query
+        query = SocialAccount.query
+        if search_terms:
+            search_condition = or_(
+                Influencer.full_name.ilike(f"%{search_terms}%"),
+                SocialAccount.username.ilike(f"%{search_terms}%")
+            )
+            query = query.filter(SocialAccount.influencer.has(search_condition))
+        if gender:
+            query = query.filter(SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")))
+        if content:
+            query = query.filter(SocialAccount.contents.any(Content.name.ilike(f"%{content}%")))
+        if platform:
+            query = query.filter(SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")))
+        if from_date and to_date:
+            date_condition = and_(
+                SocialAccount.creation_date >= from_date,
+                SocialAccount.creation_date <= to_date
+            )
+            query = query.filter(date_condition)
+
+        socialaccounts = query.all()
+        # ic(query.limit(2).all())
+        
         headers = [
             "إسم الملف",
             "إسم الحساب",
@@ -216,7 +252,9 @@ def export_socialaccounts():
         return response
 
     except Exception as e:
+        ic("An error occurred while exporting the social accounts: ", str(e))
         flash(f"An error occurred while exporting the social accounts: {str(e)}", "danger")
+        return redirect(url_for("reports_blueprint.socialaccounts"))
 
 
 # ////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +277,7 @@ def scanResults_report():
         None
     """
     page = request.args.get("page", 1, type=int)
-    per_page = 50  # Number of logs per page
+    per_page = 3  # Number of logs per page
 
     search_terms = request.args.get("q", "")
     from_date = request.args.get("from_date", default=str(datetime.datetime.today()))

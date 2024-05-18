@@ -171,12 +171,12 @@ def tiktok(username: str) -> dict:
         # "username": username,
         # "platform": "TikTok",
         # "platform_id": platform_id,
-        "public_profile_name": user_data["nickname"],
-        "followers": stats_data["followerCount"],
-        "likes": stats_data["heartCount"],
+        "public_profile_name": user_data.get("nickname", ""),
+        "followers": stats_data.get("followerCount", "0"),
+        "likes": stats_data.get("heartCount", "0"),
         "posts": 0,
-        "profile_picture": user_data["avatarLarger"],
-        "bio_text": user_data["signature"],
+        "profile_picture": user_data.get("avatarLarger", ""),
+        "bio_text": user_data.get("signature", ""),
         "external_url": url,
         # "time_taken": duration.total_seconds(),
     }  
@@ -226,12 +226,16 @@ def snapchat(username: str) -> dict:
         return profile_data
 
     # Extract profile details
-    profile_name = profile_section.find("span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x).text.strip()
-    follower_count = profile_section.find("div",class_=lambda x: x and "SubscriberText" in x).text.strip()
-    subtitle = soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x).text.strip()
-    subtitle_line2 = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x).text.strip() if soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x) else ""
-    profile_image = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x).find("img")["srcset"]
-    # address = profile_section.find("address").text.strip()
+    obj=profile_section.find("span", class_=lambda x: x and "PublicProfileDetailsCard_displayNameText" in x)
+    profile_name = obj.text.strip() if obj else ""
+    obj=profile_section.find("div", class_=lambda x: x and "SubscriberText" in x)
+    follower_count = obj.text.strip() if obj else "0"
+    obj=soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x)
+    subtitle = obj.text.strip() if obj else ""
+    obj = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x)
+    subtitle_line2 = obj.text.strip() if obj else ""
+    obj = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x)
+    profile_image = obj.find("img")["srcset"] if obj else ""
 
     profile_data: dict = {
         # "username": username,
@@ -324,13 +328,13 @@ def instagram(username: str) -> dict:
     profile_data: dict = {
         # "username": profile.username,
         # "platform": "Instagram",
-        "public_profile_name": user_data["full_name"],
-        "followers": user_data["follower_count"],
+        "public_profile_name": user_data.get("full_name", ""),
+        "followers": user_data.get("follower_count", '0'),
         "likes": 0,
-        "posts": user_data["media_count"],
-        "profile_picture": user_data["profile_pic_url_hd"],#download_profile_image_instagram(user_data["profile_pic_url"]),
-        "bio_text": user_data["biography"],
-        "external_url": user_data["external_url"],
+        "posts": user_data.get("media_count", '0'),
+        "profile_picture": user_data.get("profile_pic_url_hd", ""),#download_profile_image_instagram(user_data["profile_pic_url"]),
+        "bio_text": user_data.get("biography", ""),
+        "external_url": user_data.get("external_url", ""),
         # "time_taken": duration.total_seconds(),
         # "platform_id": platform_id,
     }
@@ -361,15 +365,18 @@ def format_numbers_snapchat(follower_count_str):
         >>> format_numbers_snapchat("12345")
         12345
     """
-    # Remove ' Subscribers' from the string
-    follower_count_str = follower_count_str.split(' ')[0]
-    # Remove commas from the string    
-    if follower_count_str.endswith('m'):
-        return int(float(follower_count_str[:-1]) * 1_000_000)
-    elif follower_count_str.endswith('k'):
-        return int(float(follower_count_str[:-1]) * 1_000)
-    else:
-        return int(follower_count_str)
+    try:
+        # Remove ' Subscribers' from the string
+        follower_count_str = follower_count_str.split(' ')[0]
+        # Remove commas from the string    
+        if follower_count_str.endswith('m'):
+            return int(float(follower_count_str[:-1]) * 1_000_000)
+        elif follower_count_str.endswith('k'):
+            return int(float(follower_count_str[:-1]) * 1_000)
+        else:
+            return int(follower_count_str)
+    except:
+        return 0
 
 
 def download_profile_image_instagram(image_url):

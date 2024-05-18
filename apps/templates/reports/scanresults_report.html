@@ -23,13 +23,13 @@
                     <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='ScanResults') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
-                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
+                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q" value="{{ search_terms }}">
                     </div>
                     <div class="date-picker" style="flex-direction: column;">
                         <div class="form-group">
                             <div class="input-group input-group-border">
                                 <span class="input-group-text" id="basic-addonDate3"><span class="fas far fa-calendar-alt"></span></span>
-                                <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="تاريخ بدء المدة" type="text">
+                                <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="تاريخ بدء المدة" type="text" value="{{ from_date }}">
                             </div>
                         </div>
                         <div class="btn-bar">

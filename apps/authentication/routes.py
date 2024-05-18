@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, request, url_for
+from flask import flash, render_template, redirect, request, session, url_for
 from flask_login import (
     current_user,
     login_required,
@@ -15,14 +15,17 @@ from apps.authentication.models import Users
 from apps.authentication.util import verify_pass,create_default_admin
 
 from apps.home.models import Log
-
+from icecream import ic
 
 @blueprint.route('/')
 def route_default():
     """
     A route function that redirects to the login page.
     """
-    return redirect(url_for('authentication_blueprint.login'))
+    # ic(session.get("original_url", url_for("authentication_blueprint.login")))
+    original_url=session.pop("original_url", url_for("authentication_blueprint.login")) 
+    return redirect(original_url)
+    # return redirect(url_for('authentication_blueprint.login'))
 
 
 # Login & Registration
@@ -58,8 +61,7 @@ def login():
                                form=login_form)
 
     if not current_user.is_authenticated:
-        return render_template('accounts/login.html',
-                               form=login_form)
+        return render_template('accounts/login.html',form=login_form)
     return redirect(url_for('home_blueprint.index'))
 
 
@@ -155,7 +157,9 @@ def unauthorized_handler():
     Returns:
         A tuple containing the rendered template and the status code.
     """
-    return render_template('home/page-403.html'), 403
+    session['original_url'] = request.url
+    # return redirect(url_for('authentication_blueprint.login'))
+    return render_template("home/page-403.html"), 403
 
 
 @blueprint.errorhandler(403)
@@ -171,8 +175,9 @@ def access_forbidden(error):
     Returns:
         A tuple containing the rendered template and the status code.
     """
+    session['original_url'] = request.url
+    # return redirect(url_for("authentication_blueprint.login"))
     return render_template('home/page-403.html'), 403
-
 
 @blueprint.errorhandler(404)
 def not_found_error(error):

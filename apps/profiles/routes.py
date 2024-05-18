@@ -56,11 +56,10 @@ def influencers():
                     SocialAccount.username.ilike(f"%{search_terms}%")
                 )
             )
-        )
-        .paginate(page=page, per_page=per_page)
+        ).paginate(page=page, per_page=per_page, error_out=False)
         # .all()
     )
-    return render_template("profiles/influencers.html", influencers=influencers)
+    return render_template("profiles/influencers.html", influencers=influencers, search_terms=search_terms)
 
 
 @blueprint.route("/influencer_add", methods=["GET", "POST"])

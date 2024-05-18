@@ -22,18 +22,18 @@
             <div class="container">
                 <form method="GET" action="{{ url_for('reports_blueprint.socialaccounts') }}" class="search-bar">
                     <!-- <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='SocialAccount') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a> -->
-                    <a href="{{ url_for('reports_blueprint.export_socialaccounts') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
+                    <a href="{{ url_for('reports_blueprint.export_socialaccounts', q=search_terms, from_date=from_date, to_date=to_date, content=selected_content, platform=selected_platform, gender=selected_gender) }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
                     
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
-                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q">
+                        <input type="text" class="form-control" id="searchbox1" placeholder=" بحث بإسم الملف أو الحساب" aria-label="Search1" aria-describedby="basic-addon1" name="q" value="{{ search_terms }}">
                     </div>
 
                     <div class="mb-3">
                         <select class="form-select" id="contentOptions" aria-label="contentOptions" name="content">
                             <option value="" selected>إختر المحتوى</option>
                             {% for content in contents %}
-                            <option value="{{ content.name }}">{{ content.name }}</option>
+                            <option value="{{ content.name }}" {% if content.name == selected_content %}selected{% endif %}>{{ content.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -41,16 +41,16 @@
                         <select class="form-select" id="platformOptions" aria-label="platformOptions" name="platform">
                             <option value="" selected>إختر المنصة</option>
                             {% for platform in platforms %}
-                            <option value="{{ platform.name }}">{{ platform.name }}</option>
+                            <option value="{{ platform.name }}" {% if platform.name == selected_platform %}selected{% endif %}>{{ platform.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
                         <select class="form-select" id="genderOptions" aria-label="genderOptions" name="gender">
-                            <option value="" selected>إختر الجنس</option>
-                            <option value="ذكر">ذكر</option>
-                            <option value="أنثى">أنثى</option>
-                            <option value="أخرى">أخرى</option>
+                            <option value="" {% if selected_gender == '' %}selected{% endif %}>إختر الجنس</option>
+                            <option value="ذكر" {% if selected_gender == 'ذكر' %}selected{% endif %}>ذكر</option>
+                            <option value="أنثى" {% if selected_gender == 'أنثى' %}selected{% endif %}>أنثى</option>
+                            <option value="أخرى" {% if selected_gender == 'أخرى' %}selected{% endif %}>أخرى</option>
                         </select>
                     </div>
 
@@ -60,16 +60,16 @@
                         <div class="form-group">
                             <div class="input-group input-group-border">
                                 <span class="input-group-text" id="basic-addonDate3"><span class="fas far fa-calendar-alt"></span></span>
-                                <input class="form-control" data-datepicker="" id="to_date" name="to_date" placeholder="إلى تاريخ" type="text">
+                                <input class="form-control" data-datepicker="" id="to_date" name="to_date" placeholder="إلى تاريخ" type="text" value="{{ to_date }}">
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group input-group-border">
                                 <span class="input-group-text" id="basic-addonDate2"><span class="fas far fa-calendar-alt"></span></span>
-                                <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="من تاريخ" type="text">
+                                <input class="form-control" data-datepicker="" id="from_date" name="from_date" placeholder="من تاريخ" type="text" value="{{ from_date }}">
                             </div>
                         </div>
-                    </div>
+                    </div>                
                 </form>
 
                 <div class="table-container">
@@ -130,7 +130,7 @@
                         </li>
                         {% else %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('reports_blueprint.socialaccounts', page=page) }}">{{ page }}</a>
+                            <a class="page-link" href="{{ url_for('reports_blueprint.socialaccounts', page=page, q=search_terms, from_date=from_date, to_date=to_date, content=selected_content, platform=selected_platform, gender=selected_gender) }}">{{ page }}</a>                        
                         </li>
                         {% endif %}
                         {% else %}

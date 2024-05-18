@@ -30,7 +30,13 @@
 
                             <div class="d-flex justify-content-center align-items-center mt-4">
                                 <span class="fw-normal">
-                                    <a href="/" class="fw-bold text-underline">الصفحة الرئيسية</a> - إتصل بنا <a href="#" class="fw-bold text-underline">الدعم الفني</a>.
+                                    <span class="fw-normal">
+                                        {% if user_authenticated %}
+                                            <a href="/home" class="fw-bold text-underline">الصفحة الرئيسية</a>
+                                        {% else %}
+                                            <a href="/login" class="fw-bold text-underline">الصفحة الرئيسية</a>
+                                        {% endif %}
+                                    </span>
                                 </span>
                             </div>
                         </div>
