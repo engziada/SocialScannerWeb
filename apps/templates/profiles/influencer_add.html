@@ -68,7 +68,7 @@
                         <div class="form-check form-switch py-4">
                             {% if profile_data and not profile_data.get('error') %}
                             {{ form.set_as_default_profile_picture.label(class_='form-check-label') }}
-                                {{ form.set_as_default_profile_picture(class_='form-check-input', id='id_set_as_default_profile_picture') }}
+                                {{ form.set_as_default_profile_picture(class_='form-check-input', id='id_set_as_default_profile_picture', checked=True) }}
                                 {% for error in form.set_as_default_profile_picture.errors %}
                                 <span class="error">{{ error }}</span>
                                 {% endfor %}

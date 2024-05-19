@@ -101,8 +101,9 @@ def influencer_add():
 
             # Check if the profile picture is a URL/Local and save it
             set_as_default_profile_picture = form.set_as_default_profile_picture.data
-            if profile_data and profile_data["profile_picture"] and set_as_default_profile_picture:
-                new_influencer.download_image(profile_data["profile_picture"])
+            if set_as_default_profile_picture:
+                new_influencer.profile_picture = profile_data["profile_picture"] if profile_data else None
+                # new_influencer.download_image(profile_data["profile_picture"])
             elif form.profile_picture.data:
                 new_influencer.save_profile_picture(picture_file=form.profile_picture.data)
 
@@ -249,17 +250,17 @@ def influencer_update_picture():
     """
     influencer_id = request.form.get('influencer_id')
     picture_url = request.form.get('picture_url')
-    # get influencer
     influencer = Influencer.query.get(influencer_id)
+    
     if not influencer:
         flash("الملف غير موجود", "danger")
         return jsonify({"redirect_url": url_for("profiles_blueprint.influencers")})
-    influencer.download_image(picture_url)
+    if not picture_url:
+        flash("الرجاء تحديد صورة", "danger")
+        return jsonify({"redirect_url": url_for("profiles_blueprint.influencer_edit", influencer_id=influencer_id)})
+    
+    influencer.profile_picture = picture_url
+    ic(influencer.profile_picture, picture_url)
+    # influencer.download_image(picture_url)
     flash("تم تعديل الصورة", "success")
-    return jsonify(
-        {
-            "redirect_url": url_for(
-                "profiles_blueprint.influencer_edit", influencer_id=influencer_id
-            )
-        }
-    )
+    return jsonify({"redirect_url": url_for("profiles_blueprint.influencer_edit", influencer_id=influencer_id)})

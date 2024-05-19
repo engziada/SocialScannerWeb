@@ -3,7 +3,8 @@
 {% block title %} تفاصيل ملف {% endblock %} 
 {% block header_title %} تفاصيل الملف {% endblock %}
 {% block header_profile_image %}
-<img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}"/>
+<img src="{{ influencer.profile_picture if influencer.profile_picture else 'https://via.placeholder.com/150' }}"/>
+<!-- <img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}" /> -->
 {% endblock %}
 
 

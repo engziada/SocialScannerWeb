@@ -65,6 +65,9 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
                 socialaccount.followers = profile_data["followers"]
                 socialaccount.likes = profile_data["likes"]
                 socialaccount.posts = profile_data["posts"]
+                socialaccount.external_url = profile_data["external_url"]
+                socialaccount.profile_picture = profile_data["profile_picture"]
+                
                 # with db_lock:
                 db_session.add(new_scanresults)
                 db_session.commit()

@@ -5,7 +5,7 @@ import requests
 from apps import db
 from werkzeug.utils import secure_filename
 from os import path, makedirs
-from flask import current_app, request
+from flask import current_app
 from icecream import ic
 import datetime
 from sqlalchemy import event
@@ -27,12 +27,6 @@ class Platform(db.Model):
 
     def __repr__(self):
         return f"Platform(id={self.id}, name='{self.name}')"
-
-# profile_data: dict = {
-#     "followers": 0,
-#     "likes": 0,
-#     "posts": 0,
-# }
 
 
 # Define Subprofiles Model
@@ -60,44 +54,44 @@ class SocialAccount(db.Model):
     def __repr__(self):
         return f"SocialAccount(id={self.id}, platform='{self.platform}', username='{self.username}')"
 
-    def save_profile_picture(self, picture_file):
-        upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
-        if not path.exists(upload_folder):
-            makedirs(upload_folder)
-        current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-        if picture_file:
-            filename = secure_filename(picture_file.filename)
-            new_filename = f'{current_time}.{filename.split(".")[-1]}'
-            filepath = path.join(upload_folder, new_filename)
-            picture_file.save(filepath)
-            self.profile_picture = new_filename
-            db.session.commit()
+    # def save_profile_picture(self, picture_file):
+    #     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    #     if not path.exists(upload_folder):
+    #         makedirs(upload_folder)
+    #     current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+    #     if picture_file:
+    #         filename = secure_filename(picture_file.filename)
+    #         new_filename = f'{current_time}.{filename.split(".")[-1]}'
+    #         filepath = path.join(upload_folder, new_filename)
+    #         picture_file.save(filepath)
+    #         self.profile_picture = new_filename
+    #         db.session.commit()
 
-    def download_image(self, image_url):
-        if not image_url:
-            return
+    # def download_image(self, image_url):
+    #     if not image_url:
+    #         return
         
-        upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
-        if not path.exists(upload_folder):
-            makedirs(upload_folder)
-        current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-        new_filename = secure_filename(f"{current_time}.jpg")
-        filepath = path.join(upload_folder, new_filename)
+    #     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    #     if not path.exists(upload_folder):
+    #         makedirs(upload_folder)
+    #     current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+    #     new_filename = secure_filename(f"{current_time}.jpg")
+    #     filepath = path.join(upload_folder, new_filename)
 
-        if image_url.startswith("/static"):
-            root_dir = os.path.dirname(os.path.abspath(__file__))
-            # ic(root_dir)
-            source_path = os.path.join(root_dir, upload_folder, "temp_insta_profile_image.jpg")
-            # ic(source_path)
-            destination_path = os.path.join(root_dir, upload_folder, new_filename)
-            # ic(destination_path)
-            shutil.copyfile(source_path, destination_path)
-        else:
-            response = requests.get(image_url)
-            with open(filepath, "wb") as f:
-                f.write(response.content)
-        self.profile_picture = new_filename
-        db.session.commit()
+    #     if image_url.startswith("/static"):
+    #         root_dir = os.path.dirname(os.path.abspath(__file__))
+    #         # ic(root_dir)
+    #         source_path = os.path.join(root_dir, upload_folder, "temp_insta_profile_image.jpg")
+    #         # ic(source_path)
+    #         destination_path = os.path.join(root_dir, upload_folder, new_filename)
+    #         # ic(destination_path)
+    #         shutil.copyfile(source_path, destination_path)
+    #     else:
+    #         response = requests.get(image_url)
+    #         with open(filepath, "wb") as f:
+    #             f.write(response.content)
+    #     self.profile_picture = new_filename
+    #     db.session.commit()
 
 
 class SocialAccount_Content(db.Model):

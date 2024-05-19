@@ -49,50 +49,50 @@ class Influencer(db.Model):
             makedirs(upload_folder)
         current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
         if picture_file:
-            if path.exists(path.join(upload_folder, picture_file)):
+            if path.exists(path.join(upload_folder, picture_file.filename)):
                 return
             filename = secure_filename(picture_file.filename)
             new_filename = f'{current_time}.{filename.split(".")[-1]}'
             filepath = path.join(upload_folder, new_filename)
             picture_file.save(filepath)
-            self.profile_picture = new_filename
+            self.profile_picture = f"{current_app.config['BASE_URL']}/{new_filename}"
             db.session.commit()
 
 
-    def download_image(self, image_url):
-        """
-        Downloads an image from the specified URL, saves it in the static folder, and updates the profile_picture attribute of the object.
+    # def download_image(self, image_url):
+    #     """
+    #     Downloads an image from the specified URL, saves it in the static folder, and updates the profile_picture attribute of the object.
         
-        Parameters:
-            self: The instance of the class.
-            image_url (str): The URL of the image to download.
+    #     Parameters:
+    #         self: The instance of the class.
+    #         image_url (str): The URL of the image to download.
         
-        Returns:
-            None
-        """
-        upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
-        if not path.exists(upload_folder):
-            makedirs(upload_folder)
-        current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-        new_filename = secure_filename(f"{current_time}.jpg")
-        filepath = path.join(upload_folder, new_filename)
+    #     Returns:
+    #         None
+    #     """
+    #     upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    #     if not path.exists(upload_folder):
+    #         makedirs(upload_folder)
+    #     current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+    #     new_filename = secure_filename(f"{current_time}.jpg")
+    #     filepath = path.join(upload_folder, new_filename)
 
-        if image_url.startswith("/static"):
-            root_dir = os.path.dirname(os.path.abspath(__file__))
-            # ic(root_dir)
-            source_path = os.path.join(
-                root_dir, upload_folder, "temp_insta_profile_image.jpg"
-            )
-            # ic(source_path)
-            destination_path = os.path.join(root_dir, upload_folder, new_filename)
-            # ic(destination_path)
-            shutil.copyfile(source_path, destination_path)
-        else:
-            response = requests.get(image_url)
-            with open(filepath, "wb") as f:
-                f.write(response.content)
-        self.profile_picture = new_filename
-        db.session.commit()
+    #     if image_url.startswith("/static"):
+    #         root_dir = os.path.dirname(os.path.abspath(__file__))
+    #         # ic(root_dir)
+    #         source_path = os.path.join(
+    #             root_dir, upload_folder, "temp_insta_profile_image.jpg"
+    #         )
+    #         # ic(source_path)
+    #         destination_path = os.path.join(root_dir, upload_folder, new_filename)
+    #         # ic(destination_path)
+    #         shutil.copyfile(source_path, destination_path)
+    #     else:
+    #         response = requests.get(image_url)
+    #         with open(filepath, "wb") as f:
+    #             f.write(response.content)
+    #     self.profile_picture = new_filename
+    #     db.session.commit()
 
 
 @event.listens_for(Influencer, "before_insert")

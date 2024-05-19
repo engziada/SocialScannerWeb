@@ -4,7 +4,8 @@
 {% block header_title %} الحسابات{% endblock %}
 {% block header_sub_title %} {{influencer.full_name}}{% endblock %}
 {% block header_profile_image %}
-<img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}">
+<!-- <img src="{{ url_for('static', filename='profile_pictures/' + influencer.profile_picture) if influencer.profile_picture else 'https://via.placeholder.com/150' }}"> -->
+<img src="{{ influencer.profile_picture if influencer.profile_picture else 'https://via.placeholder.com/150' }}">
 {% endblock %}
 
 
@@ -51,7 +52,7 @@
                                 </td>
                                 <td scope="row">{{ socialaccount.contents|map(attribute='name')|join(', ') }}</td>
                                 <td scope="row">{{ socialaccount.description }}</td>
-                                <td scope="row"><img src="{{ url_for('static', filename='profile_pictures/' +  socialaccount.profile_picture) if socialaccount.profile_picture else 'https://via.placeholder.com/150'}}" alt="Profile Picture" class="thumbnail"></td>
+                                <td scope="row"><img src="{{ socialaccount.profile_picture if socialaccount.profile_picture else 'https://via.placeholder.com/150'}}" alt="Profile Picture" class="thumbnail"></td>
                                 <td scope="row">
                                     <div class="btn-bar">
                                         <a href="{{ url_for('social_blueprint.socialaccount_edit', socialaccount_id=socialaccount.id) }}" class="btn btn-primary btn-sm">تعديل</a>

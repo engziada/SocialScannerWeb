@@ -1,6 +1,6 @@
 from apps import db
 
-from flask import render_template, redirect, request, session, url_for, flash
+from flask import  render_template, redirect, request, session, url_for, flash
 from flask_login import login_required
 
 from apps.home.models import Log
@@ -92,13 +92,13 @@ def socialaccount_add(influencer_id):
                 username=form.username.data,
                 contents=Content.query.filter(Content.id.in_(request.form.getlist("contents"))).all(),
                 bio_text=form.bio_text.data,
-                profile_picture=None,  # Set a default value initially
+                profile_picture=form.profile_picture.data, #None,
                 external_url=form.external_url.data,
                 public_profile_name=form.public_profile_name.data,
             )
 
-            if form.profile_picture.data:
-                new_socialaccount.download_image(form.profile_picture.data)
+            # if form.profile_picture.data:
+            #     new_socialaccount.download_image(form.profile_picture.data)
 
             db.session.add(new_socialaccount)
             db.session.commit()
@@ -217,7 +217,8 @@ def socialaccount_edit(socialaccount_id):
         form.profile_picture.data = socialaccount.profile_picture
         form.is_edited = False  # The form has not been edited
     else:
-        socialaccount.download_image(profile_data.get("profile_picture")) if profile_data else None
+        form.profile_picture.data = profile_data.get("profile_picture") if profile_data else None        
+        # socialaccount.download_image(profile_data.get("profile_picture")) if profile_data else None
         form.is_edited = True 
         
     if form.validate_on_submit():
@@ -227,15 +228,12 @@ def socialaccount_edit(socialaccount_id):
         socialaccount.bio_text = form.bio_text.data
         socialaccount.external_url = form.external_url.data
         socialaccount.public_profile_name = form.public_profile_name.data
-
-        # if type(form.profile_picture) == FileField and form.profile_picture.data:
-        #     socialaccount.save_profile_picture(form.profile_picture.data)
+        socialaccount.profile_picture = profile_data.get("profile_picture") if profile_data else None
 
         db.session.commit()
         session.pop("profile_data")
         flash("تم تعديل الحساب", "success")
-        return redirect(url_for("social_blueprint.socialaccounts",influencer_id=socialaccount.influencer_id,)
-        )
+        return redirect(url_for("social_blueprint.socialaccounts",influencer_id=socialaccount.influencer_id,))
     else:
         errors = form.errors
         ic("SocialAccount_Edit=>", errors)

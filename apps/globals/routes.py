@@ -1,4 +1,6 @@
-from flask import render_template, flash, send_file
+from os import path
+import random
+from flask import current_app, render_template, flash, send_file, send_from_directory
 from flask_login import login_required
 
 from apps.globals import blueprint
@@ -34,3 +36,15 @@ def export_to_excel(model_name):
         as_attachment=True,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
+
+@blueprint.route("/photo/<filename>")
+def get_photo(filename):
+    upload_folder = path.join(current_app.root_path, "static", "profile_pictures")
+    try:
+        ic(filename)
+        return send_from_directory(upload_folder, filename)
+    except:
+        filenames = [f"donotdelete{x}.jpeg" for x in range(10)]
+        filename = random.choice(filenames)
+        return send_from_directory(upload_folder, filename)
