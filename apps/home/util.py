@@ -1,10 +1,9 @@
 from datetime import datetime
 from genericpath import isfile
-from operator import ge
 from os import listdir, makedirs, path
 import random
 from bs4 import BeautifulSoup
-from flask import current_app, url_for,flash
+from flask import current_app, url_for
 from icecream import ic
 import json
 import requests
@@ -12,15 +11,9 @@ from werkzeug.utils import secure_filename
 
 from apps.profiles.models import Influencer
 from apps.reports.models import ScanLog
-from apps.social.models import Platform, SocialAccount, SocialAccount_Content
+from apps.social.models import Platform, SocialAccount
 from apps.authentication.models import Users
-from apps.content_types.models import Content
 
-from apps import db
-
-import pandas as pd
-
-from werkzeug.datastructures.file_storage import FileStorage
 
 
 # profile_data: dict = {
@@ -128,6 +121,7 @@ def tiktok(username: str) -> dict:
 
     # ic(r.status_code)
     if r.status_code != 200:
+        ic("From TikTok: ", r.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -145,6 +139,7 @@ def tiktok(username: str) -> dict:
 
     # Check if the script element exists
     if script_element is None:
+        ic("From TikTok: ", "Script Element is None")
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
@@ -159,7 +154,7 @@ def tiktok(username: str) -> dict:
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
         # ic(user_data, stats_data)
     except KeyError:
-        ic("Error in Tiktok data: ",json_data)
+        ic("From Tiktok: ",json_data)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "Could not find the required data in the JSON structure."
@@ -207,6 +202,7 @@ def snapchat(username: str) -> dict:
     r = requests.get(url, headers=headers, timeout=30)
 
     if r.status_code != 200:
+        ic("From SnapChat: ", r.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "سناب شات"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -218,6 +214,7 @@ def snapchat(username: str) -> dict:
     profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
 
     if profile_section is None:
+        ic("From SnapChat: ", "Profile Section is None")
         profile_data["username"] = username
         profile_data["platform"] = "سناب شات"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
@@ -228,9 +225,9 @@ def snapchat(username: str) -> dict:
     profile_name = obj.text.strip() if obj else ""
     obj=profile_section.find("div", class_=lambda x: x and "SubscriberText" in x)
     follower_count = obj.text.strip() if obj else "0"
-    obj=soup.find("div", class_=lambda x: x and "PublicProfileCard_mobileTitle" in x)
+    obj=soup.find("div", class_=lambda x: x and "PublicProfileCard_" in x and "Title" in x)
     subtitle = obj.text.strip() if obj else ""
-    obj = soup.find("a", class_=lambda x: x and "PublicProfileCard_mobileDetail" in x)
+    obj = soup.find("a", class_=lambda x: x and "PublicProfileCard_" in x and "Detail" in x)
     subtitle_line2 = obj.text.strip() if obj else ""
     obj = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x)
     profile_image = obj.find("img")["srcset"] if obj else ""
@@ -295,11 +292,11 @@ def instagram(username: str) -> dict:
     
     # if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad" or response.status_code != 200:
     if response.status_code != 200:
-        ic(response.status_code)
+        ic("From Instagram: ",response.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
-        ic(json_data)
+        ic("From Instagram: ", json_data)
         return profile_data
 
         
@@ -438,113 +435,3 @@ def get_summerized_report()->dict:
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
-def import_content_from_excel(file:FileStorage,selected_option:str) -> bool:
-    try:
-        file_extension = path.splitext(file.filename)[1]
-        file_path=path.join(current_app.root_path, "import" + file_extension)
-        with open(file_path, 'wb') as f:
-            f.write(file.read())
-    except Exception as e:
-        ic("Error while copying the file in <import_content_from_excel>: ", e)
-        flash(f"خطأ أثناء نسخ الملف: {e}", "danger")
-        return False
-
-    if selected_option == "contents":
-        # Define the column names
-        column_names = ["name", "description"]  # Add other column names here as necessary
-        # Read the CSV file
-        df = pd.read_csv(file_path, names=column_names, header=None, encoding="utf-8")
-        # Iterate over the rows of the DataFrame
-        for index, row in df.iterrows():
-            # Create a new Content object
-            content = Content.query.filter_by(name=row["name"].strip()).first()
-            if content:
-                continue
-            content = Content(
-                name=row["name"].strip(),
-                description=str(row.get("description", "")).strip(),
-            )
-            # Add the new Content object to the session
-            db.session.add(content)
-            
-    elif selected_option == "accounts":
-        # Define the column names
-        column_names = ["username", "platform_id", "influencer","content"]
-        # Read the CSV file
-        df = pd.read_csv(file_path, names=column_names, header=None, encoding="utf-8")
-        # Iterate over the rows of the DataFrame
-        for index, row in df.iterrows():
-            # Create a new SocialAccount object
-            # Check if there is a SocialAccount with the same username
-            existing_social_account = SocialAccount.query.filter_by(username=row["username"].strip()).first()
-            if existing_social_account:
-                continue
-        
-            influencer = Influencer.query.filter_by(full_name=row["influencer"].strip()).first()
-            if influencer:
-                influencer_id = influencer.id
-            else:
-                # flash(f"Influencer with full name {row['influencer']} not found", "danger")
-                continue
-
-            social_account = SocialAccount(
-                username=row["username"].strip(),
-                platform_id=row.get("platform_id"),
-                influencer_id=influencer_id,
-            )
-            # Add the new SocialAccount object to the session
-            db.session.add(social_account)
-            
-            content = Content.query.filter_by(name=row["content"].strip()).first()
-            if content:
-                content_id = content.id
-            else:
-                # Handle the case when the content does not exist
-                continue
-
-            # Create a new record in the socialaccount_contents table
-            socialaccount_content = SocialAccount_Content(
-                socialaccount_id=social_account.id,
-                content_id=content_id
-            )
-            # Add the new record to the session
-            db.session.add(socialaccount_content)
-            
-    elif selected_option == "profiles":
-        # Define the column names
-        column_names = ["full_name", "gender", "country", "city", "phone", "email", "profile_picture"]
-        # Read the CSV file
-        df = pd.read_csv(file_path, names=column_names, header=None, encoding="utf-8")
-        # Iterate over the rows of the DataFrame
-        for index, row in df.iterrows():
-            # Create a new Influencer object
-            # Check if there is an influencer with the same full_name
-            existing_influencer = Influencer.query.filter_by(full_name=row["full_name"].strip()).first()
-            if existing_influencer:
-                continue
-            
-            influencer = Influencer(
-                full_name=str(row["full_name"]).strip(),
-                gender=str(row.get("gender", "")).strip(),
-                country=str(row.get("country", "")).strip(),
-                city=str(row.get("city", "")).strip(),
-                phone=str(row.get("phone", "")).strip(),
-                email=str(row.get("email", "")).strip(),
-                profile_picture=str(row.get("profile_picture", "")).strip(),
-            )
-            # Add the new Influencer object to the session
-            db.session.add(influencer)
-            
-    else:
-        flash("الخيار المحدد غير مدعوم", "danger")
-        return False
-
-    # Commit the session to save the new Content objects to the database
-    try:
-        db.session.commit()
-        return True
-    except Exception as e:
-        ic("Error while importing the data in <import_content_from_excel>: ", e)
-        db.session.rollback()
-        flash(f"خطأ أثناء إستيراد البيانات: {e}", "danger")
-        return False

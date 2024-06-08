@@ -1,12 +1,13 @@
 import datetime
-from flask import  current_app, redirect, render_template, request, flash, session, url_for
+from flask import  redirect, render_template, request, flash, session, url_for
 from apps.home import blueprint
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 
 from apps.home.models import Log
 from apps.home.forms import SearchForm
-from apps.home.util import search_user_profile, get_summerized_report, import_content_from_excel
+from apps.home.util import search_user_profile, get_summerized_report
+from apps.globals.util import import_content_from_excel
 
 from apps.social.models import Platform, SocialAccount
 
@@ -198,34 +199,6 @@ def search():
 
 
 # ////////////////////////////////////////////////////////////////////////////////////////
-
-@blueprint.route('/upload_excel', methods=['GET', 'POST'])
-@login_required
-@Log.add_log("إستيراد بيانات")
-def upload_excel():
-    if request.method == 'POST':
-        # Get the selected option
-        selected_option = request.form.get("option")
-
-        # check if the post request has the file part
-        if 'excel_file' not in request.files:
-            flash('لم يتم إختيار ملف', 'danger')
-            return redirect(request.url)
-        file: FileStorage = request.files['excel_file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('لم يتم إختيار ملف', 'danger')
-            return redirect(request.url)
-        if file:
-            imported=import_content_from_excel(file,selected_option)
-            if imported:
-                flash('تم إستيراد البيانات بنجاح', 'success')
-            else:
-                flash('خطأ أثناء حفظ البيانات', 'danger')
-        return redirect(url_for("home_blueprint.upload_excel"))
-    return render_template('home/upload_excel.html')
-
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
