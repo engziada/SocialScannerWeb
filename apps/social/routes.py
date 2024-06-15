@@ -58,8 +58,8 @@ def socialaccount_add(influencer_id):
     A view function to add a social account for a specific influencer. Handles form submission, data validation, and database operations. Returns the rendered template with the form, influencer, and profile data.
     """
     referer = request.headers.get("Referer")
+    ic(f"This route was redirected from {referer}")
     if referer:
-        # ic(f"This route was redirected from {referer}")
         if referer.endswith("influencers"):
             session.pop("profile_data", None)
 

@@ -153,7 +153,10 @@ def socialaccounts():
     if gender:
         query = query.filter(SocialAccount.influencer.has(Influencer.gender.ilike(f"%{gender}%")))
     if content:
-        query = query.filter(SocialAccount.contents.any(Content.name.ilike(f"%{content}%")))
+        if content == 'محتوى غير مخصص':
+            query = query.filter(~SocialAccount.contents.any())
+        else:
+            query = query.filter(SocialAccount.contents.any(Content.name.ilike(f"%{content}%")))    
     if platform:
         query = query.filter(SocialAccount.platform.has(Platform.name.ilike(f"%{platform}%")))
     if from_date and to_date:

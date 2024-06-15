@@ -21,8 +21,7 @@
         <section class="section-header">
             <div class="container">
                 <form method="GET" action="{{ url_for('reports_blueprint.socialaccounts') }}" class="search-bar">
-                    <!-- <a href="{{ url_for('globals_blueprint.export_to_excel', model_name='SocialAccount') }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a> -->
-                    <a href="{{ url_for('reports_blueprint.export_socialaccounts', q=search_terms, from_date=from_date, to_date=to_date, content=selected_content, platform=selected_platform, gender=selected_gender) }}" style="font-family: 'Jersey 10'; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
+                    <a href="{{ url_for('reports_blueprint.export_socialaccounts', q=search_terms, from_date=from_date, to_date=to_date, content=selected_content, platform=selected_platform, gender=selected_gender) }}" style="font-family: 'Jersey 10', sans-serif; font-size: x-large;"><span class="fas fa-file-excel" style="font-size: x-large; padding-inline: 5px; color: green;"></span>Export to Excel</a>
                     
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon1"><button class="btn fas fa-search" type="submit"></button></span>
@@ -32,8 +31,9 @@
                     <div class="mb-3">
                         <select class="form-select" id="contentOptions" aria-label="contentOptions" name="content">
                             <option value="" selected>إختر المحتوى</option>
+                            <option value="محتوى غير مخصص" {% if selected_content == 'محتوى غير مخصص' %}selected{% endif %}>محتوى غير مخصص</option>
                             {% for content in contents %}
-                            <option value="{{ content.name }}" {% if content.name == selected_content %}selected{% endif %}>{{ content.name }}</option>
+                            <option value="{{ content.name }}" {% if content.name == selected_content %}selected{% endif %}>{{ content.name|safe }}</option>
                             {% endfor %}
                         </select>
                     </div>

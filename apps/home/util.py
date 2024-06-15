@@ -121,7 +121,7 @@ def tiktok(username: str) -> dict:
 
     # ic(r.status_code)
     if r.status_code != 200:
-        ic("From TikTok: ", r.status_code)
+        # ic("From TikTok: ", r.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -139,7 +139,7 @@ def tiktok(username: str) -> dict:
 
     # Check if the script element exists
     if script_element is None:
-        ic("From TikTok: ", "Script Element is None")
+        # ic("From TikTok: ", "Script Element is None")
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
@@ -154,7 +154,7 @@ def tiktok(username: str) -> dict:
         stats_data = json_data["__DEFAULT_SCOPE__"]["webapp.user-detail"]["userInfo"]["stats"]
         # ic(user_data, stats_data)
     except KeyError:
-        ic("From Tiktok: ",json_data)
+        # ic("From Tiktok: ",json_data)
         profile_data["username"] = username
         profile_data["platform"] = "تيك توك"
         profile_data["error"] = "Could not find the required data in the JSON structure."
@@ -202,7 +202,7 @@ def snapchat(username: str) -> dict:
     r = requests.get(url, headers=headers, timeout=30)
 
     if r.status_code != 200:
-        ic("From SnapChat: ", r.status_code)
+        # ic("From SnapChat: ", r.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "سناب شات"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
@@ -214,7 +214,7 @@ def snapchat(username: str) -> dict:
     profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
 
     if profile_section is None:
-        ic("From SnapChat: ", "Profile Section is None")
+        # ic("From SnapChat: ", "Profile Section is None")
         profile_data["username"] = username
         profile_data["platform"] = "سناب شات"
         profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
@@ -292,11 +292,11 @@ def instagram(username: str) -> dict:
     
     # if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad" or response.status_code != 200:
     if response.status_code != 200:
-        ic("From Instagram: ",response.status_code)
+        # ic("From Instagram: ",response.status_code)
         profile_data["username"] = username
         profile_data["platform"] = "إنستاجرام"
         profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
-        ic("From Instagram: ", json_data)
+        # ic("From Instagram: ", json_data)
         return profile_data
 
         
