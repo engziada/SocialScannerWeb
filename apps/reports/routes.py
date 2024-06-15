@@ -434,6 +434,7 @@ def contents_report():
     uncategorized_total = sum(count for _, count in uncategorized_accounts)
     gender_counts = dict(uncategorized_accounts_query.all())        
 
+    uncategorized_percentage=0
     if uncategorized_total > 0:
         # Calculate the percentages
         uncategorized_percentage = (

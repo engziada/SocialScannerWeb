@@ -48,15 +48,21 @@ class Influencer(db.Model):
         if not path.exists(upload_folder):
             makedirs(upload_folder)
         current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+
         if picture_file:
-            if path.exists(path.join(upload_folder, picture_file.filename)):
-                return
-            filename = secure_filename(picture_file.filename)
-            new_filename = f'{current_time}.{filename.split(".")[-1]}'
-            filepath = path.join(upload_folder, new_filename)
-            picture_file.save(filepath)
-            self.profile_picture = f"{current_app.config['BASE_URL']}/{new_filename}"
-            db.session.commit()
+            try:
+                if path.exists(path.join(upload_folder, picture_file.filename)):
+                    return
+                filename = secure_filename(picture_file.filename)
+                new_filename = f'{current_time}.{filename.split(".")[-1]}'
+                filepath = path.join(upload_folder, new_filename)
+                picture_file.save(filepath)
+                self.profile_picture = f"{current_app.config['BASE_URL']}/{new_filename}"
+                db.session.commit()
+            except Exception as e:
+                errmsg=f"Error in <save_profile_picture> from Infulencer Model Save_Profile_Picture:\n{e} "
+                ic(errmsg)
+                db.session.rollback()
 
 
     # def download_image(self, image_url):
