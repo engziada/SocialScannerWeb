@@ -62,7 +62,7 @@ class Influencer(db.Model):
             except Exception as e:
                 errmsg=f"Error in <save_profile_picture> from Infulencer Model Save_Profile_Picture:\n{e} "
                 ic(errmsg)
-                db.session.rollback()
+                # db.session.rollback()
 
 
     # def download_image(self, image_url):

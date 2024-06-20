@@ -280,7 +280,7 @@ def scanResults_report():
         None
     """
     page = request.args.get("page", 1, type=int)
-    per_page = 3  # Number of logs per page
+    per_page = 50  # Number of logs per page
 
     search_terms = request.args.get("q", "")
     from_date = request.args.get("from_date", default=str(datetime.datetime.today()))
