@@ -350,15 +350,6 @@ def scanResults_report():
 @blueprint.route("/contents_report")
 @login_required
 def contents_report():
-    """
-    Renders the contents report page.
-
-    This function fetches distinct content types from the database and counts the total number of social accounts for each content type. It also counts the number of social accounts for each gender for each content type. Additionally, it counts the total number of uncategorized social accounts and their genders.
-
-    Returns:
-        A rendered template for the contents report page.
-
-    """
     # Fetch distinct content types
     content_types = db.session.query(Content.name).distinct().all()
 

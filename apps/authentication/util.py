@@ -45,7 +45,7 @@ def create_default_admin(Users,db):
     admin_user = Users.query.filter_by(username=username).first()
     if admin_user is None:
         # If the admin user doesn't exist, create it
-        admin_user = Users(username=username, password_hash=password, email=email)
+        admin_user = Users(username=username, password=password, email=email)
 
         db.session.add(admin_user)
         db.session.commit()

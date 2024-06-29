@@ -176,6 +176,7 @@ def search():
         username = form.username.data
 
         try:
+            ic(session)
             existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first()
             profile_data = search_user_profile(username, platform)
             if profile_data.get("error") is not None:
