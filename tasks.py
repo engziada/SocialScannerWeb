@@ -77,7 +77,8 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
             scan_log["success_count"][platform_name] = scan_log.get("success_count", {}).get(platform_name, 0) + 1
                 
         except Exception as e:
-            ic(f"Error in process_username [{username}] on [{platform_name}]: {e}")
+            msg = f"Error in process_username [{username}] on [{platform_name}]: {e}"
+            ic(msg)
             # save the log, check if the platform is already in the log dictionary, add to success count
             scan_log["failure_count"][platform_name] = scan_log.get("failure_count", {}).get(platform_name, 0) + 1
             
@@ -97,6 +98,8 @@ def process_username(app, db_session, platform_id, username, socialaccount_id):
 def scan_database(app,db_session):
     try:
         start_time = datetime.datetime.now()
+        msg=f"Scanning database started at {start_time}"
+        ic(msg)
         # Get all distinct platform IDs
         platform_ids = [row[0] for row in db_session.query(SocialAccount.platform_id).distinct()]
         # Create a dictionary to hold the lists of SocialAccounts for each platform
@@ -145,7 +148,8 @@ def scan_database(app,db_session):
         db_session.add(new_scanlog)
         db_session.commit()
         
-        ic("Database scan completed in ", time_taken)
+        msg = f"Database scan completed in ({time_taken})"
+        ic(msg)
         # ic(scan_log)
     except Exception as e:
         msg=f"Error in scan_database: {e}"

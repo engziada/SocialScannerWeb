@@ -1,7 +1,7 @@
 import os
 
 from flask_migrate import Migrate
-from flask_minify  import Minify
+# from flask_minify  import Minify
 from sys import exit
 
 from apps.config import config_dict
@@ -11,7 +11,6 @@ from icecream import ic
 from dotenv import load_dotenv
 
 from flask_apscheduler import APScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 from tasks import scan_database
 
@@ -38,14 +37,15 @@ try:
     # Load the configuration using the default values
     app_config = config_dict[get_config_mode.capitalize()]
 except KeyError as e:
-    ic("Error: Invalid <config_mode>. Expected values [Debug, Production] ",e)
+    msg = f"Error: Invalid <config_mode>. Expected values [Debug, Production], {e} "
+    ic(msg)
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production] ')
 
 app = create_app(app_config)
 Migrate(app, db)
 
-if not DEBUG:
-    Minify(app=app, html=True, js=False, cssless=False)
+# if not DEBUG:
+#     Minify(app=app, html=True, js=False, cssless=False)
 if DEBUG:
     app.logger.info('DEBUG            = ' + str(DEBUG)             )
     app.logger.info('Page Compression = ' + 'FALSE' if DEBUG else 'TRUE' )
@@ -79,7 +79,7 @@ app.config["JOBS"] = [
 ]
 sched.init_app(app)
 # sched.add_job(id="scan", func=scheduled_job, trigger=CronTrigger(hour=6, minute=0))  # trigger="interval", seconds=10)#
-# scheduled_job()
+scheduled_job()
 sched.start()
 
 if __name__ == "__main__":
