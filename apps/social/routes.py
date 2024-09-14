@@ -66,7 +66,7 @@ def socialaccount_add(influencer_id):
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
-        return redirect(url_for("social_blueprint.influencers"))
+        return redirect(url_for("profiles_blueprint.influencers"))
 
     profile_data = {}
     if session.get("profile_data"):
