@@ -2,7 +2,7 @@ from datetime import datetime
 from genericpath import isfile
 from os import listdir, makedirs, path
 import random
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 from flask import current_app, url_for
 from icecream import ic
 import json
@@ -177,7 +177,7 @@ def tiktok(username: str) -> dict:
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
-def snapchat(username: str) -> dict:
+def snapchat_old(username: str) -> dict:
     """
     Retrieves Snapchat profile data for a given username.
 
@@ -210,6 +210,11 @@ def snapchat(username: str) -> dict:
 
     # Parse HTML content
     soup = BeautifulSoup(r.text, "html.parser")
+    
+    #for debugging only
+    with open("debug_snapchat.html", "w", encoding="utf-8") as f:
+            f.write(str(soup))
+    
 
     profile_section = soup.find("div", class_=lambda x: x and "PublicProfileCard_userDetailsContainer" in x)
 
@@ -229,7 +234,7 @@ def snapchat(username: str) -> dict:
     subtitle = obj.text.strip() if obj else ""
     obj = soup.find("a", class_=lambda x: x and "PublicProfileCard_" in x and "Detail" in x)
     subtitle_line2 = obj.text.strip() if obj else ""
-    obj = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x)
+    obj: Tag | NavigableString | None = soup.find("picture", class_=lambda x: x and "ProfilePictureBubble_webPImage" in x)
     profile_image = obj.find("img")["srcset"] if obj else ""
 
     profile_data: dict = {
@@ -247,6 +252,116 @@ def snapchat(username: str) -> dict:
         # "time_taken": duration.total_seconds(),
     }
     return profile_data
+
+
+def snapchat(username: str) -> dict:
+    """
+    Retrieves Snapchat profile data for a given username.
+
+    Args:
+        username (str): The Snapchat username to retrieve profile data for.
+
+    Returns:
+        dict: A dictionary containing the retrieved profile data including the profile name, followers, likes, posts, profile picture, bio text, external URL.
+    """
+    profile_data = {}
+    url = f"https://www.snapchat.com/add/{username}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+    # proxies = {
+    #     "http": "http://10.10.1.10:3128",
+    #     "https": "http://10.10.1.10:1080",
+    # }
+
+    # r = requests.get(url, headers=headers, proxies=proxies)
+    r = requests.get(url, headers=headers, timeout=30)
+
+    if r.status_code != 200:
+        # ic("From SnapChat: ", r.status_code)
+        profile_data["username"] = username
+        profile_data["platform"] = "سناب شات"
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
+        return profile_data
+
+    # Parse HTML content
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    # # for debugging only
+    # with open("debug_snapchat.html", "w", encoding="utf-8") as f:
+    #     f.write(str(soup))
+
+    profile_section = soup.find("meta", property="og:title") and soup.find("meta", property="og:url")
+
+    if not profile_section:
+        # ic("From SnapChat: ", "Profile Section is None")
+        profile_data["username"] = username
+        profile_data["platform"] = "سناب شات"
+        profile_data["error"] = "خطأ أثناء قراءة البيانات من المنصة"
+        return profile_data
+
+    # Extract profile details
+    subtitle = (
+        soup.find("meta", property="og:title")["content"]
+        if soup.find("meta", property="og:title")
+        else None
+    )
+    url = (
+        soup.find("meta", property="og:url")["content"]
+        if soup.find("meta", property="og:url")
+        else None
+    )
+    # profile_image = (
+    #     soup.find("meta", property="og:image")["content"]
+    #     if soup.find("meta", property="og:image")
+    #     else None
+    # )    
+    # subtitle_line2 = (
+    #     soup.find("meta", property="og:description")["content"]
+    #     if soup.find("meta", property="og:description")
+    #     else None
+    # )
+    description_meta = soup.find("meta", {"name": "description"})
+    subtitle_line2 = description_meta["content"] if description_meta else None
+
+    # Extract JSON-LD structured data if available
+    json_ld_data = soup.find("script", type="application/ld+json")
+    if json_ld_data:
+        json_content = json.loads(json_ld_data.string)
+        profile_name = json_content.get("mainEntity", {}).get("name")
+        profile_image = json_content.get("mainEntity", {}).get("image", None)
+        # profile_data["address"] = json_content.get("mainEntity", {}).get("address")
+        # profile_data["identifier"] = (
+        #     json_content.get("mainEntity", {}).get("identifier", {}).get("value")
+        # )
+        follower_count = (
+            json_content.get("mainEntity", {})
+            .get("interactionStatistic", [])[0]
+            .get("userInteractionCount")
+        )
+
+        
+        
+    profile_data: dict = {
+        # "username": username,
+        # "platform": "SnapChat",
+        "public_profile_name": profile_name,
+        "followers": follower_count,
+        "likes": 0,
+        "posts": 0,
+        "profile_picture": profile_image,
+        "bio_text": subtitle + "\n" + subtitle_line2,
+        # "address": address,
+        "external_url": url,
+        # "platform_id": platform_id,
+        # "time_taken": duration.total_seconds(),
+    }
+
+    # ic("From SnapChat: ", profile_data)
+        
+    return profile_data
+
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
