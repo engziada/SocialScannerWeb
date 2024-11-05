@@ -82,7 +82,8 @@ class ProductionConfig(Config):
 
 
 class DebugConfig(Config):
-    DEBUG = True
+    DEBUG = True,
+    TEMPLATES_AUTO_RELOAD=True
 
 
 # Load all possible configurations

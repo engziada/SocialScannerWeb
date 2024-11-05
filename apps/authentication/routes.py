@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, request, session, url_for
+from flask import flash, render_template, redirect, request, session, url_for, send_file
 from flask_login import (
     current_user,
     login_required,
@@ -16,6 +16,8 @@ from apps.authentication.util import verify_pass,create_default_admin
 
 from apps.home.models import Log
 from icecream import ic
+
+from PostgreRenderCert import generate_certificate  # Import your existing function
 
 @blueprint.route('/')
 def route_default():
@@ -145,6 +147,42 @@ def delete_user(user_id):
     return redirect(url_for("authentication_blueprint.users"))
 
 
+@blueprint.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin_dashboard():
+    total_users = Users.query.count()
+    active_users = Users.query.filter_by(is_active=True).count()
+    users = Users.query.all()
+    
+    return render_template(
+        'accounts/admin.html',
+        total_users=total_users,
+        active_users=active_users,
+        users=users
+    )
+    
+    
+@blueprint.route('/admin/generate-cert', methods=['POST'])
+@Log.add_log("إنشاء شهادة")
+@login_required
+def admin_generate_cert():
+    try:
+        ic("Generating certificate")
+        # Call your certificate generation function
+        cert_path = generate_certificate()
+        # ic(cert_path)
+        
+        # Send the file for download
+        return send_file(
+            cert_path,
+            as_attachment=True,
+            download_name='database_certificate.crt',
+            mimetype='application/x-x509-ca-cert'
+        )
+    except Exception as e:
+        flash(f'Error generating certificate: {str(e)}', 'danger')
+        return redirect(url_for('authentication_blueprint.admin_dashboard'))
+    
 # Errors
 
 @login_manager.unauthorized_handler
