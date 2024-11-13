@@ -439,15 +439,19 @@ def instagram(username: str) -> dict:
         # "username": profile.username,
         # "platform": "Instagram",
         "public_profile_name": user_data.get("full_name", ""),
-        "followers": user_data.get("follower_count", '0'),
+        "followers": user_data.get("follower_count", "0"),
         "likes": 0,
-        "posts": user_data.get("media_count", '0'),
-        "profile_picture": user_data.get("profile_pic_url_hd", ""),#download_profile_image_instagram(user_data["profile_pic_url"]),
-        "bio_text": user_data.get("biography", ""),
-        "external_url": user_data.get("external_url", ""),
+        "posts": user_data.get("media_count", "0"),
+        "profile_picture": user_data.get("profile_pic_url", ""),
+        # download_profile_image_instagram(user_data["profile_pic_url"]),
+        "bio_text": user_data.get("biography", "")
+        + "\n"
+        + user_data.get("external_url", ""),
+        "external_url": f"https://www.instagram.com/{username}/",
         # "time_taken": duration.total_seconds(),
         # "platform_id": platform_id,
     }
+    
     return profile_data
 
 

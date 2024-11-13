@@ -13,7 +13,7 @@ class SocialAccountForm(FlaskForm):
     profile_picture = HiddenField("صورة الحساب")
     # contents = QuerySelectMultipleField(query_factory=lambda: Content.query.all())
     contents = QuerySelectMultipleField("المحتوى", query_factory=lambda: Content.query.all(), get_label="name", allow_blank=False, blank_text="إختر نوع المحتوى")
-    external_url = StringField("الرابط الخارجي", render_kw={"readonly": True, "type": "url"})
+    external_url = StringField("الرابط الخارجي", render_kw={"type": "url"})
     public_profile_name = StringField("الإسم على المنصة", render_kw={"readonly": True})
     # set_as_default_profile_picture = BooleanField("إستخدم صورة الحساب كصورة رئيسية للملف")
 
