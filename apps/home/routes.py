@@ -7,11 +7,8 @@ from jinja2 import TemplateNotFound
 from apps.home.models import Log
 from apps.home.forms import SearchForm
 from apps.home.util import search_user_profile, get_summerized_report
-from apps.globals.util import import_content_from_excel
 
 from apps.social.models import Platform, SocialAccount
-
-from werkzeug.datastructures.file_storage import FileStorage
 
 from icecream import ic
 
@@ -176,6 +173,7 @@ def search():
         username = form.username.data
 
         try:
+            session.pop("profile_data", None)
             ic(session)
             existingRecord = SocialAccount.query.filter_by(username=username, platform_id=platform).first()
             profile_data = search_user_profile(username, platform)
