@@ -67,29 +67,35 @@ def socialaccount_add(influencer_id):
         flash("الملف غير موجود", "danger")
         return redirect(url_for("profiles_blueprint.influencers"))
 
-    # Clear profile data if:
-    # 1. Not coming from search flow
-    # 2. Coming from a different influencer's add flow
-    stored_influencer_id = session.get("current_influencer_id")
-    if not session.get("search_flow") or (stored_influencer_id and stored_influencer_id != influencer_id):
-        session.pop("profile_data", None)
-        session.pop("current_influencer_id", None)
-        session.pop("search_flow", None)
-
-    profile_data = {}
-    if session.get("profile_data"):
-        profile_data = session["profile_data"]
-    else:
-        # Store the current influencer_id and redirect to search
+    # Store the current influencer_id if not already stored
+    if not session.get("current_influencer_id"):
         session["current_influencer_id"] = influencer_id
         return redirect(url_for("home_blueprint.search", from_add=True))
 
+    # Only clear profile data if we're starting a new search for a different influencer
+    stored_influencer_id = session.get("current_influencer_id")
+    if stored_influencer_id and stored_influencer_id != influencer_id:
+        session.pop("profile_data", None)
+        session["current_influencer_id"] = influencer_id
+        return redirect(url_for("home_blueprint.search", from_add=True))
+
+    profile_data = session.get("profile_data", {})
+    
     form = SocialAccountForm()  # Create an instance of the form
     form.platform.choices = [(str(p.id), p.name) for p in Platform.query.all()]
-    form.platform.data = str(profile_data.get("platform_id")) if profile_data.get("platform_id") else "1"
-    form.username.data = profile_data.get("username") if profile_data.get("username") else ""
-    form.bio_text.data = profile_data.get("bio_text") if profile_data.get("bio_text") else "No Bio"
-    form.profile_picture.data = profile_data.get("profile_picture") if profile_data.get("profile_picture") else None
+    
+    # Pre-fill form data from profile_data if available
+    if profile_data:
+        form.platform.data = str(profile_data.get("platform_id", "1"))
+        form.username.data = profile_data.get("username", "")
+        form.bio_text.data = profile_data.get("bio_text", "No Bio")
+        form.profile_picture.data = profile_data.get("profile_picture", "")
+        form.external_url.data = profile_data.get("external_url", "")
+        form.public_profile_name.data = profile_data.get("public_profile_name", "")
+
+    # Get available content types for the form
+    content_choices = [(c.id, c.name) for c in Content.query.all()]
+    form.contents.choices = content_choices
 
     if form.validate_on_submit():
         try:
@@ -97,39 +103,43 @@ def socialaccount_add(influencer_id):
                 influencer_id=influencer_id,
                 platform_id=int(form.platform.data),
                 username=form.username.data,
-                contents=Content.query.filter(Content.id.in_(request.form.getlist("contents"))).all(),
                 bio_text=form.bio_text.data,
                 profile_picture=form.profile_picture.data,
                 external_url=form.external_url.data,
-                public_profile_name=form.public_profile_name.data,
+                public_profile_name=form.public_profile_name.data
             )
-
+            
+            # Add selected content types
+            if form.contents.data:
+                new_socialaccount.contents = Content.query.filter(Content.id.in_(form.contents.data)).all()
+            
             db.session.add(new_socialaccount)
             db.session.commit()
-            flash("تم إضافة الحساب", "success")
-            # Clear all session data after successful add
+
+            # Clear session data after successful addition
             session.pop("profile_data", None)
             session.pop("current_influencer_id", None)
             session.pop("search_flow", None)
-            return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
-        except IntegrityError as e:
-            ic("IntegrityError in <SocialAccount_Add>:", e)
+
+            flash("تم إضافة الحساب بنجاح", "success")
+            return redirect(
+                url_for(
+                    "social_blueprint.socialaccounts",
+                    influencer_id=influencer_id,
+                )
+            )
+        except IntegrityError:
             db.session.rollback()
-            flash("إسم الحساب موجود بالفعل", "danger")
+            flash("اسم المستخدم موجود مسبقاً", "danger")
         except Exception as e:
-            ic("Error in <SocialAccount_Add>: ", e)
             db.session.rollback()
-            flash(f"حدث خطأ أثناء تسجيل البيانات\n{e}", "danger")
-    else:
-        # Form validation failed
-        errors = form.errors
-        ic("SocialAccount_Add=>", errors)
+            flash(str(e), "danger")
 
     return render_template(
         "social/socialaccount_add.html",
         form=form,
         influencer=influencer,
-        profile_data=profile_data
+        profile_data=profile_data,
     )
 
 
