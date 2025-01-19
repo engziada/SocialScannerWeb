@@ -18,65 +18,246 @@
     <rect id="Rectangle_24" x="17.6" class="st1" width="28.8" height="11.2" />
     <rect id="Rectangle_25" y="17.6" class="st0" width="28.8" height="11.2" />
 </svg>
-
 {% endblock %}
 
-<!-- /static/assets/img/illustrations/reading-side.svg -->
+{% block stylesheets %}
+<style>
+    .stats-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
 
+    .stats-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
 
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+    .profile-showcase {
+        position: relative;
+        height: 400px;
+        margin: -2rem -1rem 2rem -1rem;
+        padding: 2rem;
+        overflow: hidden;
+        background: linear-gradient(45deg, rgba(44, 62, 80, 0.1), rgba(52, 152, 219, 0.1));
+        border-radius: 20px;
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .profile-item {
+        position: relative;
+        padding-bottom: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .profile-item:hover {
+        transform: scale(1.05) rotate(2deg);
+        z-index: 10;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-item img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .profile-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5));
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .profile-item:hover::after {
+        opacity: 1;
+    }
+
+    .profile-item.featured {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+
+    .profile-counter {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-family: 'Lalezar', cursive;
+        color: #2C3E50;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 5;
+    }
+
+    .profile-counter i {
+        color: #3498db;
+        margin-left: 0.5rem;
+    }
+
+    @keyframes floatAnimation {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+
+    .floating {
+        animation: floatAnimation 3s ease-in-out infinite;
+    }
+
+    .stats-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .stats-table th {
+        font-family: 'Lalezar', cursive;
+        font-size: 1.5rem;
+        color: #2C3E50;
+        padding: 1rem;
+        text-align: center;
+        background: linear-gradient(45deg, #2C3E50, #3498db);
+        color: white;
+        border-radius: 10px;
+    }
+
+    .stats-table td {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .stats-table tr:hover td {
+        background-color: #e9ecef;
+        transform: scale(1.01);
+    }
+
+    .stats-table .section-header {
+        font-family: 'Lalezar', cursive;
+        font-size: 1.2rem;
+        color: #2C3E50;
+        background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+    }
+
+    .stats-value {
+        font-weight: bold;
+        color: #3498db;
+    }
+
+    .platform-icon {
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+    }
+
+    .last-scan-info {
+        background: linear-gradient(45deg, #2C3E50, #3498db);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+
+    .last-scan-info td {
+        background: transparent !important;
+        color: white;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
-
     <main>
-
         {% include 'includes/preloader.html' %}
 
         <section class="section section-lg pt-0">
             <div class="container">
-                <div class="card border-0 overflow-hidden pt-6">
-                    <div class="position-relative">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[0]) if stats.get('random_pictures')[0] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="width: 20%;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[1]) if stats.get('random_pictures')[1] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 5%;left: 35%;z-index: 2;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[2]) if stats.get('random_pictures')[2] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -20%;left: 65%;z-index: 3;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[3]) if stats.get('random_pictures')[3] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -15%;left: 10%;z-index: 1;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[4]) if stats.get('random_pictures')[4] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -25%;left: 50%;z-index: 1;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[5]) if stats.get('random_pictures')[5] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 10%;left: 0%;z-index: 0;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[6]) if stats.get('random_pictures')[6] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 6%;left: 70%;z-index: 2;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[7]) if stats.get('random_pictures')[7] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 10%;left: 20%;z-index: 3;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[8]) if stats.get('random_pictures')[8] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: 15%;left: 50%;z-index: 1;">
-                        <img src="{{ url_for('static', filename='profile_pictures/' + stats.get('random_pictures')[9]) if stats.get('random_pictures')[9] else 'https://via.placeholder.com/150' }}" class="organic-radius img-fluid" style="position: absolute;width: 20%;top: -25%;left: 30%;z-index: 1;">                            
+                <div class="stats-container p-4">
+                    <div class="profile-showcase">
+                        <div class="profile-counter floating">
+                            <i class="fas fa-users"></i>
+                            {{ stats.get('total_profiles') }} حساب تم رصده
+                        </div>
+                        <div class="profile-grid">
+                            {% for i in range(7) %}
+                                {% set pic = stats.get('random_pictures')[i] if stats.get('random_pictures')[i] else 'https://via.placeholder.com/150' %}
+                                <div class="profile-item {{ 'featured' if i in [0, 4] else '' }} animate-fade-in" 
+                                     style="animation-delay: {{ i * 0.1 }}s">
+                                    <img src="{{ url_for('static', filename='profile_pictures/' + pic) if 'placeholder' not in pic else pic }}"
+                                         alt="Profile {{ i + 1 }}"
+                                         loading="lazy">
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="card-body position-relative mt-n6 mx-2 bg-white border border-gray-300 text-center rounded py-8">
-                        <table class="table">
+
+                    <div class="stats-content p-4">
+                        <table class="stats-table">
                             <tr>
-                                <th>بيانات الرصد</th>
+                                <th colspan="2">بيانات الرصد</th>
                             </tr>
                             <tr>
                                 <td>عدد الملفات المفتوحة</td>
-                                <td>{{stats.get('total_profiles')}}</td>
+                                <td class="stats-value">{{stats.get('total_profiles')}}</td>
                             </tr>
                             <tr>
                                 <td>عدد مرات المسح حتى الآن</td>
-                                <td>{{stats.get('total_scans')}}</td>
+                                <td class="stats-value">{{stats.get('total_scans')}}</td>
                             </tr>
+                            
                             <tr>
-                                <td class="h6">عدد حسابات مواقع التواصل الإجتماعي</td>
+                                <td colspan="2" class="section-header">حسابات مواقع التواصل الإجتماعي</td>
                             </tr>
                             {% for platform, count in stats.get('accounts_per_platform') %}
                                 <tr>
-                                    <td>{{platform}}</td>
-                                    <td>{{count}}</td>
+                                    <td>
+                                        <i class="fab fa-{{platform.lower()}} platform-icon"></i>
+                                        {{platform}}
+                                    </td>
+                                    <td class="stats-value">{{count}}</td>
                                 </tr>
                             {% endfor %}
-                                <tr>
-                                    <td>الإجمالي</td>
-                                    <td>{{stats.get('total_accounts')}}</td>
-                                </tr>                                
                             <tr>
-                                <td class="h6">آخر عملية مسح</td>
+                                <td>الإجمالي</td>
+                                <td class="stats-value">{{stats.get('total_accounts')}}</td>
                             </tr>
+                        </table>
+
+                        <div class="last-scan-info mt-4">
+                            <h3 class="text-center mb-3">آخر عملية مسح</h3>
+                            <table class="stats-table">
                                 <tr>
                                     <td>التاريخ</td>
                                     <td>{{stats.get('last_scan_date')}}</td>
@@ -89,16 +270,14 @@
                                     <td>المدة</td>
                                     <td>{{stats.get('last_scan_duration')}}</td>
                                 </tr>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
     {% include 'includes/footer.html' %}
-
     {% include 'includes/scripts.html' %}
-
 {% endblock %}

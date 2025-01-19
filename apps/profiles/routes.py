@@ -83,8 +83,9 @@ def influencer_add():
     """
     profile_data = {}
     if session.get("profile_data"):
-        profile_data = session["profile_data"]
-        # session.pop("profile_data")
+        profile_data = session.pop("profile_data")  # Get and remove from session
+        session.pop("search_flow", None)  # Clear search flow flag
+        session.pop("current_influencer_id", None)  # Clear any stored influencer ID
 
     form = InfluencerForm()  # Create an instance of the form
     if form.validate_on_submit():
@@ -103,14 +104,19 @@ def influencer_add():
             set_as_default_profile_picture = form.set_as_default_profile_picture.data
             if set_as_default_profile_picture:
                 new_influencer.profile_picture = profile_data["profile_picture"] if profile_data else None
-                # new_influencer.download_image(profile_data["profile_picture"])
             elif form.profile_picture.data:
                 new_influencer.save_profile_picture(picture_file=form.profile_picture.data)
 
             db.session.add(new_influencer)
             db.session.commit()
             flash("تم إضافة الملف", "success")
-            return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=new_influencer.id,profile_data=profile_data,))
+            
+            # Store profile data in session only if we have it
+            if profile_data:
+                session["profile_data"] = profile_data
+                session["search_flow"] = True
+            
+            return redirect(url_for("social_blueprint.socialaccount_add", influencer_id=new_influencer.id))
         except IntegrityError as e:
             ic("IntegrityError in <influencer_add>: ", e)
             db.session.rollback()
@@ -121,12 +127,10 @@ def influencer_add():
             influencer_id = (
                 Influencer.query.filter_by(full_name=form.full_name.data).first().id
             )
-            # return redirect(url_for("social_blueprint.socialaccount_add",influencer_id=influencer_id,profile_data=profile_data,))
             return redirect(
                 url_for(
                     "profiles_blueprint.influencer_edit",
-                    influencer_id=influencer_id,
-                    profile_data=profile_data,
+                    influencer_id=influencer_id
                 )
             )
 

@@ -30,19 +30,22 @@ def socialaccounts(influencer_id):
     Raises:
         None
     """
-    page = request.args.get("page", 1, type=int)
-    per_page = 50  # Number of logs per page
+    # Clear any lingering session data
+    session.pop("profile_data", None)
+    session.pop("search_flow", None)
+    session.pop("current_influencer_id", None)
 
+    page = request.args.get("page", 1, type=int)
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
-        return redirect(url_for("social_blueprint.influencers"))
+        return redirect(url_for("profiles_blueprint.influencers"))
 
     socialaccounts = (
         SocialAccount.query.filter_by(influencer_id=influencer_id)
-        .paginate(page=page, per_page=per_page)
-        # .all()
-    )  # Fetch social accounts for a specific influencer
+        .order_by(SocialAccount.id.desc())
+        .paginate(page=page, per_page=10)
+    )
     return render_template(
         "social/socialaccounts.html",
         socialaccounts=socialaccounts,
@@ -55,31 +58,35 @@ def socialaccounts(influencer_id):
 @Log.add_log("إضافة حساب")
 def socialaccount_add(influencer_id):
     """
-    A view function to add a social account for a specific influencer. Handles form submission, data validation, and database operations. Returns the rendered template with the form, influencer, and profile data.
+    A view function to add a social account for a specific influencer. 
+    Handles form submission, data validation, and database operations. 
+    Returns the rendered template with the form, influencer, and profile data.
     """
-    referer = request.headers.get("Referer")
-    ic(f"This route was redirected from {referer}")
-    if referer:
-        if referer.endswith("influencers"):
-            session.pop("profile_data", None)
-
     influencer = Influencer.query.get(influencer_id)
     if not influencer:
         flash("الملف غير موجود", "danger")
         return redirect(url_for("profiles_blueprint.influencers"))
 
+    # Clear profile data if:
+    # 1. Not coming from search flow
+    # 2. Coming from a different influencer's add flow
+    stored_influencer_id = session.get("current_influencer_id")
+    if not session.get("search_flow") or (stored_influencer_id and stored_influencer_id != influencer_id):
+        session.pop("profile_data", None)
+        session.pop("current_influencer_id", None)
+        session.pop("search_flow", None)
+
     profile_data = {}
     if session.get("profile_data"):
         profile_data = session["profile_data"]
-        # session.pop("profile_data")
     else:
+        # Store the current influencer_id and redirect to search
         session["current_influencer_id"] = influencer_id
-        return redirect(url_for("home_blueprint.search"))
+        return redirect(url_for("home_blueprint.search", from_add=True))
 
-    
     form = SocialAccountForm()  # Create an instance of the form
-    form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
-    form.platform.data = profile_data.get("platform_id") if profile_data.get("platform_id") else 1
+    form.platform.choices = [(str(p.id), p.name) for p in Platform.query.all()]
+    form.platform.data = str(profile_data.get("platform_id")) if profile_data.get("platform_id") else "1"
     form.username.data = profile_data.get("username") if profile_data.get("username") else ""
     form.bio_text.data = profile_data.get("bio_text") if profile_data.get("bio_text") else "No Bio"
     form.profile_picture.data = profile_data.get("profile_picture") if profile_data.get("profile_picture") else None
@@ -88,22 +95,22 @@ def socialaccount_add(influencer_id):
         try:
             new_socialaccount = SocialAccount(
                 influencer_id=influencer_id,
-                platform_id=form.platform.data,
+                platform_id=int(form.platform.data),
                 username=form.username.data,
                 contents=Content.query.filter(Content.id.in_(request.form.getlist("contents"))).all(),
                 bio_text=form.bio_text.data,
-                profile_picture=form.profile_picture.data, #None,
+                profile_picture=form.profile_picture.data,
                 external_url=form.external_url.data,
                 public_profile_name=form.public_profile_name.data,
             )
 
-            # if form.profile_picture.data:
-            #     new_socialaccount.download_image(form.profile_picture.data)
-
             db.session.add(new_socialaccount)
             db.session.commit()
             flash("تم إضافة الحساب", "success")
-            session.pop("profile_data")
+            # Clear all session data after successful add
+            session.pop("profile_data", None)
+            session.pop("current_influencer_id", None)
+            session.pop("search_flow", None)
             return redirect(url_for("social_blueprint.socialaccounts", influencer_id=influencer_id))
         except IntegrityError as e:
             ic("IntegrityError in <SocialAccount_Add>:", e)
@@ -117,7 +124,13 @@ def socialaccount_add(influencer_id):
         # Form validation failed
         errors = form.errors
         ic("SocialAccount_Add=>", errors)
-    return render_template("social/socialaccount_add.html", form=form, influencer=influencer, profile_data=profile_data)
+
+    return render_template(
+        "social/socialaccount_add.html",
+        form=form,
+        influencer=influencer,
+        profile_data=profile_data
+    )
 
 
 @blueprint.route("/socialaccount_delete/<int:influencer_id>/<int:socialaccount_id>", methods=["POST"])
@@ -173,8 +186,6 @@ def socialaccount_edit(socialaccount_id):
             flash("لا يمكن العثور على الحساب", "danger")
         elif profile_data.get("error") is not None:
             flash(profile_data["error"], "danger")
-        else:
-            session["profile_data"] = profile_data
     except Exception as e:
         ic("Error in <SocialAccount_Edit>: ", e)
         flash(f"Error: {str(e)}")  # Handle backend errors gracefully
@@ -182,60 +193,54 @@ def socialaccount_edit(socialaccount_id):
     form = SocialAccountForm()  # Create an instance of the form and populate it with existing data
     
     # Get all platforms from the database
-    choices = [(platform.id, platform.name) for platform in Platform.query.all()]
-    selected_choice = next((choice for choice in choices if choice[0] == socialaccount.platform_id), None)
-    if selected_choice:
-        choices.remove(selected_choice)
-        choices.insert(0, selected_choice)
-    form.platform.choices = choices
-    # form.platform.data = str(socialaccount.platform_id)  # Assuming platform is a foreign key
+    form.platform.choices = [(str(p.id), p.name) for p in Platform.query.all()]
+    form.platform.data = str(socialaccount.platform_id)
     form.username.data = socialaccount.username
-    form.contents.data = socialaccount.contents
-    # Set the data for the bio_text field
-    if socialaccount.bio_text:
-        form.bio_text.data = socialaccount.bio_text
-        form.is_edited = False  # The form has not been edited
-    else:
-        form.bio_text.data = profile_data.get("bio_text") if profile_data else "No Bio"
-        form.is_edited = True
-    # Set the data for the external_url field
-    if socialaccount.external_url:
-        form.external_url.data = socialaccount.external_url
-        form.is_edited = False  # The form has not been edited
-    else:
-        form.external_url.data = profile_data.get("external_url") if profile_data else ""
-        form.is_edited = True      
-    # Set the data for the public_profile_name field
-    if socialaccount.public_profile_name:
-        form.public_profile_name.data = socialaccount.public_profile_name
-        form.is_edited = False  # The form has not been edited
-    else:
-        form.public_profile_name.data = profile_data.get("public_profile_name") if profile_data else ""
-        form.is_edited = True  
-    # Set the data for the profile_picture field
-    if socialaccount.profile_picture:
-        form.profile_picture.data = socialaccount.profile_picture
-        form.is_edited = False  # The form has not been edited
-    else:
-        form.profile_picture.data = profile_data.get("profile_picture") if profile_data else None        
-        # socialaccount.download_image(profile_data.get("profile_picture")) if profile_data else None
-        form.is_edited = True 
+    
+    # Set content choices and selected values
+    form.contents.choices = [(c.id, c.name) for c in Content.query.all()]
+    if not form.is_submitted():
+        form.contents.data = [content.id for content in socialaccount.contents]
+    
+    # Set other form fields
+    form.bio_text.data = socialaccount.bio_text or profile_data.get("bio_text", "No Bio")
+    form.external_url.data = socialaccount.external_url or profile_data.get("external_url", "")
+    form.public_profile_name.data = socialaccount.public_profile_name or profile_data.get("public_profile_name", "")
+    form.profile_picture.data = socialaccount.profile_picture or profile_data.get("profile_picture")
         
     if form.validate_on_submit():
-        socialaccount.platform_id = form.platform.data
-        socialaccount.username = form.username.data
-        socialaccount.contents = Content.query.filter(Content.id.in_(request.form.getlist("contents"))).all()
-        socialaccount.bio_text = form.bio_text.data
-        socialaccount.external_url = form.external_url.data
-        socialaccount.public_profile_name = form.public_profile_name.data
-        socialaccount.profile_picture = profile_data.get("profile_picture") if profile_data else None
+        try:
+            socialaccount.platform_id = int(form.platform.data)
+            socialaccount.username = form.username.data
+            
+            # Get selected content IDs from the form
+            selected_content_ids = request.form.getlist("contents")
+            ic("Selected content IDs:", selected_content_ids)
+            
+            # Convert to integers and query Content objects
+            content_ids = [int(id) for id in selected_content_ids]
+            socialaccount.contents = Content.query.filter(Content.id.in_(content_ids)).all()
+            
+            socialaccount.bio_text = form.bio_text.data
+            socialaccount.external_url = form.external_url.data
+            socialaccount.public_profile_name = form.public_profile_name.data
+            socialaccount.profile_picture = form.profile_picture.data
 
-        db.session.commit()
-        session.pop("profile_data")
-        flash("تم تعديل الحساب", "success")
-        return redirect(url_for("social_blueprint.socialaccounts",influencer_id=socialaccount.influencer_id,))
+            db.session.commit()
+            flash("تم تعديل الحساب", "success")
+            return redirect(url_for("social_blueprint.socialaccounts", influencer_id=socialaccount.influencer_id))
+        except Exception as e:
+            ic("Error saving social account:", e)
+            db.session.rollback()
+            flash(f"حدث خطأ أثناء حفظ البيانات: {str(e)}", "danger")
     else:
         errors = form.errors
-        ic("SocialAccount_Edit=>", errors)
+        ic("SocialAccount_Edit Form Errors=>", errors)
 
-    return render_template("social/socialaccount_edit.html", form=form, socialaccount=socialaccount, influencer=socialaccount.influencer, profile_data=profile_data)
+    return render_template(
+        "social/socialaccount_edit.html",
+        form=form,
+        socialaccount=socialaccount,
+        influencer=socialaccount.influencer,
+        profile_data=profile_data
+    )

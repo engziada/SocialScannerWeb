@@ -37,7 +37,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for socialaccount in socialaccounts %}
+                        {% for socialaccount in socialaccounts.items %}
                             <tr>
                                 <td scope="row">
                                     <a href="{{ url_for('profiles_blueprint.influencer_edit', influencer_id=influencer.id) }}">

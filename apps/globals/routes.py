@@ -4,7 +4,7 @@ import os
 import random
 from flask import current_app, redirect, render_template, flash, request, send_file, send_from_directory, url_for
 from flask_login import login_required
-from werkzeug.datastructures.file_storage import FileStorage
+from werkzeug.datastructures import FileStorage
 import pgdumplib
 
 from apps.globals import blueprint

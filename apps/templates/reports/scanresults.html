@@ -62,7 +62,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for scanresult in scanresults %}
+                        {% for scanresult in scanresults.items %}
                             <tr>
                                 <td scope="row">{{ scanresult.socialaccount.influencer.full_name }}</td>
                                 <td scope="row">{{ scanresult.socialaccount.username }}</td>

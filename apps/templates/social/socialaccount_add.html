@@ -47,14 +47,21 @@
                         </div>
                         {{ form.contents.label }}
                         <div class="checkbox-list">
-                            {% for choice in form.contents %}
+                            {% for choice in form.contents.iter_choices() %}
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="contents" value="{{ choice.data }}" {% if choice.data|int in form.contents.data|map(attribute='id')|list %}checked{% endif %} >
-                                    {{ choice.label }}
+                                    <input type="checkbox" name="contents" value="{{ choice[0] }}" {% if choice[2] %}checked{% endif %}>
+                                    {{ choice[1] }}
                                 </label>
                             </div>
                             {% endfor %}
+                            {% if form.contents.errors %}
+                            <div class="error-message">
+                                {% for error in form.contents.errors %}
+                                <span class="error text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                         {{ form.bio_text.label }}
                         <div class="form-group">
@@ -121,7 +128,3 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}{% endblock javascripts %}
-
-
-
-

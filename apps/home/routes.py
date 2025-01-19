@@ -163,8 +163,17 @@ def search():
     Raises:
         None
     """
+    # Clear session data unless coming from socialaccount_add
+    if request.method == "GET" and not request.args.get("from_add"):
+        session.pop("profile_data", None)
+        session.pop("current_influencer_id", None)
+        session.pop("search_flow", None)
+    
+    # Set search flow flag
+    session["search_flow"] = True
+
     form = SearchForm()
-    form.platform.choices = [(platform.id, platform.name) for platform in Platform.query.all()]
+    form.platform.choices = [(str(p.id), p.name) for p in Platform.query.all()]
 
     profile_data = None
 
@@ -192,7 +201,7 @@ def search():
                 session["profile_data"] = profile_data
         except Exception as e:
             ic('Error in Search: ',e)
-            flash(f"Error: {str(e)}")  # Handle backend errors gracefully
+            flash(f"Error: {str(e)}")
 
     return render_template("home/search.html", form=form, profile_data=profile_data)
 

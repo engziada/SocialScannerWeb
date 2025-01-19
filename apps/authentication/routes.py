@@ -18,6 +18,7 @@ from apps.home.models import Log
 from icecream import ic
 
 from PostgreRenderCert import generate_certificate  # Import your existing function
+from datetime import datetime
 
 @blueprint.route('/')
 def route_default():
@@ -60,10 +61,13 @@ def login():
         # Something (user or pass) is not ok
         return render_template('accounts/login.html',
                                msg=' بيانات الحساب خطأ, من فضلك تأكد من إسم المستخدم و كلمة المرور',
-                               form=login_form)
+                               form=login_form,
+                               current_year=datetime.now().year)
 
     if not current_user.is_authenticated:
-        return render_template('accounts/login.html',form=login_form)
+        return render_template('accounts/login.html',
+                             form=login_form,
+                             current_year=datetime.now().year)
     return redirect(url_for('home_blueprint.index'))
 
 

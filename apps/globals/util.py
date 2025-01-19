@@ -1,11 +1,10 @@
-
 import datetime
 from os import path
 from icecream import ic
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from apps import db
 import pandas as pd
-from werkzeug.datastructures.file_storage import FileStorage
 from flask import current_app, flash
 
 from apps.content_types.models import Content
@@ -192,4 +191,3 @@ def import_content_from_excel(file: FileStorage, selected_option: str) -> bool:
         db.session.rollback()
         flash(f"خطأ أثناء إستيراد البيانات: {e}", "danger")
         return False
-    

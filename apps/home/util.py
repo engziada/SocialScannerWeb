@@ -44,10 +44,19 @@ def search_user_profile(username:str, platform_id) -> dict:
     platform = Platform.query.get(platform_id)
     if platform:
         platform_name_english = platform.name_english.lower().strip()
-        function_name = f"{platform_name_english}(username)"
-        profile_data = eval(function_name)
+        # Map platform names to functions
+        platform_functions = {
+            'tiktok': tiktok,
+            'snapchat': snapchat,
+            'instagram': instagram
+        }
+        
+        if platform_name_english in platform_functions:
+            profile_data = platform_functions[platform_name_english](username)
+        else:
+            raise ValueError(f"المنصة {platform.name} غير مدعومة حالياً")
     else:
-        raise ValueError("المنصة غبر موجودة في قاعدة البيانات")
+        raise ValueError("المنصة غير موجودة في قاعدة البيانات")
     
     duration = datetime.now() - t1
     profile_data["time_taken"] = f"{duration.total_seconds():.1f} ثانية"
@@ -56,7 +65,6 @@ def search_user_profile(username:str, platform_id) -> dict:
     profile_data["platform"] = platform.name
     profile_data["platform_name_english"] = platform.name_english
     
-    # ic(profile_data)
     return profile_data
 
 # ////////////////////////////////////////////////////////////////////////////////////////
@@ -553,4 +561,3 @@ def get_summerized_report()->dict:
     return report
 
 # ////////////////////////////////////////////////////////////////////////////////////////
-

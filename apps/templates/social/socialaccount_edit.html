@@ -51,14 +51,22 @@
                         </div>
                         {{ form.contents.label }}
                         <div class="checkbox-list">
-                            {% for choice in form.contents %}
+                            {{ form.contents(style="display: none;") }}
+                            {% for value, label in form.contents.choices %}
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="contents" value="{{ choice.data }}" {% if choice.data|int in socialaccount.contents|map(attribute='id')|list %}checked{% endif %} >
-                                    {{ choice.label }}
+                                    <input type="checkbox" name="contents" value="{{ value }}" {% if value|string in form.contents.data|map('string')|list %}checked{% endif %}>
+                                    {{ label }}
                                 </label>
                             </div>
                             {% endfor %}
+                            {% if form.contents.errors %}
+                            <div class="error-message">
+                                {% for error in form.contents.errors %}
+                                <span class="error text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                         {{ form.bio_text.label }}
                         <div class="form-group">
@@ -135,7 +143,3 @@
         });
     </script>
 {% endblock javascripts %}
-
-
-
-
