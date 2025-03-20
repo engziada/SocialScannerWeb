@@ -81,7 +81,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for influencer in influencers %}
+                            {% for influencer in influencers.items %}
                                 <tr>
                                     <td scope="row" style="border-left: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf;">
                                         <a href="{{ url_for('profiles_blueprint.influencer_edit', influencer_id=influencer.id) }}">
