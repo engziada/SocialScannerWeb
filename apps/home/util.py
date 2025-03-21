@@ -262,7 +262,7 @@ def snapchat_old(username: str) -> dict:
     return profile_data
 
 
-def snapchat(username: str) -> dict:
+def snapchat_old2(username: str) -> dict:
     """
     Retrieves Snapchat profile data for a given username.
 
@@ -370,6 +370,81 @@ def snapchat(username: str) -> dict:
         
     return profile_data
 
+
+def snapchat(username: str) -> dict:
+    """
+    Retrieves Snapchat profile data for a given username.
+
+    Args:
+        username (str): The Snapchat username to retrieve profile data for.
+
+    Returns:
+        dict: A dictionary containing the retrieved profile data including the profile name, followers, likes, posts, profile picture, bio text, external URL.
+    """
+    profile_data = {}
+    
+    url = "https://snapchat-scraper2.p.rapidapi.com/api/v1/users/detail"
+    querystring = {"username":username}
+    headers = {
+        "X-RapidAPI-Key": "da003d7174mshaee6e176c7049a0p1fbc23jsnbb794c1a7b60",
+        "X-RapidAPI-Host": "snapchat-scraper2.p.rapidapi.com",
+        # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+
+    profile_data["username"] = username
+    profile_data["platform"] = "سناب شات"
+
+    response = requests.get(url, headers=headers, params=querystring, timeout=30)
+    json_data = response.json()
+
+    # if json_data.get("status","") != "ok" or json_data.get("answer","") == "bad" or response.status_code != 200:
+    if response.status_code != 200:
+        ic("From Snapchat: ",response.status_code)
+        profile_data["error"] = "فشل في استرجاع البيانات من المنصة"
+        # ic("From Snapchat: ", json_data)
+        return profile_data
+
+    if "data" in json_data :
+        ic("From Snapchat: ", "data found")
+        ic(json_data["data"].keys())
+        if "props" in json_data["data"]:
+            ic("From Snapchat: ", "props found")
+            if "pageProps" in json_data["data"]["props"]:
+                ic("From Snapchat: ", "pageProps found")
+                if "userProfile" in json_data["data"]["props"]["pageProps"]:
+                    user_profile = json_data["data"]["props"]["pageProps"]["userProfile"]
+                    if user_profile and "$case" in user_profile and user_profile["$case"] == "publicProfileInfo" and "publicProfileInfo" in user_profile:
+                        user_data = user_profile["publicProfileInfo"]
+                    else:
+                        ic("From Snapchat: ", "User's profile not found!")
+    else:
+        ic("From Snapchat: ", "Unexpected structure") 
+        profile_data["error"] = "إسم المستخدم غير موجود على هذه المنصة"
+        return profile_data
+
+    # ic(
+    #     user_data.get("title", ""),
+    #     user_data.get("subscriberCount", "0"),
+    #     user_data.get("profilePictureUrl", ""),
+    #     user_data.get("bio", ""),
+    #     user_data.get("websiteUrl", ""),
+    #     user_data.get("snapchatCanonicalUrl", ""),
+    # )
+
+    # Retrieve profile details
+    profile_data: dict = {
+        "public_profile_name": user_data.get("title", ""),
+        "followers": int(user_data.get("subscriberCount", "0")),
+        "likes": 0,
+        "posts": 0,
+        "profile_picture": user_data.get("profilePictureUrl", ""),
+        "bio_text": user_data.get("bio", "")
+        + "\n"
+        + user_data.get("websiteUrl", ""),
+        "external_url": f"https://www.snapchat.com/add/{username}",
+    }
+    
+    return profile_data
 
 #////////////////////////////////////////////////////////////////////////////////////////
 
