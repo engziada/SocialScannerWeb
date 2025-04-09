@@ -5,6 +5,11 @@ from flask_migrate import Migrate
 from sys import exit
 
 from apps.config import config_dict
+
+# Configure icecream before importing any modules that use it
+from ic_config import configure_icecream
+configure_icecream()
+
 from apps import create_app, db
 
 from icecream import ic
@@ -85,4 +90,3 @@ sched.start()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=4000)
     # app.run(debug=True)
-

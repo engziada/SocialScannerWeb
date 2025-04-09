@@ -16,6 +16,10 @@ def hash_pass(password):
 def verify_pass(provided_password, stored_password):
     """Verify a stored password against one provided by user"""
 
+    # Check if stored_password is None
+    if stored_password is None:
+        return False
+        
     stored_password = stored_password.decode('ascii')
     salt = stored_password[:64]
     stored_password = stored_password[64:]
